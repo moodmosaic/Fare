@@ -30,6 +30,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 
 namespace NAutomaton
@@ -41,13 +42,13 @@ namespace NAutomaton
     [Serializable]
     public class State : IComparable<State>
     {
-        bool accept;
-        HashSet<Transition> transitions;
+        private bool accept;
+        private HashSet<Transition> transitions;
 
-        int number;
+        private int number;
 
-        int id;
-        static int next_id;
+        private readonly int id;
+        private static int nextId;
 
         /** 
          * Constructs a new state. Initially, the new state is a reject state. 
@@ -55,7 +56,13 @@ namespace NAutomaton
         public State()
         {
             ResetTransitions();
-            id = next_id++;
+            id = nextId++;
+        }
+
+        public int Number
+        {
+            get { return number; }
+            set { number = value; }
         }
 
         /** 
@@ -71,7 +78,7 @@ namespace NAutomaton
          * Subsequent changes are reflected in the automaton.
          * @return transition set
          */
-        public HashSet<Transition> getTransitions()
+        public HashSet<Transition> GetTransitions()
         {
             return transitions;
         }
@@ -80,7 +87,7 @@ namespace NAutomaton
          * Adds an outgoing transition.
          * @param t transition
          */
-        public void addTransition(Transition t)
+        public void AddTransition(Transition t)
         {
             transitions.Add(t);
         }
@@ -89,9 +96,9 @@ namespace NAutomaton
          * Sets acceptance for this state.
          * @param accept if true, this state is an accept state
          */
-        public void setAccept(bool accept)
+        public void SetAccept(bool isAccept)
         {
-            this.accept = accept;
+            this.accept = isAccept;
         }
 
         /**
@@ -112,8 +119,11 @@ namespace NAutomaton
         public State Step(char c)
         {
             foreach (Transition t in transitions)
-                if (t.min <= c && c <= t.max)
-                    return t.to;
+            {
+                if (t.Min <= c && c <= t.Max)
+                    return t.To;
+            }
+
             return null;
         }
 
@@ -123,11 +133,11 @@ namespace NAutomaton
          * @param dest collection where destination states are stored
          * @see #step(char)
          */
-        public void step(char c, Collection<State> dest)
+        public void Step(char c, Collection<State> dest)
         {
             foreach (Transition t in transitions)
-                if (t.min <= c && c <= t.max)
-                    dest.Add(t.to);
+                if (t.Min <= c && c <= t.Max)
+                    dest.Add(t.To);
         }
 
         private void AddEpsilon(State to)
@@ -142,8 +152,8 @@ namespace NAutomaton
         /** Returns transitions sorted by (min, reverse max, to) or (to, min, reverse max) */
         private Transition[] GetSortedTransitionArray(bool toFirst)
         {
-            Transition[] e = transitions.toArray(new Transition[transitions.size()]);
-            Arrays.sort(e, new TransitionComparator(toFirst));
+            Transition[] e = transitions.ToArray();
+            Array.Sort(e, new TransitionComparer(toFirst));
             return e;
         }
 
@@ -154,7 +164,7 @@ namespace NAutomaton
          */
         public List<Transition> GetSortedTransitions(bool toFirst)
         {
-            return Arrays.asList(getSortedTransitionArray(toFirst));
+            return GetSortedTransitionArray(toFirst).ToList();
         }
 
         /** 
@@ -164,14 +174,11 @@ namespace NAutomaton
         public override string ToString()
         {
             var b = new StringBuilder();
-            b.Append("state ").Append(number);
-            if (accept)
-                b.Append(" [accept]");
-            else
-                b.Append(" [reject]");
+            b.Append("state ").Append(Number);
+            b.Append(accept ? " [accept]" : " [reject]");
             b.Append(":\n");
             foreach (Transition t in transitions)
-                b.Append("  ").Append(t.toString()).Append("\n");
+                b.Append("  ").Append(t.ToString()).Append("\n");
             return b.ToString();
         }
 

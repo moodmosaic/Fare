@@ -43,46 +43,55 @@ namespace NAutomaton
         }
 
         /** 
-         * Compares by (min, reverse max, to) or (to, min, reverse max). 
+         * Compares by (Min, reverse Max, to) or (to, Min, reverse Max). 
          */
         public int Compare(Transition t1, Transition t2)
         {
             if (toFirst)
             {
-                if (t1.to != t2.to)
+                if (t1.To != t2.To)
                 {
-                    if (t1.to == null)
+                    if (t1.To == null)
                         return -1;
-                    else if (t2.to == null)
+                    if (t2.To == null)
                         return 1;
-                    else if (t1.to.number < t2.to.number)
+                    if (t1.To.Number < t2.To.Number)
                         return -1;
-                    else if (t1.to.number > t2.to.number)
+                    if (t1.To.Number > t2.To.Number)
                         return 1;
                 }
             }
-            if (t1.min < t2.min)
+
+            if (t1.Min < t2.Min)
                 return -1;
-            if (t1.min > t2.min)
+
+            if (t1.Min > t2.Min)
                 return 1;
-            if (t1.max > t2.max)
+
+            if (t1.Max > t2.Max)
                 return -1;
-            if (t1.max < t2.max)
+
+            if (t1.Max < t2.Max)
                 return 1;
+
             if (!toFirst)
             {
-                if (t1.to != t2.to)
+                if (t1.To != t2.To)
                 {
-                    if (t1.to == null)
+                    if (t1.To == null)
                         return -1;
-                    else if (t2.to == null)
+
+                    if (t2.To == null)
                         return 1;
-                    else if (t1.to.number < t2.to.number)
+
+                    if (t1.To.Number < t2.To.Number)
                         return -1;
-                    else if (t1.to.number > t2.to.number)
+
+                    if (t1.To.Number > t2.To.Number)
                         return 1;
                 }
             }
+
             return 0;
         }
     }

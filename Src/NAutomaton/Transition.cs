@@ -28,6 +28,8 @@
  */
 
 using System;
+using System.Diagnostics;
+using System.Text;
 
 namespace NAutomaton
 {
@@ -39,144 +41,158 @@ namespace NAutomaton
      * @author Anders M&oslash;ller &lt;<a href="mailto:amoeller@cs.au.dk">amoeller@cs.au.dk</a>&gt;
      */
     [Serializable]
-    public class Transition : ICloneable
+    public class Transition
     {
         /* 
-	 * CLASS INVARIANT: min<=max
-	 */
-	
-	char min;
-	char max;
-	
-	State to;
-	
-	/** 
-	 * Constructs a new singleton interval transition. 
-	 * @param c transition character
-	 * @param to destination state
-	 */
-	public Transition(char c, State to)	{
-		min = max = c;
-		this.to = to;
-	}
-	
-	/** 
-	 * Constructs a new transition. 
-	 * Both end points are included in the interval.
-	 * @param min transition interval minimum
-	 * @param max transition interval maximum
-	 * @param to destination state
-	 */
-	public Transition(char min, char max, State to)	{
-		if (max < min) {
-			char t = max;
-			max = min;
-			min = t;
-		}
-		this.min = min;
-		this.max = max;
-		this.to = to;
-	}
-	
-	/** Returns minimum of this transition interval. */
-	public char getMin() {
-		return min;
-	}
-	
-	/** Returns maximum of this transition interval. */
-	public char getMax() {
-		return max;
-	}
-	
-	/** Returns destination of this transition. */
-	public State getDest() {
-		return to;
-	}
-	
-	/** 
-	 * Checks for equality.
-	 * @param obj object to compare with
-	 * @return true if <tt>obj</tt> is a transition with same 
-	 *         character interval and destination state as this transition.
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Transition) {
-			Transition t = (Transition)obj;
-			return t.min == min && t.max == max && t.to == to;
-		} else
-			return false;
-	}
-	
-	/** 
-	 * Returns hash code.
-	 * The hash code is based on the character interval (not the destination state).
-	 * @return hash code
-	 */
-	@Override
-	public int hashCode() {
-		return min * 2 + max * 3;
-	}
-	
-	/** 
-	 * Clones this transition. 
-	 * @return clone with same character interval and destination state
-	 */
-	@Override
-	public Transition clone() {
-		try {
-			return (Transition)super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	static void appendCharString(char c, StringBuilder b) {
-		if (c >= 0x21 && c <= 0x7e && c != '\\' && c != '"')
-			b.append(c);
-		else {
-			b.append("\\u");
-			String s = Integer.toHexString(c);
-			if (c < 0x10)
-				b.append("000").append(s);
-			else if (c < 0x100)
-				b.append("00").append(s);
-			else if (c < 0x1000)
-				b.append("0").append(s);
-			else
-				b.append(s);
-		}
-	}
-	
-	/** 
-	 * Returns a string describing this state. Normally invoked via 
-	 * {@link Automaton#toString()}. 
-	 */
-	@Override
-	public String toString() {
-		StringBuilder b = new StringBuilder();
-		appendCharString(min, b);
-		if (min != max) {
-			b.append("-");
-			appendCharString(max, b);
-		}
-		b.append(" -> ").append(to.number);
-		return b.toString();
-	}
+         * * CLASS INVARIANT: min<=max
+         */
 
-	void appendDot(StringBuilder b) {
-		b.append(" -> ").append(to.number).append(" [label=\"");
-		appendCharString(min, b);
-		if (min != max) {
-			b.append("-");
-			appendCharString(max, b);
-		}
-		b.append("\"]\n");
-	}
+        private readonly char min;
+        private readonly char max;
+        private readonly State to;
 
-        public object Clone()
+        /** 
+         * Constructs a new singleton interval transition. 
+         * @param c transition character
+         * @param to destination state
+         */
+        public Transition(char c, State to)
         {
-            throw new NotImplementedException();
+            this.min = c;
+            this.max = c;
+            this.to = to;
+        }
+
+        public State To
+        {
+            get { return this.to; }
+        }
+
+        public char Min
+        {
+            get { return min; }
+        }
+
+        public char Max
+        {
+            get { return max; }
+        }
+
+        /** 
+         * Constructs a new transition. 
+         * Both end points are included in the interval.
+         * @param min transition interval minimum
+         * @param max transition interval maximum
+         * @param to destination state
+         */
+        public Transition(char min, char max, State to)
+        {
+            if (max < min)
+            {
+                char t = max;
+                max = min;
+                min = t;
+            }
+
+            this.min = min;
+            this.max = max;
+            this.to = to;
+        }
+
+        /** Returns minimum of this transition interval. */
+        public char GetMin()
+        {
+            return Min;
+        }
+
+        /** Returns maximum of this transition interval. */
+        public char GetMax()
+        {
+            return Max;
+        }
+
+        /** Returns destination of this transition. */
+        public State GetDest()
+        {
+            return to;
+        }
+
+        /** 
+         * Checks for equality.
+         * @param obj object to compare with
+         * @return true if <tt>obj</tt> is a transition with same 
+         *         character interval and destination state as this transition.
+         */
+        public override bool Equals(Object obj)
+        {
+            if (obj.GetType() == typeof(Transition))
+            {
+                var t = (Transition)obj;
+                return t.Min == Min && t.Max == Max && t.to == to;
+            }
+
+            return false;
+        }
+
+        /** 
+         * Returns hash code.
+         * The hash code is based on the character interval (not the destination state).
+         * @return hash code
+         */
+        public override int GetHashCode()
+        {
+            return Min * 2 + Max * 3;
+        }
+
+        private static void AppendCharString(char c, StringBuilder b)
+        {
+            if (c >= 0x21 && c <= 0x7e && c != '\\' && c != '"')
+                b.Append(c);
+            else
+            {
+                b.Append("\\u");
+
+                Debugger.Break(); // Java: string s = Integer.toHexString(c);
+                string s = string.Format("{0:X}", Convert.ToInt32(c));
+
+                if (c < 0x10)
+                    b.Append("000").Append(s);
+                else if (c < 0x100)
+                    b.Append("00").Append(s);
+                else if (c < 0x1000)
+                    b.Append("0").Append(s);
+                else
+                    b.Append(s);
+            }
+        }
+
+        /** 
+         * Returns a string describing this state. Normally invoked via 
+         * {@link Automaton#toString()}. 
+         */
+        public override string ToString()
+        {
+            var b = new StringBuilder();
+            AppendCharString(Min, b);
+            if (Min != Max)
+            {
+                b.Append("-");
+                AppendCharString(Max, b);
+            }
+            b.Append(" -> ").Append(to.Number);
+            return b.ToString();
+        }
+
+        private void AppendDot(StringBuilder b)
+        {
+            b.Append(" -> ").Append(to.Number).Append(" [label=\"");
+            AppendCharString(Min, b);
+            if (Min != Max)
+            {
+                b.Append("-");
+                AppendCharString(Max, b);
+            }
+            b.Append("\"]\n");
         }
     }
 }
