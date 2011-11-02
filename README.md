@@ -11,15 +11,12 @@ Development environment
 
 * Visual Studio 2010
   * Microsoft .NET Framework 3.5
-
-TODO: Add support for Mono/MonoDevelop.
+  
+* <i>TODO:</i> Support for Mono/MonoDevelop.
 
 Design changes
 --------------
 
-TODO:
 
 NAutomaton in use
 -----------------
-
-TODO:
