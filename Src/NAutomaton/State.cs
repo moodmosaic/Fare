@@ -118,13 +118,7 @@ namespace NAutomaton
          */
         public State Step(char c)
         {
-            foreach (Transition t in transitions)
-            {
-                if (t.Min <= c && c <= t.Max)
-                    return t.To;
-            }
-
-            return null;
+            return (from t in transitions where t.Min <= c && c <= t.Max select t.To).FirstOrDefault();
         }
 
         /** 
