@@ -35,25 +35,16 @@ namespace NAutomaton
     [Serializable]
     public class TransitionComparer : IComparer<Transition>
     {
-        internal static long serialVersionUID = 10001;
-
         private readonly bool toFirst;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TransitionComparer"/> class.
-        /// </summary>
-        /// <param name="toFirst">if set to <c>true</c> [to first].</param>
         public TransitionComparer(bool toFirst)
         {
             this.toFirst = toFirst;
         }
 
-        /// <summary>
-        /// Compares by (min, reverse max, to) or (to, min, reverse max). 
-        /// </summary>
-        /// <param name="t1">The t1.</param>
-        /// <param name="t2">The t2.</param>
-        /// <returns></returns>
+        /** 
+         * Compares by (min, reverse max, to) or (to, min, reverse max). 
+         */
         public int Compare(Transition t1, Transition t2)
         {
             if (toFirst)
