@@ -54,24 +54,24 @@ namespace NAutomaton
 
         public Transition(char c, State to)
         {
-            min = c;
-            max = c;
+            this.min = c;
+            this.max = c;
             this.to = to;
         }
 
         public State To
         {
-            get { return to; }
+            get { return this.to; }
         }
 
         public char Min
         {
-            get { return min; }
+            get { return this.min; }
         }
 
         public char Max
         {
-            get { return max; }
+            get { return this.max; }
         }
 
         public override bool Equals(object obj)
@@ -82,24 +82,24 @@ namespace NAutomaton
                 return false;
             }
 
-            return other.Min == Min
-                   && other.Max == Max
-                   && other.To == To;
+            return other.Min == this.Min
+                   && other.Max == this.Max
+                   && other.To == this.To;
         }
 
         public override int GetHashCode()
         {
-            return Min*2 + Max*3;
+            return this.Min * 2 + this.Max * 3;
         }
 
         public override string ToString()
         {
             var b = new StringBuilder();
-            AppendCharString(Min, b);
-            if (Min != Max)
+            Transition.AppendCharString(Min, b);
+            if (this.Min != this.Max)
             {
                 b.Append("-");
-                AppendCharString(Max, b);
+                Transition.AppendCharString(Max, b);
             }
             b.Append(" -> ").Append(to.Number);
             return b.ToString();

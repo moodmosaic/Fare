@@ -31,7 +31,7 @@ namespace NAutomaton
                 this.previous == null || lexicographicOrder.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
                 "Input must be sorted: " + this.previous + " >= " + current
                 );
-            Debug.Assert(SetPrevious(current));
+            Debug.Assert(this.SetPrevious(current));
 
             // Descend in the automaton (find matching prefix). 
             int pos = 0, max = current.Length;
@@ -47,7 +47,7 @@ namespace NAutomaton
                 this.ReplaceOrRegister(state);
             }
 
-            this.AddSuffix(state, current, pos);
+            StringUnionOperations.AddSuffix(state, current, pos);
         }
 
         public static NAutomaton.State Build(char[][] input)
@@ -78,6 +78,39 @@ namespace NAutomaton
             return this.root;
         }
 
+        private bool SetPrevious(char[] current)
+        {
+            if (this.previous == null)
+            {
+                this.previous = new StringBuilder();
+            }
+
+            this.previous.Length = 0;
+            this.previous.Append(current);
+
+            return true;
+        }
+
+        private void ReplaceOrRegister(State state)
+        {
+            State child = state.LastChild;
+
+            if (child.HasChildren)
+            {
+                this.ReplaceOrRegister(child);
+            }
+
+            State registered = register[child];
+            if (registered != null)
+            {
+                state.ReplaceLastChild(registered);
+            }
+            else
+            {
+                this.register.Add(child, child);
+            }
+        }
+
         private static NAutomaton.State Convert(State s, IDictionary<State, NAutomaton.State> visited)
         {
             NAutomaton.State converted = visited[s];
@@ -100,40 +133,7 @@ namespace NAutomaton
             return converted;
         }
 
-        private bool SetPrevious(char[] current)
-        {
-            if (previous == null)
-            {
-                previous = new StringBuilder();
-            }
-
-            previous.Length = 0;
-            previous.Append(current);
-
-            return true;
-        }
-
-        private void ReplaceOrRegister(State state)
-        {
-            State child = state.LastChild;
-
-            if (child.HasChildren)
-            {
-                this.ReplaceOrRegister(child);
-            }
-
-            State registered = register[child];
-            if (registered != null)
-            {
-                state.ReplaceLastChild(registered);
-            }
-            else
-            {
-                register.Add(child, child);
-            }
-        }
-
-        private void AddSuffix(State state, char[] current, int fromIndex)
+        private static void AddSuffix(State state, char[] current, int fromIndex)
         {
             for (int i = fromIndex; i < current.Length; i++)
             {

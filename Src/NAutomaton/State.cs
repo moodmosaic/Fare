@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-/*
+﻿/*
  * dk.brics.automaton
  * 
  * Copyright (c) 2001-2011 Anders Moeller
@@ -32,6 +27,12 @@ using System.Text;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+
 namespace NAutomaton
 {
     public class State : IComparable<State>
@@ -45,35 +46,41 @@ namespace NAutomaton
 
         public State()
         {
-            ResetTransitions();
-            id = nextId++;
+            this.ResetTransitions();
+            this.id = nextId++;
         }
 
         public int Number { get; set; }
 
         public bool IsAccept
         {
-            get { return isAccept; }
-            set { isAccept = value; }
+            get
+            {
+                return this.isAccept;
+            }
+            set
+            {
+                this.isAccept = value;
+            }
         }
 
         public HashSet<Transition> Transitions
         {
-            get { return transitions; }
+            get { return this.transitions; }
         }
 
         public int CompareTo(State s)
         {
-            return s.id - id;
+            return s.id - this.id;
         }
 
         public override string ToString()
         {
             var b = new StringBuilder();
-            b.Append("state ").Append(Number);
+            b.Append("state ").Append(this.Number);
             b.Append(isAccept ? " [accept]" : " [reject]");
             b.Append(":\n");
-            foreach (Transition t in transitions)
+            foreach (Transition t in this.transitions)
             {
                 b.Append("  ").Append(t.ToString()).Append("\n");
             }
@@ -82,19 +89,19 @@ namespace NAutomaton
 
         public void AddTransition(Transition t)
         {
-            transitions.Add(t);
+            this.transitions.Add(t);
         }
 
         public State Step(char c)
         {
-            return (from t in transitions
+            return (from t in this.transitions
                     where t.Min <= c && c <= t.Max
                     select t.To).FirstOrDefault();
         }
 
         public void Step(char c, Collection<State> dest)
         {
-            foreach (Transition t in transitions)
+            foreach (Transition t in this.transitions)
             {
                 if (t.Min <= c && c <= t.Max)
                 {
@@ -105,17 +112,17 @@ namespace NAutomaton
 
         public IEnumerable<Transition> GetSortedTransitions(bool toFirst)
         {
-            return GetSortedTransitionArray(toFirst);
+            return this.GetSortedTransitionArray(toFirst);
         }
 
         private void ResetTransitions()
         {
-            transitions = new HashSet<Transition>();
+            this.transitions = new HashSet<Transition>();
         }
 
         private IEnumerable<Transition> GetSortedTransitionArray(bool toFirst)
         {
-            Transition[] e = transitions.ToArray();
+            Transition[] e = this.transitions.ToArray();
             Array.Sort(e, new TransitionComparer(toFirst));
             return e;
         }
