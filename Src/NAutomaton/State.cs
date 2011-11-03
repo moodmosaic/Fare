@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
 /*
  * dk.brics.automaton
  * 
@@ -28,161 +32,92 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-
 namespace NAutomaton
 {
-    /** 
-     * <tt>Automaton</tt> state. 
-     * @author Anders M&oslash;ller &lt;<a href="mailto:amoeller@cs.au.dk">amoeller@cs.au.dk</a>&gt;
-     */
-    [Serializable]
     public class State : IComparable<State>
     {
-        private bool accept;
-        private HashSet<Transition> transitions;
-
-        private int number;
-
-        private readonly int id;
         private static int nextId;
 
-        /** 
-         * Constructs a new state. Initially, the new state is a reject state. 
-         */
+        private readonly int id;
+
+        private bool isAccept;
+        private HashSet<Transition> transitions;
+
         public State()
         {
             ResetTransitions();
             id = nextId++;
         }
 
-        public int Number
+        public int Number { get; set; }
+
+        public bool IsAccept
         {
-            get { return number; }
-            set { number = value; }
+            get { return isAccept; }
+            set { isAccept = value; }
         }
 
-        /** 
-         * Resets transition set. 
-         */
-        private void ResetTransitions()
+        public HashSet<Transition> Transitions
         {
-            transitions = new HashSet<Transition>();
+            get { return transitions; }
         }
 
-        /** 
-         * Returns the set of outgoing transitions. 
-         * Subsequent changes are reflected in the automaton.
-         * @return transition set
-         */
-        public HashSet<Transition> GetTransitions()
+        public int CompareTo(State s)
         {
-            return transitions;
+            return s.id - id;
         }
 
-        /**
-         * Adds an outgoing transition.
-         * @param t transition
-         */
+        public override string ToString()
+        {
+            var b = new StringBuilder();
+            b.Append("state ").Append(Number);
+            b.Append(isAccept ? " [accept]" : " [reject]");
+            b.Append(":\n");
+            foreach (Transition t in transitions)
+            {
+                b.Append("  ").Append(t.ToString()).Append("\n");
+            }
+            return b.ToString();
+        }
+
         public void AddTransition(Transition t)
         {
             transitions.Add(t);
         }
 
-        /** 
-         * Sets acceptance for this state.
-         * @param accept if true, this state is an accept state
-         */
-        public void SetAccept(bool isAccept)
-        {
-            this.accept = isAccept;
-        }
-
-        /**
-         * Returns acceptance status.
-         * @return true is this is an accept state
-         */
-        public bool IsAccept()
-        {
-            return accept;
-        }
-
-        /** 
-         * Performs lookup in transitions, assuming determinism. 
-         * @param c character to look up
-         * @return destination state, null if no matching outgoing transition
-         * @see #step(char, Collection)
-         */
         public State Step(char c)
         {
-            return (from t in transitions where t.Min <= c && c <= t.Max select t.To).FirstOrDefault();
+            return (from t in transitions
+                    where t.Min <= c && c <= t.Max
+                    select t.To).FirstOrDefault();
         }
 
-        /** 
-         * Performs lookup in transitions, allowing nondeterminism.
-         * @param c character to look up
-         * @param dest collection where destination states are stored
-         * @see #step(char)
-         */
         public void Step(char c, Collection<State> dest)
         {
             foreach (Transition t in transitions)
+            {
                 if (t.Min <= c && c <= t.Max)
+                {
                     dest.Add(t.To);
+                }
+            }
         }
 
-        private void AddEpsilon(State to)
+        public IEnumerable<Transition> GetSortedTransitions(bool toFirst)
         {
-            if (to.accept)
-                accept = true;
-
-            foreach (Transition t in to.transitions)
-                transitions.Add(t);
+            return GetSortedTransitionArray(toFirst);
         }
 
-        /** Returns transitions sorted by (min, reverse max, to) or (to, min, reverse max) */
-        private Transition[] GetSortedTransitionArray(bool toFirst)
+        private void ResetTransitions()
+        {
+            transitions = new HashSet<Transition>();
+        }
+
+        private IEnumerable<Transition> GetSortedTransitionArray(bool toFirst)
         {
             Transition[] e = transitions.ToArray();
             Array.Sort(e, new TransitionComparer(toFirst));
             return e;
-        }
-
-        /**
-         * Returns sorted list of outgoing transitions.
-         * @param to_first if true, order by (to, min, reverse max); otherwise (min, reverse max, to)
-         * @return transition list
-         */
-        public List<Transition> GetSortedTransitions(bool toFirst)
-        {
-            return GetSortedTransitionArray(toFirst).ToList();
-        }
-
-        /** 
-         * Returns string describing this state. Normally invoked via 
-         * {@link Automaton#toString()}. 
-         */
-        public override string ToString()
-        {
-            var b = new StringBuilder();
-            b.Append("state ").Append(Number);
-            b.Append(accept ? " [accept]" : " [reject]");
-            b.Append(":\n");
-            foreach (Transition t in transitions)
-                b.Append("  ").Append(t.ToString()).Append("\n");
-            return b.ToString();
-        }
-
-        /**
-         * Compares this object with the specified object for order.
-         * States are ordered by the time of construction.
-         */
-        public int CompareTo(State s)
-        {
-            return s.id - id;
         }
     }
 }

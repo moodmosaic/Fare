@@ -27,13 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 
 namespace NAutomaton
 {
-    [Serializable]
-    public class TransitionComparer : IComparer<Transition>
+    internal class TransitionComparer : IComparer<Transition>
     {
         private readonly bool toFirst;
 
@@ -42,53 +40,77 @@ namespace NAutomaton
             this.toFirst = toFirst;
         }
 
-        /** 
-         * Compares by (Min, reverse Max, to) or (to, Min, reverse Max). 
-         */
         public int Compare(Transition t1, Transition t2)
         {
-            if (toFirst)
+            if (this.toFirst)
             {
                 if (t1.To != t2.To)
                 {
                     if (t1.To == null)
+                    {
                         return -1;
+                    }
+
                     if (t2.To == null)
+                    {
                         return 1;
+                    }
+
                     if (t1.To.Number < t2.To.Number)
+                    {
                         return -1;
+                    }
+
                     if (t1.To.Number > t2.To.Number)
+                    {
                         return 1;
+                    }
                 }
             }
 
             if (t1.Min < t2.Min)
+            {
                 return -1;
+            }
 
             if (t1.Min > t2.Min)
+            {
                 return 1;
+            }
 
             if (t1.Max > t2.Max)
+            {
                 return -1;
+            }
 
             if (t1.Max < t2.Max)
+            {
                 return 1;
+            }
 
-            if (!toFirst)
+            if (!this.toFirst)
             {
                 if (t1.To != t2.To)
                 {
                     if (t1.To == null)
+                    {
                         return -1;
+                    }
 
                     if (t2.To == null)
+                    {
                         return 1;
+                    }
 
                     if (t1.To.Number < t2.To.Number)
+                    {
                         return -1;
+                    }
 
                     if (t1.To.Number > t2.To.Number)
+                    {
                         return 1;
+                    }
                 }
             }
 

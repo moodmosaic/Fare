@@ -28,63 +28,16 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace NAutomaton
 {
-    /** 
-     * <tt>Automaton</tt> transition. 
-     * <p>
-     * A transition, which belongs to a source state, consists of a Unicode character interval
-     * and a destination state.
-     * @author Anders M&oslash;ller &lt;<a href="mailto:amoeller@cs.au.dk">amoeller@cs.au.dk</a>&gt;
-     */
-    [Serializable]
     public class Transition
     {
-        /* 
-         * * CLASS INVARIANT: min<=max
-         */
-
         private readonly char min;
         private readonly char max;
         private readonly State to;
 
-        /** 
-         * Constructs a new singleton interval transition. 
-         * @param c transition character
-         * @param to destination state
-         */
-        public Transition(char c, State to)
-        {
-            this.min = c;
-            this.max = c;
-            this.to = to;
-        }
-
-        public State To
-        {
-            get { return this.to; }
-        }
-
-        public char Min
-        {
-            get { return min; }
-        }
-
-        public char Max
-        {
-            get { return max; }
-        }
-
-        /** 
-         * Constructs a new transition. 
-         * Both end points are included in the interval.
-         * @param min transition interval minimum
-         * @param max transition interval maximum
-         * @param to destination state
-         */
         public Transition(char min, char max, State to)
         {
             if (max < min)
@@ -99,77 +52,46 @@ namespace NAutomaton
             this.to = to;
         }
 
-        /** Returns minimum of this transition interval. */
-        public char GetMin()
+        public Transition(char c, State to)
         {
-            return Min;
+            min = c;
+            max = c;
+            this.to = to;
         }
 
-        /** Returns maximum of this transition interval. */
-        public char GetMax()
+        public State To
         {
-            return Max;
+            get { return to; }
         }
 
-        /** Returns destination of this transition. */
-        public State GetDest()
+        public char Min
         {
-            return to;
+            get { return min; }
         }
 
-        /** 
-         * Checks for equality.
-         * @param obj object to compare with
-         * @return true if <tt>obj</tt> is a transition with same 
-         *         character interval and destination state as this transition.
-         */
-        public override bool Equals(Object obj)
+        public char Max
         {
-            if (obj.GetType() == typeof(Transition))
+            get { return max; }
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Transition;
+            if (other == null)
             {
-                var t = (Transition)obj;
-                return t.Min == Min && t.Max == Max && t.to == to;
+                return false;
             }
 
-            return false;
+            return other.Min == Min
+                   && other.Max == Max
+                   && other.To == To;
         }
 
-        /** 
-         * Returns hash code.
-         * The hash code is based on the character interval (not the destination state).
-         * @return hash code
-         */
         public override int GetHashCode()
         {
-            return Min * 2 + Max * 3;
+            return Min*2 + Max*3;
         }
 
-        private static void AppendCharString(char c, StringBuilder b)
-        {
-            if (c >= 0x21 && c <= 0x7e && c != '\\' && c != '"')
-                b.Append(c);
-            else
-            {
-                b.Append("\\u");
-
-                Debugger.Break(); // Java: string s = Integer.toHexString(c);
-                string s = string.Format("{0:X}", Convert.ToInt32(c));
-
-                if (c < 0x10)
-                    b.Append("000").Append(s);
-                else if (c < 0x100)
-                    b.Append("00").Append(s);
-                else if (c < 0x1000)
-                    b.Append("0").Append(s);
-                else
-                    b.Append(s);
-            }
-        }
-
-        /** 
-         * Returns a string describing this state. Normally invoked via 
-         * {@link Automaton#toString()}. 
-         */
         public override string ToString()
         {
             var b = new StringBuilder();
@@ -183,16 +105,35 @@ namespace NAutomaton
             return b.ToString();
         }
 
-        private void AppendDot(StringBuilder b)
+        private static void AppendCharString(char c, StringBuilder b)
         {
-            b.Append(" -> ").Append(to.Number).Append(" [label=\"");
-            AppendCharString(Min, b);
-            if (Min != Max)
+            if (c >= 0x21 && c <= 0x7e && c != '\\' && c != '"')
             {
-                b.Append("-");
-                AppendCharString(Max, b);
+                b.Append(c);
             }
-            b.Append("\"]\n");
+            else
+            {
+                b.Append("\\u");
+
+                string s = string.Format("{0:X}", Convert.ToInt32(c));
+
+                if (c < 0x10)
+                {
+                    b.Append("000").Append(s);
+                }
+                else if (c < 0x100)
+                {
+                    b.Append("00").Append(s);
+                }
+                else if (c < 0x1000)
+                {
+                    b.Append("0").Append(s);
+                }
+                else
+                {
+                    b.Append(s);
+                }
+            }
         }
     }
 }

@@ -1,161 +1,153 @@
-﻿using System;
+﻿/**
+* Operations for building minimal deterministic automata from sets of strings. 
+* The algorithm requires sorted input data, but is very fast (nearly linear with the input size).
+* 
+* @author Dawid Weiss
+*/
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace NAutomaton
 {
-    /**
-    * Operations for building minimal deterministic automata from sets of strings. 
-    * The algorithm requires sorted input data, but is very fast (nearly linear with the input size).
-    * 
-    * @author Dawid Weiss
-    */
     public sealed class StringUnionOperations
     {
-    //    /**
-    // * "register" for state interning.
-    // */
-    //    private HashMap<State, State> register = new HashMap<State, State>();
+        private static readonly LexicographicOrder lexicographicOrder = new LexicographicOrder();
 
-    //    /**
-    //     * Root automaton state.
-    //     */
-    //    private State root = new State();
+        private readonly State root = new State();
 
-    //    /**
-    //     * Previous sequence added to the automaton in {@link #add(CharSequence)}.
-    //     */
-    //    private StringBuilder previous;
+        private StringBuilder previous;
+        private IDictionary<State, State> register = new Dictionary<State, State>();
 
-    //    /**
-    //     * Add another character sequence to this automaton. The sequence must be
-    //     * lexicographically larger or equal compared to any previous sequences
-    //     * added to this automaton (the input must be sorted).
-    //     */
-    //    public void add(CharSequence current) {
-    //    assert register != null : "Automaton already built.";
-    //    assert current.length() > 0 : "Input sequences must not be empty.";
-    //    assert previous == null || LEXICOGRAPHIC_ORDER.compare(previous, current) <= 0 : 
-    //        "Input must be sorted: " + previous + " >= " + current;
-    //    assert setPrevious(current);
-
-    //    // Descend in the automaton (find matching prefix). 
-    //    int pos = 0, max = current.length();
-    //    State next, state = root;
-    //    while (pos < max && (next = state.lastChild(current.charAt(pos))) != null) {
-    //        state = next;
-    //        pos++;
-    //    }
-
-    //    if (state.hasChildren())
-    //        replaceOrRegister(state);
-
-    //    addSuffix(state, current, pos);
-    //}
-
-    //    /**
-    //     * Finalize the automaton and return the root state. No more strings can be
-    //     * added to the builder after this call.
-    //     * 
-    //     * @return Root automaton state.
-    //     */
-    //    public State complete()
-    //    {
-    //        if (this.register == null)
-    //            throw new IllegalStateException();
-
-    //        if (root.hasChildren())
-    //            replaceOrRegister(root);
-
-    //        register = null;
-    //        return root;
-    //    }
-
-    //    /**
-    //     * Internal recursive traversal for conversion.
-    //     */
-    //    private static dk.brics.automaton.State convert(State s,
-    //            IdentityHashMap<State, dk.brics.automaton.State> visited) {
-    //    dk.brics.automaton.State converted = visited.get(s);
-    //    if (converted != null)
-    //        return converted;
-
-    //    converted = new dk.brics.automaton.State();
-    //    converted.setAccept(s.is_final);
-
-    //    visited.put(s, converted);
-    //    int i = 0;
-    //    char [] labels = s.labels;
-    //    for (StringUnionOperations.State target : s.states) {
-    //        converted.addTransition(new Transition(labels[i++], convert(target, visited)));
-    //    }
-
-    //    return converted;
-    //}
-
-    //    /**
-    //     * Build a minimal, deterministic automaton from a sorted list of strings.
-    //     */
-    //    public static dk.brics.automaton.State build(CharSequence[] input) {
-    //    final StringUnionOperations builder = new StringUnionOperations(); 
-
-    //    for (CharSequence chs : input)
-    //        builder.add(chs);
-
-    //    return convert(builder.complete(), new IdentityHashMap<State, dk.brics.automaton.State>());
-    //}
-
-    //    /**
-    //     * Copy <code>current</code> into an internal buffer.
-    //     */
-    //    private boolean setPrevious(CharSequence current)
-    //    {
-    //        if (previous == null)
-    //            previous = new StringBuilder();
-
-    //        previous.setLength(0);
-    //        previous.append(current);
-
-    //        return true;
-    //    }
-
-    //    /**
-    //     * Replace last child of <code>state</code> with an already registered
-    //     * state or register the last child state.
-    //     */
-    //    private void replaceOrRegister(State state) {
-    //    final State child = state.lastChild();
-
-    //    if (child.hasChildren())
-    //        replaceOrRegister(child);
-
-    //    final State registered = register.get(child);
-    //    if (registered != null) {
-    //        state.replaceLastChild(registered);
-    //    } else {
-    //        register.put(child, child);
-    //    }
-    //}
-
-    //    /**
-    //     * Add a suffix of <code>current</code> starting at <code>fromIndex</code>
-    //     * (inclusive) to state <code>state</code>.
-    //     */
-    //    private void addSuffix(State state, CharSequence current, int fromIndex) {
-    //    final int len = current.length();
-    //    for (int i = fromIndex; i < len; i++) {
-    //        state = state.newState(current.charAt(i));
-    //    }
-    //    state.is_final = true;
-    //}
-
-        /**
-        * Lexicographic order of input sequences.
-        */
-        private sealed class LexicographicOrder : Comparer<char[]>
+        public void Add(char[] current)
         {
-            public override int Compare(char[] s1, char[] s2)
+            Debug.Assert(this.register != null, "Automaton already built.");
+            Debug.Assert(current.Length > 0, "Input sequences must not be empty.");
+            Debug.Assert(
+                this.previous == null || lexicographicOrder.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
+                "Input must be sorted: " + this.previous + " >= " + current
+                );
+            Debug.Assert(SetPrevious(current));
+
+            // Descend in the automaton (find matching prefix). 
+            int pos = 0, max = current.Length;
+            State next, state = root;
+            while (pos < max && (next = state.GetLastChild(current[pos])) != null)
+            {
+                state = next;
+                pos++;
+            }
+
+            if (state.HasChildren)
+            {
+                this.ReplaceOrRegister(state);
+            }
+
+            this.AddSuffix(state, current, pos);
+        }
+
+        public static NAutomaton.State Build(char[][] input)
+        {
+            var builder = new StringUnionOperations();
+
+            foreach (var chs in input)
+            {
+                builder.Add(chs);
+            }
+
+            return StringUnionOperations.Convert(builder.Complete(), new Dictionary<State, NAutomaton.State>());
+        }
+
+        private State Complete()
+        {
+            if (register == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (this.root.HasChildren)
+            {
+                this.ReplaceOrRegister(this.root);
+            }
+
+            this.register = null;
+            return this.root;
+        }
+
+        private static NAutomaton.State Convert(State s, IDictionary<State, NAutomaton.State> visited)
+        {
+            NAutomaton.State converted = visited[s];
+            if (converted != null)
+            {
+                return converted;
+            }
+
+            converted = new NAutomaton.State();
+            converted.IsAccept = s.IsFinal;
+
+            visited.Add(s, converted);
+            int i = 0;
+            char[] labels = s.TransitionLabels;
+            foreach (State target in s.States)
+            {
+                converted.AddTransition(new Transition(labels[i++], Convert(target, visited)));
+            }
+
+            return converted;
+        }
+
+        private bool SetPrevious(char[] current)
+        {
+            if (previous == null)
+            {
+                previous = new StringBuilder();
+            }
+
+            previous.Length = 0;
+            previous.Append(current);
+
+            return true;
+        }
+
+        private void ReplaceOrRegister(State state)
+        {
+            State child = state.LastChild;
+
+            if (child.HasChildren)
+            {
+                this.ReplaceOrRegister(child);
+            }
+
+            State registered = register[child];
+            if (registered != null)
+            {
+                state.ReplaceLastChild(registered);
+            }
+            else
+            {
+                register.Add(child, child);
+            }
+        }
+
+        private void AddSuffix(State state, char[] current, int fromIndex)
+        {
+            for (int i = fromIndex; i < current.Length; i++)
+            {
+                state = state.NewState(current[i]);
+            }
+
+            state.IsFinal = true;
+        }
+
+        #region Nested type: LexicographicOrder
+
+        private sealed class LexicographicOrder : IComparer<char[]>
+        {
+            public int Compare(char[] s1, char[] s2)
             {
                 int lens1 = s1.Length;
                 int lens2 = s2.Length;
@@ -173,188 +165,115 @@ namespace NAutomaton
             }
         }
 
-        /**
-        * State with <code>char</code> labels on transitions.
-        */
+        #endregion
+
+        #region Nested type: State
+
         private sealed class State
         {
-            /** An empty set of labels. */
             private static readonly char[] noLabels = new char[0];
-
-            /** An empty set of states. */
             private static readonly State[] noStates = new State[0];
+            private bool isFinal;
 
-            /**
-             * Labels of outgoing transitions. Indexed identically to {@link #states}.
-             * Labels must be sorted lexicographically.
-             */
             private char[] labels = noLabels;
-
-            /**
-             * States reachable from outgoing transitions. Indexed identically to
-             * {@link #labels}.
-             */
             private State[] states = noStates;
 
-            /**
-             * <code>true</code> if this state corresponds to the end of at least one
-             * input sequence.
-             */
-            private readonly bool isFinal;
-
-            /**
-             * Returns the target state of a transition leaving this state and labeled
-             * with <code>label</code>. If no such transition exists, returns
-             * <code>null</code>.
-             */
-            public State GetState(char label)
+            public char[] TransitionLabels
             {
-                int index = Array.BinarySearch(labels, label);
-                return index >= 0 ? states[index] : null;
+                get { return this.labels; }
             }
 
-            /**
-             * Returns an array of outgoing transition labels. The array is sorted in 
-             * lexicographic order and indexes correspond to states returned from 
-             * {@link #getStates()}.
-             */
-            public char[] GetTransitionLabels()
+            public IEnumerable<State> States
             {
-                return this.labels;
+                get { return this.states; }
             }
 
-            /**
-             * Returns an array of outgoing transitions from this state. The returned
-             * array must not be changed.
-             */
-            public State[] GetStates()
+            public bool HasChildren
             {
-                return this.states;
+                get { return this.labels.Length > 0; }
             }
 
-            /**
-             * Two states are equal if:
-             * <ul>
-             * <li>they have an identical number of outgoing transitions, labeled with
-             * the same labels</li>
-             * <li>corresponding outgoing transitions lead to the same states (to states
-             * with an identical right-language).
-             * </ul>
-             */
-            public override bool Equals(Object obj)
+            public bool IsFinal
             {
-                var other = (State)obj;
-                return isFinal == other.isFinal
-                    && Object.Equals(this.labels, other.labels)
-                    && State.ReferenceEquals(this.states, other.states);
+                get { return this.isFinal; }
+                set { this.isFinal = value; }
             }
 
-            /**
-             * Return <code>true</code> if this state has any children (outgoing
-             * transitions).
-             */
-            public bool HasChildren()
+            public State LastChild
             {
-                return labels.Length > 0;
+                get
+                {
+                    Debug.Assert(this.HasChildren, "No outgoing transitions.");
+                    return this.states[this.states.Length - 1];
+                }
             }
 
-            /**
-             * Is this state a final state in the automaton?
-             */
-            public bool IsFinal()
+            public override bool Equals(object obj)
             {
-                return isFinal;
+                var other = obj as State;
+                if (other == null)
+                {
+                    return false;
+                }
+
+                return this.isFinal == other.isFinal
+                       && State.ReferenceEquals(states, other.states)
+                       && object.Equals(labels, other.labels);
             }
 
-            /**
-             * Compute the hash code of the <i>current</i> status of this state.
-             */
             public override int GetHashCode()
             {
-                int hash = isFinal ? 1 : 0;
-
+                int hash = this.isFinal ? 1 : 0;
                 hash ^= hash * 31 + this.labels.Length;
 
                 hash = this.labels.Aggregate(hash, (current, c) => current ^ current * 31 + c);
 
-                /*
-                 * Compare the right-language of this state using reference-identity of
-                 * outgoing states. This is possible because states are interned (stored
-                 * in registry) and traversed in post-order, so any outgoing transitions
-                 * are already interned.
-                 */
+                //Compare the right-language of this state using reference-identity of
+                //outgoing states. This is possible because states are interned (stored
+                //in registry) and traversed in post-order, so any outgoing transitions
+                //are already interned.
                 return this.states.Aggregate(hash, (current, s) => current ^ RuntimeHelpers.GetHashCode(s));
             }
 
-            /**
-             * Create a new outgoing transition labeled <code>label</code> and return
-             * the newly created target state for this transition.
-             */
-            private State NewState(char label)
+            public State NewState(char label)
             {
-                if (Array.BinarySearch(labels, label) < 0)
-                {
-                    throw new InvalidOperationException("State already has transition labeled: " + label);
-                }
+                Debug.Assert(
+                    Array.BinarySearch(this.labels, label) < 0,
+                    "State already has transition labeled: " + label
+                    );
 
-                labels = CopyOf(labels, labels.Length + 1);
-                states = CopyOf(states, states.Length + 1);
+                this.labels = CopyOf(this.labels, this.labels.Length + 1);
+                this.states = CopyOf(this.states, this.states.Length + 1);
 
-                labels[labels.Length - 1] = label;
-                return states[states.Length - 1] = new State();
+                this.labels[this.labels.Length - 1] = label;
+                return states[this.states.Length - 1] = new State();
             }
 
-            /**
-             * Return the most recent transitions's target state.
-             */
-            private State LastChild()
+            public State GetLastChild(char label)
             {
-                if (!HasChildren())
-                {
-                    throw new InvalidOperationException("No outgoing transitions.");
-                }
-
-                return states[states.Length - 1];
-            }
-
-            /**
-             * Return the associated state if the most recent transition
-             * is labeled with <code>label</code>.
-             */
-            private State LastChild(char label)
-            {
-                int index = labels.Length - 1;
+                int index = this.labels.Length - 1;
                 State s = null;
-                if (index >= 0 && labels[index] == label)
+                if (index >= 0 && this.labels[index] == label)
                 {
-                    s = states[index];
+                    s = this.states[index];
                 }
 
-                if (s != GetState(label))
-                {
-                    throw new InvalidOperationException("s");
-                }
-
+                Debug.Assert(s == this.GetState(label));
                 return s;
             }
 
-            /**
-             * Replace the last added outgoing transition's target state with the given
-             * state.
-             */
-            private void ReplaceLastChild(State state)
+            public void ReplaceLastChild(State state)
             {
-                if (HasChildren() == false)
-                {
-                    throw new InvalidOperationException("No outgoing transitions.");
-                }
-
-                states[states.Length - 1] = state;
+                Debug.Assert(this.HasChildren, "No outgoing transitions.");
+                this.states[this.states.Length - 1] = state;
             }
 
-            /**
-             * JDK1.5-replacement of {@link Arrays#copyOf(char[], int)}
-             */
+            private State GetState(char label)
+            {
+                int index = Array.BinarySearch(this.labels, label);
+                return index >= 0 ? states[index] : null;
+            }
+
             private static char[] CopyOf(char[] original, int newLength)
             {
                 var copy = new char[newLength];
@@ -362,9 +281,6 @@ namespace NAutomaton
                 return copy;
             }
 
-            /**
-             * JDK1.5-replacement of {@link Arrays#copyOf(char[], int)}
-             */
             private static State[] CopyOf(State[] original, int newLength)
             {
                 var copy = new State[newLength];
@@ -372,16 +288,17 @@ namespace NAutomaton
                 return copy;
             }
 
-            /**
-             * Compare two lists of objects for reference-equality.
-             */
             private static bool ReferenceEquals(Object[] a1, Object[] a2)
             {
                 if (a1.Length != a2.Length)
+                {
                     return false;
+                }
 
                 return !a1.Where((t, i) => t != a2[i]).Any();
             }
         }
+
+        #endregion
     }
 }
