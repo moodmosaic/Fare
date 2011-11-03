@@ -29,50 +29,8 @@
 
 namespace NAutomaton
 {
-    public class StatePair
+    public interface IAutomatonProvider
     {
-        private readonly State s1;
-        private readonly State s2;
-
-        public StatePair(State s1, State s2)
-        {
-            this.s1 = s1;
-            this.s2 = s2;
-        }
-
-        public State FirstState
-        {
-            get
-            {
-                return this.s1;
-            }
-        }
-
-        public State SecondState
-        {
-            get
-            {
-
-                return this.s2;
-            }
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = obj as StatePair;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return other.FirstState  == this.FirstState 
-                && other.SecondState == this.SecondState;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.FirstState.GetHashCode() 
-                + this.SecondState.GetHashCode();
-        }
+        Automaton GetAutomaton(string name);
     }
 }

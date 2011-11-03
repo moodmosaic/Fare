@@ -83,8 +83,8 @@ namespace NAutomaton
             }
 
             return other.Min == this.Min
-                   && other.Max == this.Max
-                   && other.To == this.To;
+                && other.Max == this.Max
+                && other.To  == this.To;
         }
 
         public override int GetHashCode()
@@ -95,11 +95,11 @@ namespace NAutomaton
         public override string ToString()
         {
             var b = new StringBuilder();
-            Transition.AppendCharString(Min, b);
+            Transition.AppendCharString(this.Min, b);
             if (this.Min != this.Max)
             {
                 b.Append("-");
-                Transition.AppendCharString(Max, b);
+                Transition.AppendCharString(this.Max, b);
             }
             b.Append(" -> ").Append(to.Number);
             return b.ToString();

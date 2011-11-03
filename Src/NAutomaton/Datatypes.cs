@@ -27,52 +27,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+
 namespace NAutomaton
 {
-    public class StatePair
+    public sealed class Datatypes
     {
-        private readonly State s1;
-        private readonly State s2;
-
-        public StatePair(State s1, State s2)
+        public static bool IsUnicodeBlockName(string name)
         {
-            this.s1 = s1;
-            this.s2 = s2;
+            throw new NotImplementedException();
         }
 
-        public State FirstState
+        public static bool IsUnicodeCategoryName(string name)
         {
-            get
-            {
-                return this.s1;
-            }
+            throw new NotImplementedException();
         }
 
-        public State SecondState
+        public static bool IsXmlName(string name)
         {
-            get
-            {
-
-                return this.s2;
-            }
+            throw new NotImplementedException();
         }
 
-        public override bool Equals(object obj)
+        public static Automaton Get(string name)
         {
-            var other = obj as StatePair;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return other.FirstState  == this.FirstState 
-                && other.SecondState == this.SecondState;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.FirstState.GetHashCode() 
-                + this.SecondState.GetHashCode();
+            throw new NotImplementedException();
         }
     }
 }

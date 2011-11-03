@@ -29,50 +29,34 @@
 
 namespace NAutomaton
 {
-    public class StatePair
+    public class DatatypesAutomatonProvider : IAutomatonProvider
     {
-        private readonly State s1;
-        private readonly State s2;
+        private readonly bool enableUnicodeBlocks;
+        private readonly bool enableUnicodeCategories;
+        private readonly bool enableXml;
 
-        public StatePair(State s1, State s2)
+        public DatatypesAutomatonProvider()
+            : this(true, true, true)
         {
-            this.s1 = s1;
-            this.s2 = s2;
         }
 
-        public State FirstState
+        public DatatypesAutomatonProvider(bool enableUnicodeBlocks, bool enableUnicodeCategories, bool enableXml)
         {
-            get
-            {
-                return this.s1;
-            }
+            this.enableUnicodeBlocks     = enableUnicodeBlocks;
+            this.enableUnicodeCategories = enableUnicodeCategories;
+            this.enableXml               = enableXml;
         }
 
-        public State SecondState
+        public virtual Automaton GetAutomaton(string name)
         {
-            get
+            if (this.enableUnicodeBlocks     && Datatypes.IsUnicodeBlockName(name)    ||
+                this.enableUnicodeCategories && Datatypes.IsUnicodeCategoryName(name) ||
+                this.enableXml               && Datatypes.IsXmlName(name))
             {
-
-                return this.s2;
-            }
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = obj as StatePair;
-            if (other == null)
-            {
-                return false;
+                return Datatypes.Get(name);
             }
 
-            return other.FirstState  == this.FirstState 
-                && other.SecondState == this.SecondState;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.FirstState.GetHashCode() 
-                + this.SecondState.GetHashCode();
+            return null;
         }
     }
 }

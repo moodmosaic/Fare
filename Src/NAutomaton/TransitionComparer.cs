@@ -31,7 +31,7 @@ using System.Collections.Generic;
 
 namespace NAutomaton
 {
-    internal class TransitionComparer : IComparer<Transition>
+    internal sealed class TransitionComparer : IComparer<Transition>
     {
         private readonly bool toFirst;
 

@@ -16,7 +16,7 @@ namespace NAutomaton
 {
     public sealed class StringUnionOperations
     {
-        private static readonly LexicographicOrder lexicographicOrder = new LexicographicOrder();
+        private static readonly IComparer<char[]> lexicographicOrder = new LexicographicOrder();
 
         private readonly State root = new State();
 
@@ -34,8 +34,10 @@ namespace NAutomaton
             Debug.Assert(this.SetPrevious(current));
 
             // Descend in the automaton (find matching prefix). 
-            int pos = 0, max = current.Length;
-            State next, state = root;
+            int pos = 0;
+            int max = current.Length;
+            State next;
+            State state = root;
             while (pos < max && (next = state.GetLastChild(current[pos])) != null)
             {
                 state = next;
@@ -64,9 +66,9 @@ namespace NAutomaton
 
         private State Complete()
         {
-            if (register == null)
+            if (this.register == null)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("register is null");
             }
 
             if (this.root.HasChildren)
@@ -100,7 +102,7 @@ namespace NAutomaton
                 this.ReplaceOrRegister(child);
             }
 
-            State registered = register[child];
+            State registered = this.register[child];
             if (registered != null)
             {
                 state.ReplaceLastChild(registered);
@@ -127,7 +129,7 @@ namespace NAutomaton
             char[] labels = s.TransitionLabels;
             foreach (State target in s.States)
             {
-                converted.AddTransition(new Transition(labels[i++], Convert(target, visited)));
+                converted.AddTransition(new Transition(labels[i++], StringUnionOperations.Convert(target, visited)));
             }
 
             return converted;
@@ -142,8 +144,6 @@ namespace NAutomaton
 
             state.IsFinal = true;
         }
-
-        #region Nested type: LexicographicOrder
 
         private sealed class LexicographicOrder : IComparer<char[]>
         {
@@ -165,18 +165,15 @@ namespace NAutomaton
             }
         }
 
-        #endregion
-
-        #region Nested type: State
-
         private sealed class State
         {
-            private static readonly char[] noLabels = new char[0];
+            private static readonly  char[] noLabels = new char[0];
             private static readonly State[] noStates = new State[0];
-            private bool isFinal;
-
-            private char[] labels = noLabels;
+            
+            private  char[] labels = noLabels;
             private State[] states = noStates;
+
+            private bool isFinal;
 
             public char[] TransitionLabels
             {
@@ -217,16 +214,15 @@ namespace NAutomaton
                 }
 
                 return this.isFinal == other.isFinal
-                       && State.ReferenceEquals(states, other.states)
-                       && object.Equals(labels, other.labels);
+                    && State.ReferenceEquals(states, other.states)
+                    && object.Equals(labels, other.labels);
             }
 
             public override int GetHashCode()
             {
                 int hash = this.isFinal ? 1 : 0;
                 hash ^= hash * 31 + this.labels.Length;
-
-                hash = this.labels.Aggregate(hash, (current, c) => current ^ current * 31 + c);
+                hash  = this.labels.Aggregate(hash, (current, c) => current ^ current * 31 + c);
 
                 //Compare the right-language of this state using reference-identity of
                 //outgoing states. This is possible because states are interned (stored
@@ -298,7 +294,5 @@ namespace NAutomaton
                 return !a1.Where((t, i) => t != a2[i]).Any();
             }
         }
-
-        #endregion
     }
 }
