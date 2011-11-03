@@ -31,5 +31,46 @@ namespace NAutomaton
 {
     public class StatePair
     {
+        private readonly State s1;
+        private readonly State s2;
+
+        public StatePair(State s1, State s2)
+        {
+            this.s1 = s1;
+            this.s2 = s2;
+        }
+
+        public State FirstState
+        {
+            get
+            {
+                return this.s1;
+            }
+        }
+
+        public State SecondState
+        {
+            get
+            {
+
+                return this.s2;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as StatePair;
+            if (other == null)
+            {
+                return false;
+            }
+
+            return other.s1 == s1 && other.s2 == s2;
+        }
+
+        public override int GetHashCode()
+        {
+            return s1.GetHashCode() + s2.GetHashCode();
+        }
     }
 }
