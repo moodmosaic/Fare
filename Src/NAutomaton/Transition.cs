@@ -113,7 +113,7 @@ namespace NAutomaton
             return b.ToString();
         }
 
-        private static void AppendCharString(char c, StringBuilder b)
+        internal static void AppendCharString(char c, StringBuilder b)
         {
             if (c >= 0x21 && c <= 0x7e && c != '\\' && c != '"')
             {
@@ -142,6 +142,18 @@ namespace NAutomaton
                     b.Append(s);
                 }
             }
+        }
+
+        internal void AppendDot(StringBuilder b)
+        {
+            b.Append(" -> ").Append(to.Number).Append(" [label=\"");
+            Transition.AppendCharString(min, b);
+            if (min != max)
+            {
+                b.Append("-");
+                Transition.AppendCharString(max, b);
+            }
+            b.Append("\"]\n");
         }
     }
 }

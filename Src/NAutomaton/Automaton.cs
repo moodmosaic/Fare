@@ -29,171 +29,117 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace NAutomaton
 {
     public class Automaton
     {
-        public const int MINIMIZE_HUFFMAN = 0;
+        public const int MinimizeHuffman = 0;
+        public const int MinimizeBrzozowski = 1;
+        public const int MinimizeHopcroft = 2;
 
-        public const int MINIMIZE_BRZOZOWSKI = 1;
+        private static int minimization = MinimizeHopcroft;
+        private static bool minimizeAlways;
+        private static bool allowMutation;
+        private static bool? isDebug;
 
-        public const int MINIMIZE_HOPCROFT = 2;
+        private bool deterministic;
+        private int hashCode;
+        private State initial;
+        private string singleton;
 
-        internal static int minimization = MINIMIZE_HOPCROFT;
-
-        internal State initial;
-
-        internal bool deterministic;
-
-        internal object info;
-
-        internal int hash_code;
-
-        internal string singleton;
-
-        internal static bool minimize_always = false;
-
-        internal static bool allow_mutation = false;
-
-        internal static bool? is_debug = null;
-         
         public Automaton()
         {
-            initial = new State();
-            deterministic = true;
-            singleton = null;
+            this.initial       = new State();
+            this.deterministic = true;
+            this.singleton     = null;
         }
 
-        internal virtual bool isDebug
+        private bool IsDebug
         {
             get
             {
-                if (is_debug == null)
+                if (isDebug == null)
                 {
-                    is_debug = Convert.ToBoolean(Environment.GetEnvironmentVariable("dk.brics.automaton.debug") != null);
+                    isDebug = Convert.ToBoolean(Environment.GetEnvironmentVariable("dk.brics.automaton.debug") != null);
                 }
 
-                return (bool)is_debug;
+                return isDebug.Value;
             }
         }
 
         public static int Minimization
         {
-            set
-            {
-                minimization = value;
-            }
+            set { minimization = value; }
         }
 
         public static bool MinimizeAlways
         {
-            set
-            {
-                minimize_always = value;
-            }
+            set { minimizeAlways = value; }
         }
 
-        public static bool setAllowMutate(bool flag)
+        private static bool AllowMutate
         {
-            bool b = allow_mutation;
-            allow_mutation = flag;
-            return b;
+            get { return allowMutation; }
         }
 
-        internal static bool AllowMutate
+        private bool IsSingleton
         {
-            get
-            {
-                return allow_mutation;
-            }
-        }
-
-        internal virtual void checkMinimizeAlways()
-        {
-            if (minimize_always)
-            {
-                minimize();
-            }
-        }
-
-        internal virtual bool isSingleton
-        {
-            get
-            {
-                return singleton!=null;
-            }
+            get { return this.singleton != null; }
         }
 
         public virtual string Singleton
         {
-            get
-            {
-                return singleton;
-            }
+            get { return this.singleton; }
         }
 
         public virtual State InitialState
         {
             set
             {
-                initial = value;
-                singleton = null;
+                this.initial = value;
+                this.singleton = null;
             }
             get
             {
-                expandSingleton();
-                return initial;
+                this.ExpandSingleton();
+                return this.initial;
             }
         }
 
-        public virtual bool isDeterministic
+        public virtual bool IsDeterministic
         {
-            get
-            {
-                return deterministic;
-            }
-            set
-            {
-                this.deterministic = value;
-            }
+            get { return this.deterministic; }
+            set { this.deterministic = value; }
         }
 
-        public virtual object Info
-        {
-            set
-            {
-                this.info = value;
-            }
-            get
-            {
-                return info;
-            }
-        }
+        public virtual object Info { set; get; }
 
         public virtual HashSet<State> States
         {
             get
             {
-                expandSingleton();
+                this.ExpandSingleton();
                 HashSet<State> visited;
-                if (isDebug)
+                if (this.IsDebug)
                 {
-                    visited = new HashSet<State>();
+                    visited = new HashSet<State>(); // LinkedHashSet.
                 }
                 else
                 {
                     visited = new HashSet<State>();
                 }
-                LinkedList<State> worklist = new LinkedList<State>();
-                worklist.AddLast(initial);
-                visited.Add(initial);
+                var worklist = new LinkedList<State>();
+                worklist.AddLast(this.initial);
+                visited.Add(this.initial);
                 while (worklist.Count > 0)
                 {
                     State s = worklist.RemoveAndReturnFirst();
                     ICollection<Transition> tr;
-                    if (isDebug)
+                    if (IsDebug)
                     {
                         tr = s.GetSortedTransitions(false);
                     }
@@ -218,10 +164,10 @@ namespace NAutomaton
         {
             get
             {
-                expandSingleton();
-                HashSet<State> accepts = new HashSet<State>();
-                HashSet<State> visited = new HashSet<State>();
-                LinkedList<State> worklist = new LinkedList<State>();
+                this.ExpandSingleton();
+                var accepts = new HashSet<State>();
+                var visited = new HashSet<State>();
+                var worklist = new LinkedList<State>();
                 worklist.AddLast(initial);
                 visited.Add(initial);
                 while (worklist.Count > 0)
@@ -244,10 +190,7 @@ namespace NAutomaton
             }
         }
 
-        ///	 
-        ///	 <summary>  Assigns consecutive numbers to the given states.  </summary>
-        ///	 
-        internal static HashSet<State> StateNumbers
+        private static HashSet<State> StateNumbers
         {
             set
             {
@@ -259,12 +202,115 @@ namespace NAutomaton
             }
         }
 
-        ///	 
-        ///	 <summary>  Adds transitions to explicit crash state to ensure that transition function is total.  </summary>
-        ///	 
-        internal virtual void totalize()
+        private char[] StartPoints
         {
-            State s = new State();
+            get
+            {
+                var pointset = new HashSet<char?>();
+                foreach (State s in States)
+                {
+                    pointset.Add(Char.MinValue);
+                    foreach (Transition t in s.Transitions)
+                    {
+                        pointset.Add(t.Min);
+                        if (t.Max < Char.MaxValue)
+                        {
+                            pointset.Add((char)(t.Max + 1));
+                        }
+                    }
+                }
+                var points = new char[pointset.Count];
+                int n = 0;
+                foreach (var m in pointset)
+                {
+                    points[n++] = m.Value;
+                }
+                Array.Sort(points);
+                return points;
+            }
+        }
+
+        public virtual HashSet<State> LiveStates
+        {
+            get
+            {
+                this.ExpandSingleton();
+                return this.GetLiveStates(States);
+            }
+        }
+
+        public virtual int NumberOfStates
+        {
+            get
+            {
+                if (this.IsSingleton)
+                {
+                    return singleton.Length + 1;
+                }
+                return this.States.Count;
+            }
+        }
+
+        public virtual int NumberOfTransitions
+        {
+            get
+            {
+                if (this.IsSingleton)
+                {
+                    return singleton.Length;
+                }
+                return this.States.Sum(s => s.Transitions.Count());
+            }
+        }
+
+        public virtual bool IsEmptyString
+        {
+            get { return BasicOperations.IsEmptyString(this); }
+        }
+
+        public virtual bool IsEmpty
+        {
+            get { return BasicOperations.IsEmpty(this); }
+        }
+
+        public virtual bool IsTotal
+        {
+            get { return BasicOperations.IsTotal(this); }
+        }
+
+        public virtual bool IsFinite
+        {
+            get { return SpecialOperations.IsFinite(this); }
+        }
+
+        public virtual HashSet<string> FiniteStrings
+        {
+            get { return SpecialOperations.GetFiniteStrings(this); }
+        }
+
+        public virtual string CommonPrefix
+        {
+            get { return SpecialOperations.GetCommonPrefix(this); }
+        }
+
+        public static bool SetAllowMutate(bool flag)
+        {
+            bool b = allowMutation;
+            allowMutation = flag;
+            return b;
+        }
+
+        private void CheckMinimizeAlways()
+        {
+            if (minimizeAlways)
+            {
+                this.Minimize();
+            }
+        }
+
+        private void Totalize()
+        {
+            var s = new State();
             s.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, s));
             foreach (State p in States)
             {
@@ -287,143 +333,85 @@ namespace NAutomaton
             }
         }
 
-        ///	
-        ///	 <summary>  Restores representation invariant.
-        ///	  This method must be invoked before any built-in automata operation is performed 
-        ///	  if automaton states or transitions are manipulated manually. </summary>
-        ///	  <seealso cref= #setDeterministic(boolean) </seealso>
-        ///	 
-        public virtual void restoreInvariant()
+        public virtual void RestoreInvariant()
         {
-            removeDeadTransitions();
+            this.RemoveDeadTransitions();
         }
 
-        ///	 
-        ///	 <summary>  Reduces this automaton.
-        ///	  An automaton is "reduced" by combining overlapping and adjacent edge intervals with same destination.  </summary>
-        ///	 
-        public virtual void reduce()
+        public virtual void Reduce()
         {
-            if (Singleton)
+            if (this.IsSingleton)
             {
                 return;
             }
-            Set<State> states = States;
+            HashSet<State> states = States;
             StateNumbers = states;
             foreach (State s in states)
             {
-                IList<Transition> st = s.getSortedTransitions(true);
-                s.resetTransitions();
+                IList<Transition> st = s.GetSortedTransitions(true);
+                s.ResetTransitions();
                 State p = null;
                 int min = -1, max = -1;
                 foreach (Transition t in st)
                 {
-                    if (p == t.to)
+                    if (p == t.To)
                     {
-                        if (t.min <= max + 1)
+                        if (t.Min <= max + 1)
                         {
-                            if (t.max > max)
+                            if (t.Max > max)
                             {
-                                max = t.max;
+                                max = t.Max;
                             }
                         }
                         else
                         {
                             if (p != null)
                             {
-                                s.transitions.add(new Transition((char)min, (char)max, p));
+                                s.Transitions.Add(new Transition((char)min, (char)max, p));
                             }
-                            min = t.min;
-                            max = t.max;
+                            min = t.Min;
+                            max = t.Max;
                         }
                     }
                     else
                     {
                         if (p != null)
                         {
-                            s.transitions.add(new Transition((char)min, (char)max, p));
+                            s.Transitions.Add(new Transition((char)min, (char)max, p));
                         }
-                        p = t.to;
-                        min = t.min;
-                        max = t.max;
+                        p = t.To;
+                        min = t.Min;
+                        max = t.Max;
                     }
                 }
                 if (p != null)
                 {
-                    s.transitions.add(new Transition((char)min, (char)max, p));
+                    s.Transitions.Add(new Transition((char)min, (char)max, p));
                 }
             }
-            clearHashCode();
+            this.ClearHashCode();
         }
 
-        ///	 
-        ///	 <summary>  Returns sorted array of all interval start points.  </summary>
-        ///	 
-        internal virtual char[] StartPoints
+        private HashSet<State> GetLiveStates(HashSet<State> states)
         {
-            get
-            {
-                Set<char?> pointset = new HashSet<char?>();
-                foreach (State s in States)
-                {
-                    pointset.add(Char.MinValue);
-                    foreach (Transition t in s.transitions)
-                    {
-                        pointset.add(t.min);
-                        if (t.max < Char.MaxValue)
-                        {
-                            pointset.add((char)(t.max + 1));
-                        }
-                    }
-                }
-                char[] points = new char[pointset.size()];
-                int n = 0;
-                foreach (char? m in pointset)
-                {
-                    points[n++] = m;
-                }
-                Arrays.sort(points);
-                return points;
-            }
-        }
-
-        ///	 
-        ///	 <summary>  Returns the set of live states. A state is "live" if an accept state is reachable from it.  </summary>
-        ///	  <returns> set of <seealso cref="State"/> objects </returns>
-        ///	 
-        public virtual Set<State> LiveStates
-        {
-            get
-            {
-                expandSingleton();
-                return getLiveStates(States);
-            }
-        }
-
-        private Set<State> getLiveStates(Set<State> states)
-        {
-            Dictionary<State, Set<State>> map = new Dictionary<State, Set<State>>();
+            Dictionary<State, HashSet<State>> map = states.ToDictionary(s => s, s => new HashSet<State>());
             foreach (State s in states)
             {
-                map.Add(s, new HashSet<State>());
-            }
-            foreach (State s in states)
-            {
-                foreach (Transition t in s.transitions)
+                foreach (Transition t in s.Transitions)
                 {
-                    map[t.to].add(s);
+                    map[t.To].Add(s);
                 }
             }
-            Set<State> live = new HashSet<State>(AcceptStates);
-            LinkedList<State> worklist = new LinkedList<State>(live);
+            var live = new HashSet<State>(this.AcceptStates);
+            var worklist = new LinkedList<State>(live);
             while (worklist.Count > 0)
             {
-                State s = worklist.RemoveFirst();
+                State s = worklist.RemoveAndReturnFirst();
                 foreach (State p in map[s])
                 {
-                    if (!live.contains(p))
+                    if (!live.Contains(p))
                     {
-                        live.add(p);
+                        live.Add(p);
                         worklist.AddLast(p);
                     }
                 }
@@ -431,111 +419,59 @@ namespace NAutomaton
             return live;
         }
 
-        ///	 
-        ///	 <summary>  Removes transitions to dead states and calls <seealso cref="#reduce()"/> and <seealso cref="#clearHashCode()"/>.
-        ///	  (A state is "dead" if no accept state is reachable from it.) </summary>
-        ///	 
-        public virtual void removeDeadTransitions()
+        public virtual void RemoveDeadTransitions()
         {
-            clearHashCode();
-            if (Singleton)
+            this.ClearHashCode();
+            if (this.IsSingleton)
             {
                 return;
             }
-            Set<State> states = States;
-            Set<State> live = getLiveStates(states);
+            HashSet<State> states = this.States;
+            HashSet<State> live = this.GetLiveStates(states);
             foreach (State s in states)
             {
-                Set<Transition> st = s.transitions;
-                s.resetTransitions();
+                HashSet<Transition> st = s.Transitions;
+                s.ResetTransitions();
                 foreach (Transition t in st)
                 {
-                    if (live.contains(t.to))
+                    if (live.Contains(t.To))
                     {
-                        s.transitions.add(t);
+                        s.Transitions.Add(t);
                     }
                 }
             }
-            reduce();
+            this.Reduce();
         }
 
-        ///	 
-        ///	 <summary>  Returns a sorted array of transitions for each state (and sets state numbers).  </summary>
-        ///	 
-        internal static Transition[][] getSortedTransitions(Set<State> states)
+        private static Transition[][] GetSortedTransitions(HashSet<State> states)
         {
             StateNumbers = states;
-            Transition[][] transitions = new Transition[states.size()][];
+            var transitions = new Transition[states.Count][];
             foreach (State s in states)
             {
-                transitions[s.number] = s.getSortedTransitionArray(false);
+                transitions[s.Number] = s.GetSortedTransitions(false).ToArray();
             }
             return transitions;
         }
 
-        ///	 
-        ///	 <summary>  Expands singleton representation to normal representation.
-        ///	  Does nothing if not in singleton representation.  </summary>
-        ///	 
-        public virtual void expandSingleton()
+        public virtual void ExpandSingleton()
         {
-            if (Singleton)
+            if (this.IsSingleton)
             {
-                State p = new State();
+                var p = new State();
                 initial = p;
-                for (int i = 0; i < singleton.Length; i++)
+                foreach (char t in singleton)
                 {
-                    State q = new State();
-                    p.transitions.add(new Transition(singleton[i], q));
+                    var q = new State();
+                    p.Transitions.Add(new Transition(t, q));
                     p = q;
                 }
-                p.accept = true;
-                deterministic = true;
-                singleton = null;
+                p.IsAccept = true;
+                this.deterministic = true;
+                this.singleton = null;
             }
         }
 
-        ///	
-        ///	 <summary>  Returns the number of states in this automaton. </summary>
-        ///	 
-        public virtual int NumberOfStates
-        {
-            get
-            {
-                if (Singleton)
-                {
-                    return singleton.Length + 1;
-                }
-                return States.size();
-            }
-        }
-
-        ///	
-        ///	 <summary>  Returns the number of transitions in this automaton. This number is counted
-        ///	  as the total number of edges, where one edge may be a character interval. </summary>
-        ///	 
-        public virtual int NumberOfTransitions
-        {
-            get
-            {
-                if (Singleton)
-                {
-                    return singleton.Length;
-                }
-                int c = 0;
-                foreach (State s in States)
-                {
-                    c += s.transitions.size();
-                }
-                return c;
-            }
-        }
-
-        ///	
-        ///	 <summary>  Returns true if the language of this automaton is equal to the language
-        ///	  of the given automaton. Implemented using <code>hashCode</code> and
-        ///	  <code>subsetOf</code>. </summary>
-        ///	 
         public override bool Equals(object obj)
         {
             if (obj == this)
@@ -546,69 +482,54 @@ namespace NAutomaton
             {
                 return false;
             }
-            Automaton a = (Automaton)obj;
-            if (Singleton && a.Singleton)
+            var a = (Automaton)obj;
+            if (this.IsSingleton && a.IsSingleton)
             {
                 return singleton.Equals(a.singleton);
             }
-            return GetHashCode() == a.GetHashCode() && subsetOf(a) && a.subsetOf(this);
+            return this.GetHashCode() == a.GetHashCode() && this.SubsetOf(a) && a.SubsetOf(this);
         }
 
-        ///	
-        ///	 <summary>  Returns hash code for this automaton. The hash code is based on the
-        ///	  number of states and transitions in the minimized automaton.
-        ///	  Invoking this method may involve minimizing the automaton. </summary>
-        ///	 
         public override int GetHashCode()
         {
-            if (hash_code == 0)
+            if (this.hashCode == 0)
             {
-                minimize();
+                this.Minimize();
             }
-            return hash_code;
+            return this.hashCode;
         }
 
-        ///	
-        ///	 <summary>  Recomputes the hash code.
-        ///	  The automaton must be minimal when this operation is performed. </summary>
-        ///	 
-        internal virtual void recomputeHashCode()
+        private void RecomputeHashCode()
         {
-            hash_code = NumberOfStates  3 + NumberOfTransitions  2;
-            if (hash_code == 0)
+            this.hashCode = this.NumberOfStates * 3 + this.NumberOfTransitions * 2;
+            if (this.hashCode == 0)
             {
-                hash_code = 1;
+                this.hashCode = 1;
             }
         }
 
-        ///	
-        ///	 <summary>  Must be invoked when the stored hash code may no longer be valid. </summary>
-        ///	 
-        internal virtual void clearHashCode()
+        private void ClearHashCode()
         {
-            hash_code = 0;
+            this.hashCode = 0;
         }
 
-        ///	
-        ///	 <summary>  Returns a string representation of this automaton. </summary>
-        ///	 
         public override string ToString()
         {
-            StringBuilder b = new StringBuilder();
-            if (Singleton)
+            var b = new StringBuilder();
+            if (this.IsSingleton)
             {
                 b.Append("singleton: ");
-                foreach (char c in singleton.ToCharArray())
+                foreach (char c in singleton)
                 {
-                    Transition.appendCharString(c, b);
+                    Transition.AppendCharString(c, b);
                 }
                 b.AppendLine();
             }
             else
             {
-                Set<State> states = States;
-                StateNumbers = states;
-                b.Append("initial state: ").append(initial.number).append("\n");
+                HashSet<State> states = States;
+                Automaton.StateNumbers = states;
+                b.Append("initial state: ").Append(initial.Number).Append("\n");
                 foreach (State s in states)
                 {
                     b.Append(s.ToString());
@@ -617,636 +538,345 @@ namespace NAutomaton
             return b.ToString();
         }
 
-        ///	
-        ///	 <summary>  Returns <a href="http://www.research.att.com/sw/tools/graphviz/" target="_top">Graphviz Dot</a> 
-        ///	  representation of this automaton. </summary>
-        ///	 
-        public virtual string toDot()
+        public virtual string ToDot()
         {
-            StringBuilder b = new StringBuilder("digraph Automaton {\n");
+            var b = new StringBuilder("digraph Automaton {\n");
             b.Append("  rankdir = LR;\n");
-            Set<State> states = States;
-            StateNumbers = states;
+            HashSet<State> states = States;
+            Automaton.StateNumbers = states;
             foreach (State s in states)
             {
-                b.Append("  ").append(s.number);
-                if (s.accept)
-                {
-                    b.Append(" [shape=doublecircle,label=\"\"];\n");
-                }
-                else
-                {
-                    b.Append(" [shape=circle,label=\"\"];\n");
-                }
+                b.Append("  ").Append(s.Number);
+                b.Append(s.IsAccept ? " [shape=doublecircle,label=\"\"];\n" : " [shape=circle,label=\"\"];\n");
                 if (s == initial)
                 {
                     b.Append("  initial [shape=plaintext,label=\"\"];\n");
-                    b.Append("  initial -> ").append(s.number).append("\n");
+                    b.Append("  initial -> ").Append(s.Number).Append("\n");
                 }
-                foreach (Transition t in s.transitions)
+                foreach (Transition t in s.Transitions)
                 {
-                    b.Append("  ").append(s.number);
-                    t.appendDot(b);
+                    b.Append("  ").Append(s.Number);
+                    t.AppendDot(b);
                 }
             }
             return b.Append("}\n").ToString();
         }
 
-        ///	
-        ///	 <summary>  Returns a clone of this automaton, expands if singleton. </summary>
-        ///	 
-        internal virtual Automaton cloneExpanded()
+        private Automaton CloneExpanded()
         {
-            Automaton a = Clone();
-            a.expandSingleton();
+            Automaton a = this.Clone();
+            a.ExpandSingleton();
             return a;
         }
 
-        ///	
-        ///	 <summary>  Returns a clone of this automaton unless <code>allow_mutation</code> is set, expands if singleton. </summary>
-        ///	 
-        internal virtual Automaton cloneExpandedIfRequired()
+        private Automaton CloneExpandedIfRequired()
         {
-            if (allow_mutation)
+            if (allowMutation)
             {
-                expandSingleton();
+                this.ExpandSingleton();
                 return this;
             }
-            else
-            {
-                return cloneExpanded();
-            }
+
+            return this.CloneExpanded();
         }
 
-        ///	
-        ///	 <summary>  Returns a clone of this automaton. </summary>
-        ///	 
-        public override Automaton Clone()
+        public Automaton Clone()
         {
-            try
+            var a = (Automaton)this.MemberwiseClone();
+            if (!this.IsSingleton)
             {
-                Automaton a = (Automaton)base.Clone();
-                if (!Singleton)
+                Dictionary<State, State> m = this.States.ToDictionary(s => s, s => new State());
+
+                foreach (State s in this.States)
                 {
-                    Dictionary<State, State> m = new Dictionary<State, State>();
-                    Set<State> states = States;
-                    foreach (State s in states)
+                    State p = m[s];
+                    p.IsAccept = s.IsAccept;
+                    if (s == initial)
                     {
-                        m.Add(s, new State());
+                        a.initial = p;
                     }
-                    foreach (State s in states)
+                    foreach (Transition t in s.Transitions)
                     {
-                        State p = m[s];
-                        p.accept = s.accept;
-                        if (s == initial)
-                        {
-                            a.initial = p;
-                        }
-                        foreach (Transition t in s.transitions)
-                        {
-                            p.transitions.add(new Transition(t.min, t.max, m[t.to]));
-                        }
+                        p.Transitions.Add(new Transition(t.Min, t.Max, m[t.To]));
                     }
                 }
-                return a;
             }
-            catch (CloneNotSupportedException e)
-            {
-                throw new Exception(e);
-            }
-        }
-
-        ///	
-        ///	 <summary>  Returns a clone of this automaton, or this automaton itself if <code>allow_mutation</code> flag is set.  </summary>
-        ///	 
-        internal virtual Automaton cloneIfRequired()
-        {
-            if (allow_mutation)
-            {
-                return this;
-            }
-            else
-            {
-                return Clone();
-            }
-        }
-
-        ///	 
-        ///	 <summary>  Retrieves a serialized <code>Automaton</code> located by a URL. </summary>
-        ///	  <param name="url"> URL of serialized automaton </param>
-        ///	  <exception cref="IOException"> if input/output related exception occurs </exception>
-        ///	  <exception cref="OptionalDataException"> if the data is not a serialized object </exception>
-        ///	  <exception cref="InvalidClassException"> if the class serial number does not match </exception>
-        ///	  <exception cref="ClassCastException"> if the data is not a serialized <code>Automaton</code> </exception>
-        ///	  <exception cref="ClassNotFoundException"> if the class of the serialized object cannot be found </exception>
-        ///	 
-        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-        //ORIGINAL LINE: public static Automaton load(java.net.URL url) throws java.io.IOException, java.io.OptionalDataException, ClassCastException, ClassNotFoundException, java.io.InvalidClassException
-        public static Automaton load(URL url)
-        {
-            return load(url.openStream());
-        }
-
-        ///	
-        ///	 <summary>  Retrieves a serialized <code>Automaton</code> from a stream. </summary>
-        ///	  <param name="stream"> input stream with serialized automaton </param>
-        ///	  <exception cref="IOException"> if input/output related exception occurs </exception>
-        ///	  <exception cref="OptionalDataException"> if the data is not a serialized object </exception>
-        ///	  <exception cref="InvalidClassException"> if the class serial number does not match </exception>
-        ///	  <exception cref="ClassCastException"> if the data is not a serialized <code>Automaton</code> </exception>
-        ///	  <exception cref="ClassNotFoundException"> if the class of the serialized object cannot be found </exception>
-        ///	 
-        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-        //ORIGINAL LINE: public static Automaton load(java.io.InputStream stream) throws java.io.IOException, java.io.OptionalDataException, ClassCastException, ClassNotFoundException, java.io.InvalidClassException
-        public static Automaton load(InputStream stream)
-        {
-            ObjectInputStream s = new ObjectInputStream(stream);
-            return (Automaton)s.readObject();
-        }
-
-        ///	
-        ///	 <summary>  Writes this <code>Automaton</code> to the given stream. </summary>
-        ///	  <param name="stream"> output stream for serialized automaton </param>
-        ///	  <exception cref="IOException"> if input/output related exception occurs </exception>
-        ///	 
-        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-        //ORIGINAL LINE: public void store(java.io.OutputStream stream) throws java.io.IOException
-        public virtual void store(OutputStream stream)
-        {
-            ObjectOutputStream s = new ObjectOutputStream(stream);
-            s.writeObject(this);
-            s.flush();
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeEmpty()"/>. </summary>
-        ///	 
-        public static Automaton makeEmpty()
-        {
-            return BasicAutomata.makeEmpty();
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeEmptyString()"/>. </summary>
-        ///	 
-        public static Automaton makeEmptyString()
-        {
-            return BasicAutomata.makeEmptyString();
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeAnyString()"/>. </summary>
-        ///	 
-        public static Automaton makeAnyString()
-        {
-            return BasicAutomata.makeAnyString();
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeAnyChar()"/>. </summary>
-        ///	 
-        public static Automaton makeAnyChar()
-        {
-            return BasicAutomata.makeAnyChar();
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeChar(char)"/>. </summary>
-        ///	 
-        public static Automaton makeChar(char c)
-        {
-            return BasicAutomata.makeChar(c);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeCharRange(char, char)"/>. </summary>
-        ///	 
-        public static Automaton makeCharRange(char min, char max)
-        {
-            return BasicAutomata.makeCharRange(min, max);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeCharSet(String)"/>. </summary>
-        ///	 
-        public static Automaton makeCharSet(string set)
-        {
-            return BasicAutomata.makeCharSet(set);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeInterval(int, int, int)"/>. </summary>
-        ///	 
-        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-        //ORIGINAL LINE: public static Automaton makeInterval(int min, int max, int digits) throws IllegalArgumentException
-        public static Automaton makeInterval(int min, int max, int digits)
-        {
-            return BasicAutomata.makeInterval(min, max, digits);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeString(String)"/>. </summary>
-        ///	 
-        public static Automaton makeString(string s)
-        {
-            return BasicAutomata.makeString(s);
-        }
-
-        ///     
-        ///     <summary>  See <seealso cref="BasicAutomata#makeStringUnion(CharSequence...)"/>. </summary>
-        ///     
-        public static Automaton makeStringUnion(params CharSequence[] strings)
-        {
-            return BasicAutomata.makeStringUnion(strings);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeMaxInteger(String)"/>. </summary>
-        ///	 
-        public static Automaton makeMaxInteger(string n)
-        {
-            return BasicAutomata.makeMaxInteger(n);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeMinInteger(String)"/>. </summary>
-        ///	 
-        public static Automaton makeMinInteger(string n)
-        {
-            return BasicAutomata.makeMinInteger(n);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeTotalDigits(int)"/>. </summary>
-        ///	 
-        public static Automaton makeTotalDigits(int i)
-        {
-            return BasicAutomata.makeTotalDigits(i);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeFractionDigits(int)"/>. </summary>
-        ///	 
-        public static Automaton makeFractionDigits(int i)
-        {
-            return BasicAutomata.makeFractionDigits(i);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeIntegerValue(String)"/>. </summary>
-        ///	 
-        public static Automaton makeIntegerValue(string value)
-        {
-            return BasicAutomata.makeIntegerValue(value);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeDecimalValue(String)"/>. </summary>
-        ///	 
-        public static Automaton makeDecimalValue(string value)
-        {
-            return BasicAutomata.makeDecimalValue(value);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicAutomata#makeStringMatcher(String)"/>. </summary>
-        ///	 
-        public static Automaton makeStringMatcher(string s)
-        {
-            return BasicAutomata.makeStringMatcher(s);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicOperations#concatenate(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton concatenate(Automaton a)
-        {
-            return BasicOperations.concatenate(this, a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#concatenate(List)"/>. </summary>
-        ///	 
-        public static Automaton concatenate(IList<Automaton> l)
-        {
-            return BasicOperations.concatenate(l);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#optional(Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton optional()
-        {
-            return BasicOperations.optional(this);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#repeat(Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton repeat()
-        {
-            return BasicOperations.repeat(this);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#repeat(Automaton, int)"/>. </summary>
-        ///	 
-        public virtual Automaton repeat(int min)
-        {
-            return BasicOperations.repeat(this, min);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#repeat(Automaton, int, int)"/>. </summary>
-        ///	 
-        public virtual Automaton repeat(int min, int max)
-        {
-            return BasicOperations.repeat(this, min, max);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#complement(Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton complement()
-        {
-            return BasicOperations.complement(this);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#minus(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton minus(Automaton a)
-        {
-            return BasicOperations.minus(this, a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#intersection(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton intersection(Automaton a)
-        {
-            return BasicOperations.intersection(this, a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#subsetOf(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual bool subsetOf(Automaton a)
-        {
-            return BasicOperations.subsetOf(this, a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#union(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton union(Automaton a)
-        {
-            return BasicOperations.union(this, a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#union(Collection)"/>. </summary>
-        ///	 
-        public static Automaton union(ICollection<Automaton> l)
-        {
-            return BasicOperations.union(l);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#determinize(Automaton)"/>. </summary>
-        ///	 
-        public virtual void determinize()
-        {
-            BasicOperations.determinize(this);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="BasicOperations#addEpsilons(Automaton, Collection)"/>. </summary>
-        ///	 
-        public virtual void addEpsilons(ICollection<StatePair> pairs)
-        {
-            BasicOperations.addEpsilons(this, pairs);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#isEmptyString(Automaton)"/>. </summary>
-        ///	 
-        public virtual bool isEmptyString()
-        {
-            get
-            {
-                return BasicOperations.isEmptyString(this);
-            }
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#isEmpty(Automaton)"/>. </summary>
-        ///	 
-        public virtual bool isEmpty()
-        {
-            get
-            {
-                return BasicOperations.isEmpty(this);
-            }
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#isTotal(Automaton)"/>. </summary>
-        ///	 
-        public virtual bool isTotal()
-        {
-            get
-            {
-                return BasicOperations.isTotal(this);
-            }
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#getShortestExample(Automaton, boolean)"/>. </summary>
-        ///	 
-        public virtual string getShortestExample(bool accepted)
-        {
-            return BasicOperations.getShortestExample(this, accepted);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="BasicOperations#run(Automaton, String)"/>. </summary>
-        ///	 
-        public virtual bool run(string s)
-        {
-            return BasicOperations.run(this, s);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="MinimizationOperations#minimize(Automaton)"/>. </summary>
-        ///	 
-        public virtual void minimize()
-        {
-            MinimizationOperations.minimize(this);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="MinimizationOperations#minimize(Automaton)"/>.
-        ///	  Returns the automaton being given as argument. </summary>
-        ///	 
-        public static Automaton minimize(Automaton a)
-        {
-            a.minimize();
             return a;
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#overlap(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton overlap(Automaton a)
+        private Automaton CloneIfRequired()
         {
-            return SpecialOperations.overlap(this, a);
+            if (allowMutation)
+            {
+                return this;
+            }
+            return this.Clone();
         }
 
-        ///	 
-        ///	 <summary>  See <seealso cref="SpecialOperations#singleChars(Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton singleChars()
+        public static Automaton Load(Uri url)
         {
-            return SpecialOperations.singleChars(this);
+            throw new NotImplementedException();
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#trim(Automaton, String, char)"/>. </summary>
-        ///	 
-        public virtual Automaton trim(string set, char c)
+        public static Automaton Load(Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Store(Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Automaton MakeEmpty()
+        {
+            return BasicAutomata.MakeEmpty();
+        }
+
+        public static Automaton MakeEmptyString()
+        {
+            return BasicAutomata.MakeEmptyString();
+        }
+
+        public static Automaton MakeAnyString()
+        {
+            return BasicAutomata.MakeAnyString();
+        }
+
+        public static Automaton MakeAnyChar()
+        {
+            return BasicAutomata.MakeAnyChar();
+        }
+
+        public static Automaton MakeChar(char c)
+        {
+            return BasicAutomata.MakeChar(c);
+        }
+
+        public static Automaton MakeCharRange(char min, char max)
+        {
+            return BasicAutomata.MakeCharRange(min, max);
+        }
+
+        public static Automaton MakeCharSet(string set)
+        {
+            return BasicAutomata.MakeCharSet(set);
+        }
+
+        public static Automaton MakeInterval(int min, int max, int digits)
+        {
+            return BasicAutomata.MakeInterval(min, max, digits);
+        }
+
+        public static Automaton MakeString(string s)
+        {
+            return BasicAutomata.MakeString(s);
+        }
+
+        public static Automaton MakeStringUnion(params char[][] strings)
+        {
+            return BasicAutomata.MakeStringUnion(strings);
+        }
+
+        public static Automaton MakeMaxInteger(string n)
+        {
+            return BasicAutomata.MakeMaxInteger(n);
+        }
+
+        public static Automaton MakeMinInteger(string n)
+        {
+            return BasicAutomata.MakeMinInteger(n);
+        }
+
+        public static Automaton MakeTotalDigits(int i)
+        {
+            return BasicAutomata.MakeTotalDigits(i);
+        }
+
+        public static Automaton MakeFractionDigits(int i)
+        {
+            return BasicAutomata.MakeFractionDigits(i);
+        }
+
+        public static Automaton MakeIntegerValue(string value)
+        {
+            return BasicAutomata.MakeIntegerValue(value);
+        }
+
+        public static Automaton MakeDecimalValue(string value)
+        {
+            return BasicAutomata.MakeDecimalValue(value);
+        }
+
+        public static Automaton MakeStringMatcher(string s)
+        {
+            return BasicAutomata.MakeStringMatcher(s);
+        }
+
+        public virtual Automaton Concatenate(Automaton a)
+        {
+            return BasicOperations.Concatenate(this, a);
+        }
+
+        public static Automaton Concatenate(IList<Automaton> l)
+        {
+            return BasicOperations.Concatenate(l);
+        }
+
+        public virtual Automaton Optional()
+        {
+            return BasicOperations.Optional(this);
+        }
+
+        public virtual Automaton Repeat()
+        {
+            return BasicOperations.Repeat(this);
+        }
+
+        public virtual Automaton Repeat(int min)
+        {
+            return BasicOperations.Repeat(this, min);
+        }
+
+        public virtual Automaton Repeat(int min, int max)
+        {
+            return BasicOperations.Repeat(this, min, max);
+        }
+
+        public virtual Automaton Complement()
+        {
+            return BasicOperations.Complement(this);
+        }
+
+        public virtual Automaton Minus(Automaton a)
+        {
+            return BasicOperations.Minus(this, a);
+        }
+
+        public virtual Automaton Intersection(Automaton a)
+        {
+            return BasicOperations.Intersection(this, a);
+        }
+
+        public virtual bool SubsetOf(Automaton a)
+        {
+            return BasicOperations.SubsetOf(this, a);
+        }
+
+        public virtual Automaton Union(Automaton a)
+        {
+            return BasicOperations.Union(this, a);
+        }
+
+        public static Automaton Union(ICollection<Automaton> l)
+        {
+            return BasicOperations.Union(l);
+        }
+
+        public virtual void Determinize()
+        {
+            BasicOperations.Determinize(this);
+        }
+
+        public virtual void AddEpsilons(ICollection<StatePair> pairs)
+        {
+            BasicOperations.AddEpsilons(this, pairs);
+        }
+
+        public virtual string GetShortestExample(bool accepted)
+        {
+            return BasicOperations.GetShortestExample(this, accepted);
+        }
+
+        public virtual bool Run(string s)
+        {
+            return BasicOperations.Run(this, s);
+        }
+
+        public virtual void Minimize()
+        {
+            MinimizationOperations.Minimize(this);
+        }
+
+        public static Automaton Minimize(Automaton a)
+        {
+            a.Minimize();
+            return a;
+        }
+
+        public virtual Automaton Overlap(Automaton a)
+        {
+            return SpecialOperations.Overlap(this, a);
+        }
+
+        public virtual Automaton SingleChars()
+        {
+            return SpecialOperations.SingleChars(this);
+        }
+
+        public virtual Automaton Trim(string set, char c)
         {
             return SpecialOperations.Trim(this, set, c);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#compress(Automaton, String, char)"/>. </summary>
-        ///	 
-        public virtual Automaton compress(string set, char c)
+        public virtual Automaton Compress(string set, char c)
         {
-            return SpecialOperations.compress(this, set, c);
+            return SpecialOperations.Compress(this, set, c);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#subst(Automaton, Map)"/>. </summary>
-        ///	 
-        public virtual Automaton subst(IDictionary<char?, Set<char?>> map)
+        public virtual Automaton Subst(IDictionary<char?, HashSet<char?>> map)
         {
-            return SpecialOperations.subst(this, map);
+            return SpecialOperations.Subst(this, map);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#subst(Automaton, char, String)"/>. </summary>
-        ///	 
-        public virtual Automaton subst(char c, string s)
+        public virtual Automaton Subst(char c, string s)
         {
-            return SpecialOperations.subst(this, c, s);
+            return SpecialOperations.Subst(this, c, s);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#homomorph(Automaton, char[], char[])"/>. </summary>
-        ///	 
-        public virtual Automaton homomorph(char[] source, char[] dest)
+        public virtual Automaton Homomorph(char[] source, char[] dest)
         {
-            return SpecialOperations.homomorph(this, source, dest);
+            return SpecialOperations.Homomorph(this, source, dest);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#projectChars(Automaton, Set)"/>. </summary>
-        ///	 
-        public virtual Automaton projectChars(Set<char?> chars)
+        public virtual Automaton ProjectChars(HashSet<char?> chars)
         {
-            return SpecialOperations.projectChars(this, chars);
+            return SpecialOperations.ProjectChars(this, chars);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#isFinite(Automaton)"/>. </summary>
-        ///	 
-        public virtual bool isFinite()
+        public virtual HashSet<string> GetStrings(int length)
         {
-            get
-            {
-                return SpecialOperations.isFinite(this);
-            }
+            return SpecialOperations.GetStrings(this, length);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#getStrings(Automaton, int)"/>. </summary>
-        ///	 
-        public virtual Set<string> getStrings(int length)
+        public virtual HashSet<string> GetFiniteStrings(int limit)
         {
-            return SpecialOperations.getStrings(this, length);
+            return SpecialOperations.GetFiniteStrings(this, limit);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#getFiniteStrings(Automaton)"/>. </summary>
-        ///	 
-        public virtual Set<string> FiniteStrings
+        public virtual void PrefixClose()
         {
-            get
-            {
-                return SpecialOperations.getFiniteStrings(this);
-            }
+            SpecialOperations.PrefixClose(this);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#getFiniteStrings(Automaton, int)"/>. </summary>
-        ///	 
-        public virtual Set<string> getFiniteStrings(int limit)
+        public static Automaton HexCases(Automaton a)
         {
-            return SpecialOperations.getFiniteStrings(this, limit);
+            return SpecialOperations.HexCases(a);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#getCommonPrefix(Automaton)"/>. </summary>
-        ///	 
-        public virtual string CommonPrefix
+        public static Automaton ReplaceWhitespace(Automaton a)
         {
-            get
-            {
-                return SpecialOperations.getCommonPrefix(this);
-            }
+            return SpecialOperations.ReplaceWhitespace(a);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#prefixClose(Automaton)"/>. </summary>
-        ///	 
-        public virtual void prefixClose()
+        public static string ShuffleSubsetOf(ICollection<Automaton> ca, Automaton a, char? suspendShuffle, char? resumeShuffle)
         {
-            SpecialOperations.prefixClose(this);
+            return ShuffleOperations.ShuffleSubsetOf(ca, a, suspendShuffle, resumeShuffle);
         }
 
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#hexCases(Automaton)"/>. </summary>
-        ///	 
-        public static Automaton hexCases(Automaton a)
+        public virtual Automaton Shuffle(Automaton a)
         {
-            return SpecialOperations.hexCases(a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="SpecialOperations#replaceWhitespace(Automaton)"/>. </summary>
-        ///	 
-        public static Automaton replaceWhitespace(Automaton a)
-        {
-            return SpecialOperations.replaceWhitespace(a);
-        }
-
-        ///	
-        ///	 <summary>  See <seealso cref="ShuffleOperations#shuffleSubsetOf(Collection, Automaton, Character, Character)"/>. </summary>
-        ///	  
-        public static string shuffleSubsetOf(ICollection<Automaton> ca, Automaton a, char? suspend_shuffle, char? resume_shuffle)
-        {
-            return ShuffleOperations.shuffleSubsetOf(ca, a, suspend_shuffle, resume_shuffle);
-        }
-
-        ///	 
-        ///	 <summary>  See <seealso cref="ShuffleOperations#shuffle(Automaton, Automaton)"/>. </summary>
-        ///	 
-        public virtual Automaton shuffle(Automaton a)
-        {
-            return ShuffleOperations.shuffle(this, a);
+            return ShuffleOperations.Shuffle(this, a);
         }
     }
-
 }

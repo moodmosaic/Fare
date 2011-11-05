@@ -112,19 +112,14 @@ namespace NAutomaton
 
         public IList<Transition> GetSortedTransitions(bool toFirst)
         {
-            return this.GetSortedTransitionArray(toFirst).ToList();
-        }
-
-        private void ResetTransitions()
-        {
-            this.transitions = new HashSet<Transition>();
-        }
-
-        private IEnumerable<Transition> GetSortedTransitionArray(bool toFirst)
-        {
             Transition[] e = this.transitions.ToArray();
             Array.Sort(e, new TransitionComparer(toFirst));
-            return e;
+            return e.ToList();
+        }
+
+        public void ResetTransitions()
+        {
+            this.transitions = new HashSet<Transition>();
         }
     }
 }
