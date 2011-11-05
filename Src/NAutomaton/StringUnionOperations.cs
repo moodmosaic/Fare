@@ -122,7 +122,7 @@ namespace NAutomaton
             }
 
             converted = new NAutomaton.State();
-            converted.IsAccept = s.IsFinal;
+            converted.Accept = s.IsFinal;
 
             visited.Add(s, converted);
             int i = 0;

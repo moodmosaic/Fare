@@ -66,7 +66,7 @@ namespace NAutomaton
         public String Generate()
         {
             var builder = new StringBuilder();
-            this.Generate(builder, automaton.InitialState);
+            this.Generate(builder, automaton.Initial);
             return builder.ToString();
         }
 

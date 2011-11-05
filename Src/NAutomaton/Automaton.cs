@@ -86,17 +86,13 @@ namespace NAutomaton
             get { return allowMutation; }
         }
 
-        private bool IsSingleton
-        {
-            get { return this.singleton != null; }
-        }
-
-        public virtual string Singleton
+        public string Singleton
         {
             get { return this.singleton; }
+            set { this.singleton = value; }
         }
 
-        public virtual State InitialState
+        public State Initial
         {
             set
             {
@@ -110,15 +106,15 @@ namespace NAutomaton
             }
         }
 
-        public virtual bool IsDeterministic
+        public bool IsDeterministic
         {
             get { return this.deterministic; }
             set { this.deterministic = value; }
         }
 
-        public virtual object Info { set; get; }
+        public object Info { set; get; }
 
-        public virtual HashSet<State> States
+        public HashSet<State> States
         {
             get
             {
@@ -160,7 +156,7 @@ namespace NAutomaton
             }
         }
 
-        public virtual HashSet<State> AcceptStates
+        public HashSet<State> AcceptStates
         {
             get
             {
@@ -173,7 +169,7 @@ namespace NAutomaton
                 while (worklist.Count > 0)
                 {
                     State s = worklist.RemoveAndReturnFirst();
-                    if (s.IsAccept)
+                    if (s.Accept)
                     {
                         accepts.Add(s);
                     }
@@ -230,7 +226,7 @@ namespace NAutomaton
             }
         }
 
-        public virtual HashSet<State> LiveStates
+        public HashSet<State> LiveStates
         {
             get
             {
@@ -239,7 +235,7 @@ namespace NAutomaton
             }
         }
 
-        public virtual int NumberOfStates
+        public int NumberOfStates
         {
             get
             {
@@ -251,7 +247,7 @@ namespace NAutomaton
             }
         }
 
-        public virtual int NumberOfTransitions
+        public int NumberOfTransitions
         {
             get
             {
@@ -263,32 +259,37 @@ namespace NAutomaton
             }
         }
 
-        public virtual bool IsEmptyString
+        public bool IsEmptyString
         {
             get { return BasicOperations.IsEmptyString(this); }
         }
 
-        public virtual bool IsEmpty
+        public bool IsEmpty
         {
             get { return BasicOperations.IsEmpty(this); }
         }
 
-        public virtual bool IsTotal
+        public bool IsTotal
         {
             get { return BasicOperations.IsTotal(this); }
         }
 
-        public virtual bool IsFinite
+        public bool IsFinite
         {
             get { return SpecialOperations.IsFinite(this); }
         }
 
-        public virtual HashSet<string> FiniteStrings
+        public bool IsSingleton
+        {
+            get { return this.singleton != null; }
+        }
+
+        public HashSet<string> FiniteStrings
         {
             get { return SpecialOperations.GetFiniteStrings(this); }
         }
 
-        public virtual string CommonPrefix
+        public string CommonPrefix
         {
             get { return SpecialOperations.GetCommonPrefix(this); }
         }
@@ -333,12 +334,12 @@ namespace NAutomaton
             }
         }
 
-        public virtual void RestoreInvariant()
+        public void RestoreInvariant()
         {
             this.RemoveDeadTransitions();
         }
 
-        public virtual void Reduce()
+        public void Reduce()
         {
             if (this.IsSingleton)
             {
@@ -419,7 +420,7 @@ namespace NAutomaton
             return live;
         }
 
-        public virtual void RemoveDeadTransitions()
+        public void RemoveDeadTransitions()
         {
             this.ClearHashCode();
             if (this.IsSingleton)
@@ -454,7 +455,7 @@ namespace NAutomaton
             return transitions;
         }
 
-        public virtual void ExpandSingleton()
+        public void ExpandSingleton()
         {
             if (this.IsSingleton)
             {
@@ -466,7 +467,7 @@ namespace NAutomaton
                     p.Transitions.Add(new Transition(t, q));
                     p = q;
                 }
-                p.IsAccept = true;
+                p.Accept = true;
                 this.deterministic = true;
                 this.singleton = null;
             }
@@ -538,7 +539,7 @@ namespace NAutomaton
             return b.ToString();
         }
 
-        public virtual string ToDot()
+        public string ToDot()
         {
             var b = new StringBuilder("digraph Automaton {\n");
             b.Append("  rankdir = LR;\n");
@@ -547,7 +548,7 @@ namespace NAutomaton
             foreach (State s in states)
             {
                 b.Append("  ").Append(s.Number);
-                b.Append(s.IsAccept ? " [shape=doublecircle,label=\"\"];\n" : " [shape=circle,label=\"\"];\n");
+                b.Append(s.Accept ? " [shape=doublecircle,label=\"\"];\n" : " [shape=circle,label=\"\"];\n");
                 if (s == initial)
                 {
                     b.Append("  initial [shape=plaintext,label=\"\"];\n");
@@ -590,7 +591,7 @@ namespace NAutomaton
                 foreach (State s in this.States)
                 {
                     State p = m[s];
-                    p.IsAccept = s.IsAccept;
+                    p.Accept = s.Accept;
                     if (s == initial)
                     {
                         a.initial = p;
@@ -623,7 +624,7 @@ namespace NAutomaton
             throw new NotImplementedException();
         }
 
-        public virtual void Store(Stream stream)
+        public void Store(Stream stream)
         {
             throw new NotImplementedException();
         }
@@ -713,7 +714,7 @@ namespace NAutomaton
             return BasicAutomata.MakeStringMatcher(s);
         }
 
-        public virtual Automaton Concatenate(Automaton a)
+        public Automaton Concatenate(Automaton a)
         {
             return BasicOperations.Concatenate(this, a);
         }
@@ -723,47 +724,47 @@ namespace NAutomaton
             return BasicOperations.Concatenate(l);
         }
 
-        public virtual Automaton Optional()
+        public Automaton Optional()
         {
             return BasicOperations.Optional(this);
         }
 
-        public virtual Automaton Repeat()
+        public Automaton Repeat()
         {
             return BasicOperations.Repeat(this);
         }
 
-        public virtual Automaton Repeat(int min)
+        public Automaton Repeat(int min)
         {
             return BasicOperations.Repeat(this, min);
         }
 
-        public virtual Automaton Repeat(int min, int max)
+        public Automaton Repeat(int min, int max)
         {
             return BasicOperations.Repeat(this, min, max);
         }
 
-        public virtual Automaton Complement()
+        public Automaton Complement()
         {
             return BasicOperations.Complement(this);
         }
 
-        public virtual Automaton Minus(Automaton a)
+        public Automaton Minus(Automaton a)
         {
             return BasicOperations.Minus(this, a);
         }
 
-        public virtual Automaton Intersection(Automaton a)
+        public Automaton Intersection(Automaton a)
         {
             return BasicOperations.Intersection(this, a);
         }
 
-        public virtual bool SubsetOf(Automaton a)
+        public bool SubsetOf(Automaton a)
         {
             return BasicOperations.SubsetOf(this, a);
         }
 
-        public virtual Automaton Union(Automaton a)
+        public Automaton Union(Automaton a)
         {
             return BasicOperations.Union(this, a);
         }
@@ -773,27 +774,27 @@ namespace NAutomaton
             return BasicOperations.Union(l);
         }
 
-        public virtual void Determinize()
+        public void Determinize()
         {
             BasicOperations.Determinize(this);
         }
 
-        public virtual void AddEpsilons(ICollection<StatePair> pairs)
+        public void AddEpsilons(ICollection<StatePair> pairs)
         {
             BasicOperations.AddEpsilons(this, pairs);
         }
 
-        public virtual string GetShortestExample(bool accepted)
+        public string GetShortestExample(bool accepted)
         {
             return BasicOperations.GetShortestExample(this, accepted);
         }
 
-        public virtual bool Run(string s)
+        public bool Run(string s)
         {
             return BasicOperations.Run(this, s);
         }
 
-        public virtual void Minimize()
+        public void Minimize()
         {
             MinimizationOperations.Minimize(this);
         }
@@ -804,57 +805,57 @@ namespace NAutomaton
             return a;
         }
 
-        public virtual Automaton Overlap(Automaton a)
+        public Automaton Overlap(Automaton a)
         {
             return SpecialOperations.Overlap(this, a);
         }
 
-        public virtual Automaton SingleChars()
+        public Automaton SingleChars()
         {
             return SpecialOperations.SingleChars(this);
         }
 
-        public virtual Automaton Trim(string set, char c)
+        public Automaton Trim(string set, char c)
         {
             return SpecialOperations.Trim(this, set, c);
         }
 
-        public virtual Automaton Compress(string set, char c)
+        public Automaton Compress(string set, char c)
         {
             return SpecialOperations.Compress(this, set, c);
         }
 
-        public virtual Automaton Subst(IDictionary<char?, HashSet<char?>> map)
+        public Automaton Subst(IDictionary<char?, HashSet<char?>> map)
         {
             return SpecialOperations.Subst(this, map);
         }
 
-        public virtual Automaton Subst(char c, string s)
+        public Automaton Subst(char c, string s)
         {
             return SpecialOperations.Subst(this, c, s);
         }
 
-        public virtual Automaton Homomorph(char[] source, char[] dest)
+        public Automaton Homomorph(char[] source, char[] dest)
         {
             return SpecialOperations.Homomorph(this, source, dest);
         }
 
-        public virtual Automaton ProjectChars(HashSet<char?> chars)
+        public Automaton ProjectChars(HashSet<char?> chars)
         {
             return SpecialOperations.ProjectChars(this, chars);
         }
 
-        public virtual HashSet<string> GetStrings(int length)
+        public HashSet<string> GetStrings(int length)
         {
             return SpecialOperations.GetStrings(this, length);
         }
 
-        public virtual HashSet<string> GetFiniteStrings(int limit)
+        public HashSet<string> GetFiniteStrings(int limit)
         {
             return SpecialOperations.GetFiniteStrings(this, limit);
         }
 
-        public virtual void PrefixClose()
+        public void PrefixClose()
         {
             SpecialOperations.PrefixClose(this);
         }
@@ -874,7 +875,7 @@ namespace NAutomaton
             return ShuffleOperations.ShuffleSubsetOf(ca, a, suspendShuffle, resumeShuffle);
         }
 
-        public virtual Automaton Shuffle(Automaton a)
+        public Automaton Shuffle(Automaton a)
         {
             return ShuffleOperations.Shuffle(this, a);
         }

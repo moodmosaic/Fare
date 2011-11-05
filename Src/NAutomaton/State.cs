@@ -41,7 +41,7 @@ namespace NAutomaton
 
         private readonly int id;
 
-        private bool isAccept;
+        private bool accept;
         private HashSet<Transition> transitions;
 
         public State()
@@ -52,15 +52,15 @@ namespace NAutomaton
 
         public int Number { get; set; }
 
-        public bool IsAccept
+        public bool Accept
         {
             get
             {
-                return this.isAccept;
+                return this.accept;
             }
             set
             {
-                this.isAccept = value;
+                this.accept = value;
             }
         }
 
@@ -78,7 +78,7 @@ namespace NAutomaton
         {
             var b = new StringBuilder();
             b.Append("state ").Append(this.Number);
-            b.Append(isAccept ? " [accept]" : " [reject]");
+            b.Append(accept ? " [accept]" : " [reject]");
             b.Append(":\n");
             foreach (Transition t in this.transitions)
             {

@@ -1,92 +1,584 @@
-﻿using System;
+﻿/*
+ * dk.brics.automaton
+ * 
+ * Copyright (c) 2001-2011 Anders Moeller
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace NAutomaton
 {
-    public class BasicAutomata
+    public static class BasicAutomata
     {
-        internal static Automaton MakeEmpty()
+        public static Automaton MakeEmpty()
         {
-            throw new NotImplementedException();
+            return new Automaton
+            {
+                Initial    = new State(),
+                IsDeterministic = true
+            };
         }
 
-        internal static Automaton MakeEmptyString()
+        public static Automaton MakeEmptyString()
         {
-            throw new NotImplementedException();
+            return new Automaton
+            {
+                Singleton       = "",
+                IsDeterministic = true
+            };
         }
 
-        internal static Automaton MakeAnyString()
+        public static Automaton MakeAnyString()
         {
-            throw new NotImplementedException();
+            var state = new State();
+            state.Accept = true;
+            state.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, state));
+
+            return new Automaton
+            {
+                Initial = state,
+                IsDeterministic = true
+            };
         }
 
-        internal static Automaton MakeAnyChar()
+        public static Automaton MakeAnyChar()
         {
-            throw new NotImplementedException();
+            return MakeCharRange(Char.MinValue, Char.MaxValue);
         }
 
-        internal static Automaton MakeChar(char c)
+        public static Automaton MakeChar(char c)
         {
-            throw new NotImplementedException();
+            return new Automaton
+            {
+                Singleton = char.ToString(c),
+                IsDeterministic = true
+            };
         }
 
-        internal static Automaton MakeCharRange(char min, char max)
+        public static Automaton MakeCharRange(char min, char max)
         {
-            throw new NotImplementedException();
+            if (min == max)
+            {
+                return MakeChar(min);
+            }
+
+            var a  = new Automaton();
+            var s1 = new State();
+            var s2 = new State();
+            
+            a.Initial = s1;
+            s2.Accept = true;
+            
+            if (min <= max)
+            {
+                s1.Transitions.Add(new Transition(min, max, s2));
+            }
+            
+            a.IsDeterministic = true;
+            
+            return a;
         }
 
-        internal static Automaton MakeCharSet(string set)
+        public static Automaton MakeCharSet(string set)
         {
-            throw new NotImplementedException();
+            if (set.Length == 1)
+            {
+                return MakeChar(set[0]);
+            }
+
+            var a  = new Automaton();
+            var s1 = new State();
+            var s2 = new State();
+            
+            a.Initial   = s1;
+            s2.Accept = true;
+
+            foreach (char t in set)
+            {
+                s1.Transitions.Add(new Transition(t, s2));
+            }
+
+            a.IsDeterministic = true;
+            a.Reduce();
+            
+            return a;
         }
 
-        internal static Automaton MakeInterval(int min, int max, int digits)
+        private static State AnyOfRightLength(string x, int n)
         {
-            throw new NotImplementedException();
+            var s = new State();
+            
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                s.AddTransition(new Transition('0', '9', AnyOfRightLength(x, n + 1)));
+            }
+
+            return s;
         }
 
-        internal static Automaton MakeString(string s)
+        private static State AtLeast(string x, int n, ICollection<State> initials, bool zeros)
         {
-            throw new NotImplementedException();
+            var s = new State();
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                if (zeros)
+                {
+                    initials.Add(s);
+                }
+                char c = x[n];
+                s.AddTransition(new Transition(c, AtLeast(x, n + 1, initials, zeros && c == '0')));
+                if (c < '9')
+                {
+                    s.AddTransition(new Transition((char)(c + 1), '9', AnyOfRightLength(x, n + 1)));
+                }
+            }
+            return s;
         }
 
-        internal static Automaton MakeStringUnion(char[][] strings)
+        private static State AtMost(string x, int n)
         {
-            throw new NotImplementedException();
+            var s = new State();
+
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                char c = x[n];
+                s.AddTransition(new Transition(c, AtMost(x, (char)n + 1)));
+                if (c > '0')
+                {
+                    s.AddTransition(new Transition('0', (char)(c - 1), AnyOfRightLength(x, n + 1)));
+                }
+            }
+
+            return s;
+        }
+	 
+        private static State Between(string x, string y, int n, ICollection<State> initials, bool zeros)
+        {
+            var s = new State();
+
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                if (zeros)
+                {
+                    initials.Add(s);
+                }
+                char cx = x[n];
+                char cy = y[n];
+                if (cx == cy)
+                {
+                    s.AddTransition(new Transition(cx, Between(x, y, n + 1, initials, zeros && cx == '0')));
+                }
+                else // cx < cy
+                {
+                    s.AddTransition(new Transition(cx, AtLeast(x, n + 1, initials, zeros && cx == '0')));
+                    s.AddTransition(new Transition(cy, AtMost(y, n + 1)));
+                    if (cx + 1 < cy)
+                    {
+                        s.AddTransition(new Transition((char)(cx + 1), (char)(cy - 1), AnyOfRightLength(x, n + 1)));
+                    }
+                }
+            }
+            return s;
         }
 
-        internal static Automaton MakeMaxInteger(string n)
+        public static Automaton MakeInterval(int min, int max, int digits)
         {
-            throw new NotImplementedException();
+            var a = new Automaton();
+            string x = Convert.ToString(min);
+            string y = Convert.ToString(max);
+            if (min > max || (digits > 0 && y.Length > digits))
+            {
+                throw new System.ArgumentException();
+            }
+            int d;
+            if (digits > 0)
+            {
+                d = digits;
+            }
+            else
+            {
+                d = y.Length;
+            }
+            StringBuilder bx = new StringBuilder();
+            for (int i = x.Length; i < d; i++)
+            {
+                bx.Append('0');
+            }
+            bx.Append(x);
+            x = bx.ToString();
+            StringBuilder by = new StringBuilder();
+            for (int i = y.Length; i < d; i++)
+            {
+                by.Append('0');
+            }
+            by.Append(y);
+            y = by.ToString();
+            ICollection<State> initials = new List<State>();
+            a.initial = between(x, y, 0, initials, digits <= 0);
+            if (digits <= 0)
+            {
+                List<StatePair> pairs = new List<StatePair>();
+                foreach (State p in initials)
+                {
+                    if (a.initial != p)
+                    {
+                        pairs.Add(new StatePair(a.initial, p));
+                    }
+                }
+                a.addEpsilons(pairs);
+                a.initial.addTransition(new Transition('0', a.initial));
+                a.deterministic = false;
+            }
+            else
+            {
+                a.deterministic = true;
+            }
+            a.checkMinimizeAlways();
+            return a;
         }
 
-        internal static Automaton MakeMinInteger(string n)
+        ///	 
+        ///	 <summary> * Returns a new (deterministic) automaton that accepts the single given string. </summary>
+        ///	 
+        public static Automaton makeString(string s)
         {
-            throw new NotImplementedException();
+            Automaton a = new Automaton();
+            a.singleton = s;
+            a.deterministic = true;
+            return a;
         }
 
-        internal static Automaton MakeTotalDigits(int i)
+        ///    
+        ///     <summary> * Returns a new (deterministic and minimal) automaton that accepts the union of the
+        ///     * given set of strings. The input character sequences are internally sorted in-place,
+        ///     * so the input array is modified.  </summary>
+        ///     * <seealso cref= StringUnionOperations </seealso>
+        ///     
+        public static Automaton makeStringUnion(params CharSequence[] strings)
         {
-            throw new NotImplementedException();
+            if (strings.length == 0)
+            {
+                return makeEmpty();
+            }
+            Arrays.sort(strings, StringUnionOperations.LEXICOGRAPHIC_ORDER);
+            Automaton a = new Automaton();
+            a.Initial = StringUnionOperations.build(strings);
+            a.Deterministic = true;
+            a.reduce();
+            a.recomputeHashCode();
+            return a;
         }
 
-        internal static Automaton MakeFractionDigits(int i)
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing nonnegative integers
+        ///	 * that are not larger than the given value. </summary>
+        ///	 * <param name="n"> string representation of maximum value </param>
+        ///	 
+        public static Automaton makeMaxInteger(string n)
         {
-            throw new NotImplementedException();
+            int i = 0;
+            while (i < n.Length && n[i] == '0')
+            {
+                i++;
+            }
+            StringBuilder b = new StringBuilder();
+            b.Append("0*(0|");
+            if (i < n.Length)
+            {
+                b.Append("[0-9]{1," + (n.Length - i - 1) + "}|");
+            }
+            maxInteger(n.Substring(i), 0, b);
+            b.Append(")");
+            return Automaton.minimize((new RegExp(b.ToString())).toAutomaton());
         }
 
-        internal static Automaton MakeIntegerValue(string value)
+        private static void maxInteger(string n, int i, StringBuilder b)
         {
-            throw new NotImplementedException();
+            b.Append('(');
+            if (i < n.Length)
+            {
+                char c = n[i];
+                if (c != '0')
+                {
+                    b.Append("[0-" + (char)(c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
+                }
+                b.Append(c);
+                maxInteger(n, i + 1, b);
+            }
+            b.Append(')');
         }
 
-        internal static Automaton MakeDecimalValue(string value)
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing nonnegative integers
+        ///	 * that are not less that the given value. </summary>
+        ///	 * <param name="n"> string representation of minimum value </param>
+        ///	 
+        public static Automaton makeMinInteger(string n)
         {
-            throw new NotImplementedException();
+            int i = 0;
+            while (i + 1 < n.Length && n[i] == '0')
+            {
+                i++;
+            }
+            StringBuilder b = new StringBuilder();
+            b.Append("0*");
+            minInteger(n.Substring(i), 0, b);
+            b.Append("[0-9]*");
+            return Automaton.minimize((new RegExp(b.ToString())).toAutomaton());
         }
 
-        internal static Automaton MakeStringMatcher(string s)
+        private static void minInteger(string n, int i, StringBuilder b)
         {
-            throw new NotImplementedException();
+            b.Append('(');
+            if (i < n.Length)
+            {
+                char c = n[i];
+                if (c != '9')
+                {
+                    b.Append("[" + (char)(c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
+                }
+                b.Append(c);
+                minInteger(n, i + 1, b);
+            }
+            b.Append(')');
+        }
+
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing decimal numbers
+        ///	 * that can be written with at most the given number of digits.
+        ///	 * Surrounding whitespace is permitted. </summary>
+        ///	 * <param name="i"> max number of necessary digits </param>
+        ///	 
+        public static Automaton makeTotalDigits(int i)
+        {
+            return Automaton.minimize((new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")).toAutomaton());
+        }
+
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing decimal numbers
+        ///	 * that can be written with at most the given number of digits in the fraction part.
+        ///	 * Surrounding whitespace is permitted. </summary>
+        ///	 * <param name="i"> max number of necessary fraction digits </param>
+        ///	 
+        public static Automaton makeFractionDigits(int i)
+        {
+            return Automaton.minimize((new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")).toAutomaton());
+        }
+
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing the given integer.
+        ///	 * Surrounding whitespace is permitted. </summary>
+        ///	 * <param name="value"> string representation of integer </param>
+        ///	 
+        public static Automaton makeIntegerValue(string value)
+        {
+            bool minus = false;
+            int i = 0;
+            while (i < value.Length)
+            {
+                char c = value[i];
+                if (c == '-')
+                {
+                    minus = true;
+                }
+                if (c >= '1' && c <= '9')
+                {
+                    break;
+                }
+                i++;
+            }
+            StringBuilder b = new StringBuilder();
+            b.Append(value.Substring(i));
+            if (b.Length == 0)
+            {
+                b.Append("0");
+            }
+            Automaton s;
+            if (minus)
+            {
+                s = Automaton.makeChar('-');
+            }
+            else
+            {
+                s = Automaton.makeChar('+').optional();
+            }
+            Automaton ws = Datatypes.WhitespaceAutomaton;
+            return Automaton.minimize(ws.concatenate(s.concatenate(Automaton.makeChar('0').repeat()).concatenate(Automaton.makeString(b.ToString()))).concatenate(ws));
+        }
+
+        ///	
+        ///	 <summary> * Constructs automaton that accept strings representing the given decimal number.
+        ///	 * Surrounding whitespace is permitted. </summary>
+        ///	 * <param name="value"> string representation of decimal number </param>
+        ///	 
+        public static Automaton makeDecimalValue(string value)
+        {
+            bool minus = false;
+            int i = 0;
+            while (i < value.Length)
+            {
+                char c = value[i];
+                if (c == '-')
+                {
+                    minus = true;
+                }
+                if ((c >= '1' && c <= '9') || c == '.')
+                {
+                    break;
+                }
+                i++;
+            }
+            StringBuilder b1 = new StringBuilder();
+            StringBuilder b2 = new StringBuilder();
+            int p = value.IndexOf('.', i);
+            if (p == -1)
+            {
+                b1.Append(value.Substring(i));
+            }
+            else
+            {
+                b1.Append(value.Substring(i, p - i));
+                i = value.Length - 1;
+                while (i > p)
+                {
+                    char c = value[i];
+                    if (c >= '1' && c <= '9')
+                    {
+                        break;
+                    }
+                    i--;
+                }
+                b2.Append(value.Substring(p + 1, i + 1 - (p + 1)));
+            }
+            if (b1.Length == 0)
+            {
+                b1.Append("0");
+            }
+            Automaton s;
+            if (minus)
+            {
+                s = Automaton.makeChar('-');
+            }
+            else
+            {
+                s = Automaton.makeChar('+').optional();
+            }
+            Automaton d;
+            if (b2.Length == 0)
+            {
+                d = Automaton.makeChar('.').concatenate(Automaton.makeChar('0').repeat(1)).optional();
+            }
+            else
+            {
+                d = Automaton.makeChar('.').concatenate(Automaton.makeString(b2.ToString())).concatenate(Automaton.makeChar('0').repeat());
+            }
+            Automaton ws = Datatypes.WhitespaceAutomaton;
+            return Automaton.minimize(ws.concatenate(s.concatenate(Automaton.makeChar('0').repeat()).concatenate(Automaton.makeString(b1.ToString())).concatenate(d)).concatenate(ws));
+        }
+
+        ///	
+        ///	 <summary> * Constructs deterministic automaton that matches strings that contain the given substring. </summary>
+        ///	 
+        public static Automaton makeStringMatcher(string s)
+        {
+            Automaton a = new Automaton();
+            State[] states = new State[s.Length + 1];
+            states[0] = a.initial;
+            for (int i = 0; i < s.Length; i++)
+            {
+                states[i + 1] = new State();
+            }
+            State f = states[s.Length];
+            f.accept = true;
+            f.transitions.add(new Transition(Char.MinValue, Char.MaxValue, f));
+            for (int i = 0; i < s.Length; i++)
+            {
+                Set<char?> done = new HashSet<char?>();
+                char c = s[i];
+                states[i].transitions.add(new Transition(c, states[i + 1]));
+                done.add(c);
+                for (int j = i; j >= 1; j--)
+                {
+                    char d = s[j - 1];
+                    if (!done.contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
+                    {
+                        states[i].transitions.add(new Transition(d, states[j]));
+                        done.add(d);
+                    }
+                }
+                char[] da = new char[done.size()];
+                int h = 0;
+                foreach (char w in done)
+                {
+                    da[h++] = w;
+                }
+                Arrays.sort(da);
+                int from = Char.MinValue;
+                int k = 0;
+                while (from <= Char.MaxValue)
+                {
+                    while (k < da.Length && da[k] == from)
+                    {
+                        k++;
+                        from++;
+                    }
+                    if (from <= Char.MaxValue)
+                    {
+                        int to = Char.MaxValue;
+                        if (k < da.Length)
+                        {
+                            to = da[k] - 1;
+                            k++;
+                        }
+                        states[i].transitions.add(new Transition((char)from, (char)to, states[0]));
+                        from = to + 2;
+                    }
+                }
+            }
+            a.deterministic = true;
+            return a;
         }
     }
+
 }
