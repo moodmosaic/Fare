@@ -64,7 +64,7 @@ namespace NAutomaton
             get { return this.to; }
         }
 
-        public State Destination
+        public virtual State Destination
         {
             get
             {
@@ -72,12 +72,12 @@ namespace NAutomaton
             }
         }
 
-        public char Min
+        public virtual char Min
         {
             get { return this.min; }
         }
 
-        public char Max
+        public virtual char Max
         {
             get { return this.max; }
         }
