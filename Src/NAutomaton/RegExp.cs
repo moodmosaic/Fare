@@ -27,13 +27,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+
 namespace NAutomaton
 {
-    public class Automaton
+    public class RegExp
     {
-        public State GetInitialState()
+        private string regex;
+
+        public RegExp(string regex)
         {
-            throw new System.NotImplementedException();
+            // TODO: Complete member initialization
+            this.regex = regex;
+        }
+
+        public Automaton ToAutomaton()
+        {
+            throw new NotImplementedException();
         }
     }
 }

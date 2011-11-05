@@ -64,6 +64,14 @@ namespace NAutomaton
             get { return this.to; }
         }
 
+        public State Destination
+        {
+            get
+            {
+                return this.to;
+            }
+        }
+
         public char Min
         {
             get { return this.min; }

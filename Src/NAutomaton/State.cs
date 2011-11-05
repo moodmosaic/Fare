@@ -110,9 +110,9 @@ namespace NAutomaton
             }
         }
 
-        public IEnumerable<Transition> GetSortedTransitions(bool toFirst)
+        public IList<Transition> GetSortedTransitions(bool toFirst)
         {
-            return this.GetSortedTransitionArray(toFirst);
+            return this.GetSortedTransitionArray(toFirst).ToList();
         }
 
         private void ResetTransitions()
