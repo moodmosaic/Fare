@@ -31,31 +31,23 @@ namespace NAutomaton
 {
     public class StatePair
     {
-        private readonly State s1;
-        private readonly State s2;
+        public StatePair(State s, State s1, State s2)
+        {
+            this.S = s;
+            this.S1 = s1;
+            this.S2 = s2;
+        }
 
         public StatePair(State s1, State s2)
+            : this(null, s1, s2)
         {
-            this.s1 = s1;
-            this.s2 = s2;
         }
 
-        public State FirstState
-        {
-            get
-            {
-                return this.s1;
-            }
-        }
+        public State S { get; set; }
 
-        public State SecondState
-        {
-            get
-            {
+        public State S1 { get; set; }
 
-                return this.s2;
-            }
-        }
+        public State S2 { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -65,14 +57,12 @@ namespace NAutomaton
                 return false;
             }
 
-            return other.FirstState  == this.FirstState 
-                && other.SecondState == this.SecondState;
+            return other.S1 == this.S1 && other.S2 == this.S2;
         }
 
         public override int GetHashCode()
         {
-            return this.FirstState.GetHashCode() 
-                + this.SecondState.GetHashCode();
+            return this.S1.GetHashCode() + this.S2.GetHashCode();
         }
     }
 }

@@ -33,7 +33,8 @@ namespace NAutomaton
             Debug.Assert(this.register != null, "Automaton already built.");
             Debug.Assert(current.Length > 0, "Input sequences must not be empty.");
             Debug.Assert(
-                this.previous == null || LexicographicOrderComparer.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
+                this.previous == null ||
+                LexicographicOrderComparer.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
                 "Input must be sorted: " + this.previous + " >= " + current
                 );
             Debug.Assert(this.SetPrevious(current));
@@ -150,8 +151,12 @@ namespace NAutomaton
             state.IsFinal = true;
         }
 
+        #region Nested type: LexicographicOrder
+
         private sealed class LexicographicOrder : IComparer<char[]>
         {
+            #region IComparer<char[]> Members
+
             public int Compare(char[] s1, char[] s2)
             {
                 int lens1 = s1.Length;
@@ -168,17 +173,22 @@ namespace NAutomaton
 
                 return lens1 - lens2;
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: State
 
         private sealed class State
         {
-            private static readonly  char[] noLabels = new char[0];
+            private static readonly char[] noLabels = new char[0];
             private static readonly State[] noStates = new State[0];
-            
-            private  char[] labels = noLabels;
-            private State[] states = noStates;
-
             private bool isFinal;
+
+            private char[] labels = noLabels;
+            private State[] states = noStates;
 
             public char[] TransitionLabels
             {
@@ -219,15 +229,15 @@ namespace NAutomaton
                 }
 
                 return this.isFinal == other.isFinal
-                    && State.ReferenceEquals(states, other.states)
-                    && object.Equals(labels, other.labels);
+                       && State.ReferenceEquals(states, other.states)
+                       && object.Equals(labels, other.labels);
             }
 
             public override int GetHashCode()
             {
                 int hash = this.isFinal ? 1 : 0;
-                hash ^= hash * 31 + this.labels.Length;
-                hash  = this.labels.Aggregate(hash, (current, c) => current ^ current * 31 + c);
+                hash ^= hash*31 + this.labels.Length;
+                hash = this.labels.Aggregate(hash, (current, c) => current ^ current*31 + c);
 
                 //Compare the right-language of this state using reference-identity of
                 //outgoing states. This is possible because states are interned (stored
@@ -299,5 +309,7 @@ namespace NAutomaton
                 return !a1.Where((t, i) => t != a2[i]).Any();
             }
         }
+
+        #endregion
     }
 }

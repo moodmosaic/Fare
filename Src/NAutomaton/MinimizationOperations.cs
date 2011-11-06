@@ -1,5 +1,4 @@
-﻿
-namespace NAutomaton
+﻿namespace NAutomaton
 {
     public class MinimizationOperations
     {

@@ -36,12 +36,12 @@ namespace NAutomaton
         private readonly RunAutomaton automaton;
         private readonly char[] chars;
 
-        private int matchEnd   = -1;
+        private int matchEnd = -1;
         private int matchStart = -1;
 
         public AutomatonMatcher(char[] chars, RunAutomaton automaton)
         {
-            this.chars     = chars;
+            this.chars = chars;
             this.automaton = automaton;
         }
 
@@ -59,6 +59,8 @@ namespace NAutomaton
         {
             get { return chars; }
         }
+
+        #region IMatchResult Members
 
         public virtual int End()
         {
@@ -102,6 +104,8 @@ namespace NAutomaton
             OnlyZero(group);
             return Start();
         }
+
+        #endregion
 
         public virtual bool Find()
         {

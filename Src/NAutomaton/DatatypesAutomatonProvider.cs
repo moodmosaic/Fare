@@ -42,21 +42,25 @@ namespace NAutomaton
 
         public DatatypesAutomatonProvider(bool enableUnicodeBlocks, bool enableUnicodeCategories, bool enableXml)
         {
-            this.enableUnicodeBlocks     = enableUnicodeBlocks;
+            this.enableUnicodeBlocks = enableUnicodeBlocks;
             this.enableUnicodeCategories = enableUnicodeCategories;
-            this.enableXml               = enableXml;
+            this.enableXml = enableXml;
         }
+
+        #region IAutomatonProvider Members
 
         public virtual Automaton GetAutomaton(string name)
         {
-            if (this.enableUnicodeBlocks     && Datatypes.IsUnicodeBlockName(name)    ||
+            if (this.enableUnicodeBlocks && Datatypes.IsUnicodeBlockName(name) ||
                 this.enableUnicodeCategories && Datatypes.IsUnicodeCategoryName(name) ||
-                this.enableXml               && Datatypes.IsXmlName(name))
+                this.enableXml && Datatypes.IsXmlName(name))
             {
                 return Datatypes.Get(name);
             }
 
             return null;
         }
+
+        #endregion
     }
 }

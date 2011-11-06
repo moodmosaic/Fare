@@ -33,6 +33,8 @@ namespace NAutomaton
 {
     public sealed class Datatypes
     {
+        public static Automaton WhitespaceAutomaton { get; set; }
+
         public static bool IsUnicodeBlockName(string name)
         {
             throw new NotImplementedException();
@@ -52,7 +54,5 @@ namespace NAutomaton
         {
             throw new NotImplementedException();
         }
-
-        public static Automaton WhitespaceAutomaton { get; set; }
     }
 }

@@ -29,7 +29,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -54,14 +53,8 @@ namespace NAutomaton
 
         public bool Accept
         {
-            get
-            {
-                return this.accept;
-            }
-            set
-            {
-                this.accept = value;
-            }
+            get { return this.accept; }
+            set { this.accept = value; }
         }
 
         public HashSet<Transition> Transitions
@@ -69,10 +62,14 @@ namespace NAutomaton
             get { return this.transitions; }
         }
 
+        #region IComparable<State> Members
+
         public int CompareTo(State s)
         {
             return s.id - this.id;
         }
+
+        #endregion
 
         public override string ToString()
         {
@@ -87,6 +84,19 @@ namespace NAutomaton
             return b.ToString();
         }
 
+        internal void AddEpsilon(State to)
+        {
+            if (to.accept)
+            {
+                accept = true;
+            }
+
+            foreach (Transition t in to.transitions)
+            {
+                transitions.Add(t);
+            }
+        }
+
         public void AddTransition(Transition t)
         {
             this.transitions.Add(t);
@@ -99,7 +109,7 @@ namespace NAutomaton
                     select t.To).FirstOrDefault();
         }
 
-        public void Step(char c, Collection<State> dest)
+        public void Step(char c, ICollection<State> dest)
         {
             foreach (Transition t in this.transitions)
             {

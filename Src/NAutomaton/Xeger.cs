@@ -54,7 +54,7 @@ namespace NAutomaton
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
         /// <param name="regex">The regex.</param>
-        public Xeger(String regex) 
+        public Xeger(String regex)
             : this(regex, new Random())
         {
         }
@@ -66,7 +66,7 @@ namespace NAutomaton
         public String Generate()
         {
             var builder = new StringBuilder();
-            this.Generate(builder, automaton.Initial);
+            this.Generate(builder, automaton.InitialState);
             return builder.ToString();
         }
 
@@ -81,7 +81,7 @@ namespace NAutomaton
                 }
                 return;
             }
-            
+
             int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
             int option = Xeger.GetRandomInt(0, nroptions, random);
             if (state.Accept && option == 0)
@@ -98,7 +98,7 @@ namespace NAutomaton
 
         private void AppendChoice(StringBuilder builder, Transition transition)
         {
-            var c = (char)Xeger.GetRandomInt(transition.Min, transition.Max, random);
+            var c = (char) Xeger.GetRandomInt(transition.Min, transition.Max, random);
             builder.Append(c);
         }
 
@@ -113,7 +113,7 @@ namespace NAutomaton
         {
             int dif = max - min;
             double number = random.NextDouble();
-            return min + (int)Math.Round(number * dif);
+            return min + (int) Math.Round(number*dif);
         }
     }
 }

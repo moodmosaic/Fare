@@ -34,8 +34,8 @@ namespace NAutomaton
 {
     public class Transition
     {
-        private readonly char min;
         private readonly char max;
+        private readonly char min;
         private readonly State to;
 
         public Transition(char min, char max, State to)
@@ -66,10 +66,7 @@ namespace NAutomaton
 
         public virtual State Destination
         {
-            get
-            {
-                return this.to;
-            }
+            get { return this.to; }
         }
 
         public virtual char Min
@@ -91,13 +88,13 @@ namespace NAutomaton
             }
 
             return other.Min == this.Min
-                && other.Max == this.Max
-                && other.To  == this.To;
+                   && other.Max == this.Max
+                   && other.To == this.To;
         }
 
         public override int GetHashCode()
         {
-            return this.Min * 2 + this.Max * 3;
+            return this.Min*2 + this.Max*3;
         }
 
         public override string ToString()

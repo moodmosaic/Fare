@@ -40,6 +40,8 @@ namespace NAutomaton
             this.toFirst = toFirst;
         }
 
+        #region IComparer<Transition> Members
+
         public int Compare(Transition t1, Transition t2)
         {
             if (this.toFirst)
@@ -116,5 +118,7 @@ namespace NAutomaton
 
             return 0;
         }
+
+        #endregion
     }
 }

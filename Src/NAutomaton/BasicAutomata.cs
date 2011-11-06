@@ -40,8 +40,8 @@ namespace NAutomaton
         {
             return new Automaton
                        {
-                           Initial = new State(),
-                           Deterministic = true
+                           InitialState = new State(),
+                           IsDeterministic = true
                        };
         }
 
@@ -50,7 +50,7 @@ namespace NAutomaton
             return new Automaton
                        {
                            Singleton = "",
-                           Deterministic = true
+                           IsDeterministic = true
                        };
         }
 
@@ -62,8 +62,8 @@ namespace NAutomaton
 
             return new Automaton
                        {
-                           Initial = state,
-                           Deterministic = true
+                           InitialState = state,
+                           IsDeterministic = true
                        };
         }
 
@@ -77,7 +77,7 @@ namespace NAutomaton
             return new Automaton
                        {
                            Singleton = char.ToString(c),
-                           Deterministic = true
+                           IsDeterministic = true
                        };
         }
 
@@ -92,7 +92,7 @@ namespace NAutomaton
             var s1 = new State();
             var s2 = new State();
 
-            a.Initial = s1;
+            a.InitialState = s1;
             s2.Accept = true;
 
             if (min <= max)
@@ -100,7 +100,7 @@ namespace NAutomaton
                 s1.Transitions.Add(new Transition(min, max, s2));
             }
 
-            a.Deterministic = true;
+            a.IsDeterministic = true;
 
             return a;
         }
@@ -116,7 +116,7 @@ namespace NAutomaton
             var s1 = new State();
             var s2 = new State();
 
-            a.Initial = s1;
+            a.InitialState = s1;
             s2.Accept = true;
 
             foreach (char t in set)
@@ -124,7 +124,7 @@ namespace NAutomaton
                 s1.Transitions.Add(new Transition(t, s2));
             }
 
-            a.Deterministic = true;
+            a.IsDeterministic = true;
             a.Reduce();
 
             return a;
@@ -248,18 +248,18 @@ namespace NAutomaton
             by.Append(y);
             y = by.ToString();
             ICollection<State> initials = new List<State>();
-            a.Initial = Between(x, y, 0, initials, digits <= 0);
+            a.InitialState = Between(x, y, 0, initials, digits <= 0);
             if (digits <= 0)
             {
                 List<StatePair> pairs =
-                    (from p in initials where a.Initial != p select new StatePair(a.Initial, p)).ToList();
+                    (from p in initials where a.InitialState != p select new StatePair(a.InitialState, p)).ToList();
                 a.AddEpsilons(pairs);
-                a.Initial.AddTransition(new Transition('0', a.Initial));
-                a.Deterministic = false;
+                a.InitialState.AddTransition(new Transition('0', a.InitialState));
+                a.IsDeterministic = false;
             }
             else
             {
-                a.Deterministic = true;
+                a.IsDeterministic = true;
             }
             a.CheckMinimizeAlways();
             return a;
@@ -270,7 +270,7 @@ namespace NAutomaton
             return new Automaton
                        {
                            Singleton = s,
-                           Deterministic = true
+                           IsDeterministic = true
                        };
         }
 
@@ -282,8 +282,8 @@ namespace NAutomaton
             }
             Array.Sort(strings, StringUnionOperations.LexicographicOrderComparer);
             var a = new Automaton();
-            a.Initial = StringUnionOperations.Build(strings);
-            a.Deterministic = true;
+            a.InitialState = StringUnionOperations.Build(strings);
+            a.IsDeterministic = true;
             a.Reduce();
             a.RecomputeHashCode();
             return a;
@@ -469,7 +469,7 @@ namespace NAutomaton
         {
             var a = new Automaton();
             var states = new State[s.Length + 1];
-            states[0] = a.Initial;
+            states[0] = a.InitialState;
             for (int i = 0; i < s.Length; i++)
             {
                 states[i + 1] = new State();
@@ -521,7 +521,7 @@ namespace NAutomaton
                     }
                 }
             }
-            a.Deterministic = true;
+            a.IsDeterministic = true;
             return a;
         }
     }

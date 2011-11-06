@@ -1,5 +1,4 @@
-﻿
-namespace NAutomaton
+﻿namespace NAutomaton
 {
     public class SpecialOperations
     {
@@ -23,7 +22,9 @@ namespace NAutomaton
             throw new System.NotImplementedException();
         }
 
-        internal static Automaton Subst(Automaton automaton, System.Collections.Generic.IDictionary<char?, System.Collections.Generic.HashSet<char?>> map)
+        internal static Automaton Subst(Automaton automaton,
+                                        System.Collections.Generic.IDictionary
+                                            <char?, System.Collections.Generic.HashSet<char?>> map)
         {
             throw new System.NotImplementedException();
         }
