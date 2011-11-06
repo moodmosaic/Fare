@@ -52,5 +52,7 @@ namespace NAutomaton
         {
             throw new NotImplementedException();
         }
+
+        public static Automaton WhitespaceAutomaton { get; set; }
     }
 }

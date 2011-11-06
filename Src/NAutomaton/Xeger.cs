@@ -75,23 +75,23 @@ namespace NAutomaton
             var transitions = state.GetSortedTransitions(true);
             if (transitions.Count == 0)
             {
-                if (!state.IsAccept)
+                if (!state.Accept)
                 {
                     throw new InvalidOperationException("state");
                 }
                 return;
             }
             
-            int nroptions = state.IsAccept ? transitions.Count : transitions.Count - 1;
+            int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
             int option = Xeger.GetRandomInt(0, nroptions, random);
-            if (state.IsAccept && option == 0)
+            if (state.Accept && option == 0)
             {
                 // 0 is considered stop.
                 return;
             }
 
             // Moving on to next transition.
-            Transition transition = transitions[option - (state.IsAccept ? 1 : 0)];
+            Transition transition = transitions[option - (state.Accept ? 1 : 0)];
             this.AppendChoice(builder, transition);
             Generate(builder, transition.Destination);
         }

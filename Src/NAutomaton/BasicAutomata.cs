@@ -39,19 +39,19 @@ namespace NAutomaton
         public static Automaton MakeEmpty()
         {
             return new Automaton
-            {
-                Initial    = new State(),
-                Deterministic = true
-            };
+                       {
+                           Initial = new State(),
+                           Deterministic = true
+                       };
         }
 
         public static Automaton MakeEmptyString()
         {
             return new Automaton
-            {
-                Singleton       = "",
-                Deterministic = true
-            };
+                       {
+                           Singleton = "",
+                           Deterministic = true
+                       };
         }
 
         public static Automaton MakeAnyString()
@@ -61,10 +61,10 @@ namespace NAutomaton
             state.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, state));
 
             return new Automaton
-            {
-                Initial = state,
-                Deterministic = true
-            };
+                       {
+                           Initial = state,
+                           Deterministic = true
+                       };
         }
 
         public static Automaton MakeAnyChar()
@@ -75,10 +75,10 @@ namespace NAutomaton
         public static Automaton MakeChar(char c)
         {
             return new Automaton
-            {
-                Singleton = char.ToString(c),
-                Deterministic = true
-            };
+                       {
+                           Singleton = char.ToString(c),
+                           Deterministic = true
+                       };
         }
 
         public static Automaton MakeCharRange(char min, char max)
@@ -88,20 +88,20 @@ namespace NAutomaton
                 return MakeChar(min);
             }
 
-            var a  = new Automaton();
+            var a = new Automaton();
             var s1 = new State();
             var s2 = new State();
-            
+
             a.Initial = s1;
             s2.Accept = true;
-            
+
             if (min <= max)
             {
                 s1.Transitions.Add(new Transition(min, max, s2));
             }
-            
+
             a.Deterministic = true;
-            
+
             return a;
         }
 
@@ -112,11 +112,11 @@ namespace NAutomaton
                 return MakeChar(set[0]);
             }
 
-            var a  = new Automaton();
+            var a = new Automaton();
             var s1 = new State();
             var s2 = new State();
-            
-            a.Initial   = s1;
+
+            a.Initial = s1;
             s2.Accept = true;
 
             foreach (char t in set)
@@ -126,14 +126,14 @@ namespace NAutomaton
 
             a.Deterministic = true;
             a.Reduce();
-            
+
             return a;
         }
 
         private static State AnyOfRightLength(string x, int n)
         {
             var s = new State();
-            
+
             if (x.Length == n)
             {
                 s.Accept = true;
@@ -163,7 +163,7 @@ namespace NAutomaton
                 s.AddTransition(new Transition(c, AtLeast(x, n + 1, initials, zeros && c == '0')));
                 if (c < '9')
                 {
-                    s.AddTransition(new Transition((char)(c + 1), '9', AnyOfRightLength(x, n + 1)));
+                    s.AddTransition(new Transition((char) (c + 1), '9', AnyOfRightLength(x, n + 1)));
                 }
             }
             return s;
@@ -180,16 +180,16 @@ namespace NAutomaton
             else
             {
                 char c = x[n];
-                s.AddTransition(new Transition(c, AtMost(x, (char)n + 1)));
+                s.AddTransition(new Transition(c, AtMost(x, (char) n + 1)));
                 if (c > '0')
                 {
-                    s.AddTransition(new Transition('0', (char)(c - 1), AnyOfRightLength(x, n + 1)));
+                    s.AddTransition(new Transition('0', (char) (c - 1), AnyOfRightLength(x, n + 1)));
                 }
             }
 
             return s;
         }
-     
+
         private static State Between(string x, string y, int n, ICollection<State> initials, bool zeros)
         {
             var s = new State();
@@ -216,7 +216,7 @@ namespace NAutomaton
                     s.AddTransition(new Transition(cy, AtMost(y, n + 1)));
                     if (cx + 1 < cy)
                     {
-                        s.AddTransition(new Transition((char)(cx + 1), (char)(cy - 1), AnyOfRightLength(x, n + 1)));
+                        s.AddTransition(new Transition((char) (cx + 1), (char) (cy - 1), AnyOfRightLength(x, n + 1)));
                     }
                 }
             }
@@ -230,17 +230,9 @@ namespace NAutomaton
             string y = Convert.ToString(max);
             if (min > max || (digits > 0 && y.Length > digits))
             {
-                throw new System.ArgumentException();
+                throw new ArgumentException();
             }
-            int d;
-            if (digits > 0)
-            {
-                d = digits;
-            }
-            else
-            {
-                d = y.Length;
-            }
+            int d = digits > 0 ? digits : y.Length;
             var bx = new StringBuilder();
             for (int i = x.Length; i < d; i++)
             {
@@ -259,7 +251,8 @@ namespace NAutomaton
             a.Initial = Between(x, y, 0, initials, digits <= 0);
             if (digits <= 0)
             {
-                var pairs = (from p in initials where a.Initial != p select new StatePair(a.Initial, p)).ToList();
+                List<StatePair> pairs =
+                    (from p in initials where a.Initial != p select new StatePair(a.Initial, p)).ToList();
                 a.AddEpsilons(pairs);
                 a.Initial.AddTransition(new Transition('0', a.Initial));
                 a.Deterministic = false;
@@ -275,10 +268,10 @@ namespace NAutomaton
         public static Automaton MakeString(string s)
         {
             return new Automaton
-            {
-                Singleton = s,
-                Deterministic = true
-            };
+                       {
+                           Singleton = s,
+                           Deterministic = true
+                       };
         }
 
         public static Automaton MakeStringUnion(params char[][] strings)
@@ -322,7 +315,7 @@ namespace NAutomaton
                 char c = n[i];
                 if (c != '0')
                 {
-                    b.Append("[0-" + (char)(c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
+                    b.Append("[0-" + (char) (c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
                 }
                 b.Append(c);
                 MaxInteger(n, i + 1, b);
@@ -352,7 +345,7 @@ namespace NAutomaton
                 char c = n[i];
                 if (c != '9')
                 {
-                    b.Append("[" + (char)(c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
+                    b.Append("[" + (char) (c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
                 }
                 b.Append(c);
                 MinInteger(n, i + 1, b);
@@ -362,12 +355,17 @@ namespace NAutomaton
 
         public static Automaton MakeTotalDigits(int i)
         {
-            return Automaton.Minimize((new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")).toAutomaton());
+            return
+                Automaton.Minimize(
+                    (new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*"))
+                        .ToAutomaton());
         }
 
         public static Automaton MakeFractionDigits(int i)
         {
-            return Automaton.Minimize((new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")).toAutomaton());
+            return
+                Automaton.Minimize(
+                    (new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")).ToAutomaton());
         }
 
         public static Automaton MakeIntegerValue(string value)
@@ -393,14 +391,13 @@ namespace NAutomaton
             {
                 b.Append("0");
             }
-            Automaton s;
-            s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
+            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
             Automaton ws = Datatypes.WhitespaceAutomaton;
             return Automaton.Minimize(
                 ws.Concatenate(
                     s.Concatenate(Automaton.MakeChar('0').Repeat())
                         .Concatenate(Automaton.MakeString(b.ToString())))
-                            .Concatenate(ws));
+                    .Concatenate(ws));
         }
 
         public static Automaton MakeDecimalValue(string value)
@@ -446,65 +443,62 @@ namespace NAutomaton
             {
                 b1.Append("0");
             }
-            Automaton s;
-            if (minus)
-            {
-                s = Automaton.MakeChar('-');
-            }
-            else
-            {
-                s = Automaton.MakeChar('+').Optional();
-            }
+            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
             Automaton d;
             if (b2.Length == 0)
             {
-                d = Automaton.MakeChar('.').concatenate(Automaton.makeChar('0').repeat(1)).optional();
+                d = Automaton.MakeChar('.').Concatenate(Automaton.MakeChar('0').Repeat(1)).Optional();
             }
             else
             {
-                d = Automaton.makeChar('.').concatenate(Automaton.makeString(b2.ToString())).concatenate(Automaton.makeChar('0').repeat());
+                d = Automaton.MakeChar('.')
+                    .Concatenate(Automaton.MakeString(b2.ToString()))
+                    .Concatenate(Automaton.MakeChar('0')
+                                     .Repeat());
             }
             Automaton ws = Datatypes.WhitespaceAutomaton;
-            return Automaton.minimize(ws.concatenate(s.concatenate(Automaton.makeChar('0').repeat()).concatenate(Automaton.makeString(b1.ToString())).concatenate(d)).concatenate(ws));
+            return Automaton.Minimize(
+                ws.Concatenate(
+                    s.Concatenate(Automaton.MakeChar('0').Repeat())
+                        .Concatenate(Automaton.MakeString(b1.ToString()))
+                        .Concatenate(d))
+                    .Concatenate(ws));
         }
 
-        ///	
-        ///	 <summary> * Constructs deterministic automaton that matches strings that contain the given substring. </summary>
-        ///	 
-        public static Automaton makeStringMatcher(string s)
+        public static Automaton MakeStringMatcher(string s)
         {
-            Automaton a = new Automaton();
-            State[] states = new State[s.Length + 1];
-            states[0] = a.initial;
+            var a = new Automaton();
+            var states = new State[s.Length + 1];
+            states[0] = a.Initial;
             for (int i = 0; i < s.Length; i++)
             {
                 states[i + 1] = new State();
             }
             State f = states[s.Length];
-            f.accept = true;
-            f.transitions.add(new Transition(Char.MinValue, Char.MaxValue, f));
+            f.Accept = true;
+            f.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, f));
             for (int i = 0; i < s.Length; i++)
             {
-                Set<char?> done = new HashSet<char?>();
+                var done = new HashSet<char?>();
                 char c = s[i];
-                states[i].transitions.add(new Transition(c, states[i + 1]));
-                done.add(c);
+                states[i].Transitions.Add(new Transition(c, states[i + 1]));
+                done.Add(c);
                 for (int j = i; j >= 1; j--)
                 {
                     char d = s[j - 1];
-                    if (!done.contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
+                    if (!done.Contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
                     {
-                        states[i].transitions.add(new Transition(d, states[j]));
-                        done.add(d);
+                        states[i].Transitions.Add(new Transition(d, states[j]));
+                        done.Add(d);
                     }
                 }
-                char[] da = new char[done.size()];
+                var da = new char[done.Count];
                 int h = 0;
                 foreach (char w in done)
                 {
                     da[h++] = w;
                 }
-                Arrays.sort(da);
+                Array.Sort(da);
                 int from = Char.MinValue;
                 int k = 0;
                 while (from <= Char.MaxValue)
@@ -522,14 +516,13 @@ namespace NAutomaton
                             to = da[k] - 1;
                             k++;
                         }
-                        states[i].transitions.add(new Transition((char)from, (char)to, states[0]));
+                        states[i].Transitions.Add(new Transition((char) from, (char) to, states[0]));
                         from = to + 2;
                     }
                 }
             }
-            a.deterministic = true;
+            a.Deterministic = true;
             return a;
         }
     }
-
 }
