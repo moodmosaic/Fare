@@ -29,6 +29,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace NAutomaton
@@ -40,7 +41,7 @@ namespace NAutomaton
             return new Automaton
             {
                 Initial    = new State(),
-                IsDeterministic = true
+                Deterministic = true
             };
         }
 
@@ -49,7 +50,7 @@ namespace NAutomaton
             return new Automaton
             {
                 Singleton       = "",
-                IsDeterministic = true
+                Deterministic = true
             };
         }
 
@@ -62,7 +63,7 @@ namespace NAutomaton
             return new Automaton
             {
                 Initial = state,
-                IsDeterministic = true
+                Deterministic = true
             };
         }
 
@@ -76,7 +77,7 @@ namespace NAutomaton
             return new Automaton
             {
                 Singleton = char.ToString(c),
-                IsDeterministic = true
+                Deterministic = true
             };
         }
 
@@ -99,7 +100,7 @@ namespace NAutomaton
                 s1.Transitions.Add(new Transition(min, max, s2));
             }
             
-            a.IsDeterministic = true;
+            a.Deterministic = true;
             
             return a;
         }
@@ -123,7 +124,7 @@ namespace NAutomaton
                 s1.Transitions.Add(new Transition(t, s2));
             }
 
-            a.IsDeterministic = true;
+            a.Deterministic = true;
             a.Reduce();
             
             return a;
@@ -188,7 +189,7 @@ namespace NAutomaton
 
             return s;
         }
-	 
+     
         private static State Between(string x, string y, int n, ICollection<State> initials, bool zeros)
         {
             var s = new State();
@@ -240,14 +241,14 @@ namespace NAutomaton
             {
                 d = y.Length;
             }
-            StringBuilder bx = new StringBuilder();
+            var bx = new StringBuilder();
             for (int i = x.Length; i < d; i++)
             {
                 bx.Append('0');
             }
             bx.Append(x);
             x = bx.ToString();
-            StringBuilder by = new StringBuilder();
+            var by = new StringBuilder();
             for (int i = y.Length; i < d; i++)
             {
                 by.Append('0');
@@ -255,85 +256,65 @@ namespace NAutomaton
             by.Append(y);
             y = by.ToString();
             ICollection<State> initials = new List<State>();
-            a.initial = between(x, y, 0, initials, digits <= 0);
+            a.Initial = Between(x, y, 0, initials, digits <= 0);
             if (digits <= 0)
             {
-                List<StatePair> pairs = new List<StatePair>();
-                foreach (State p in initials)
-                {
-                    if (a.initial != p)
-                    {
-                        pairs.Add(new StatePair(a.initial, p));
-                    }
-                }
-                a.addEpsilons(pairs);
-                a.initial.addTransition(new Transition('0', a.initial));
-                a.deterministic = false;
+                var pairs = (from p in initials where a.Initial != p select new StatePair(a.Initial, p)).ToList();
+                a.AddEpsilons(pairs);
+                a.Initial.AddTransition(new Transition('0', a.Initial));
+                a.Deterministic = false;
             }
             else
             {
-                a.deterministic = true;
+                a.Deterministic = true;
             }
-            a.checkMinimizeAlways();
+            a.CheckMinimizeAlways();
             return a;
         }
 
-        ///	 
-        ///	 <summary> * Returns a new (deterministic) automaton that accepts the single given string. </summary>
-        ///	 
-        public static Automaton makeString(string s)
+        public static Automaton MakeString(string s)
         {
-            Automaton a = new Automaton();
-            a.singleton = s;
-            a.deterministic = true;
-            return a;
-        }
-
-        ///    
-        ///     <summary> * Returns a new (deterministic and minimal) automaton that accepts the union of the
-        ///     * given set of strings. The input character sequences are internally sorted in-place,
-        ///     * so the input array is modified.  </summary>
-        ///     * <seealso cref= StringUnionOperations </seealso>
-        ///     
-        public static Automaton makeStringUnion(params CharSequence[] strings)
-        {
-            if (strings.length == 0)
+            return new Automaton
             {
-                return makeEmpty();
+                Singleton = s,
+                Deterministic = true
+            };
+        }
+
+        public static Automaton MakeStringUnion(params char[][] strings)
+        {
+            if (strings.Length == 0)
+            {
+                return MakeEmpty();
             }
-            Arrays.sort(strings, StringUnionOperations.LEXICOGRAPHIC_ORDER);
-            Automaton a = new Automaton();
-            a.Initial = StringUnionOperations.build(strings);
+            Array.Sort(strings, StringUnionOperations.LexicographicOrderComparer);
+            var a = new Automaton();
+            a.Initial = StringUnionOperations.Build(strings);
             a.Deterministic = true;
-            a.reduce();
-            a.recomputeHashCode();
+            a.Reduce();
+            a.RecomputeHashCode();
             return a;
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing nonnegative integers
-        ///	 * that are not larger than the given value. </summary>
-        ///	 * <param name="n"> string representation of maximum value </param>
-        ///	 
-        public static Automaton makeMaxInteger(string n)
+        public static Automaton MakeMaxInteger(string n)
         {
             int i = 0;
             while (i < n.Length && n[i] == '0')
             {
                 i++;
             }
-            StringBuilder b = new StringBuilder();
+            var b = new StringBuilder();
             b.Append("0*(0|");
             if (i < n.Length)
             {
                 b.Append("[0-9]{1," + (n.Length - i - 1) + "}|");
             }
-            maxInteger(n.Substring(i), 0, b);
+            MaxInteger(n.Substring(i), 0, b);
             b.Append(")");
-            return Automaton.minimize((new RegExp(b.ToString())).toAutomaton());
+            return Automaton.Minimize((new RegExp(b.ToString())).ToAutomaton());
         }
 
-        private static void maxInteger(string n, int i, StringBuilder b)
+        private static void MaxInteger(string n, int i, StringBuilder b)
         {
             b.Append('(');
             if (i < n.Length)
@@ -344,31 +325,26 @@ namespace NAutomaton
                     b.Append("[0-" + (char)(c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
                 }
                 b.Append(c);
-                maxInteger(n, i + 1, b);
+                MaxInteger(n, i + 1, b);
             }
             b.Append(')');
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing nonnegative integers
-        ///	 * that are not less that the given value. </summary>
-        ///	 * <param name="n"> string representation of minimum value </param>
-        ///	 
-        public static Automaton makeMinInteger(string n)
+        public static Automaton MakeMinInteger(string n)
         {
             int i = 0;
             while (i + 1 < n.Length && n[i] == '0')
             {
                 i++;
             }
-            StringBuilder b = new StringBuilder();
+            var b = new StringBuilder();
             b.Append("0*");
-            minInteger(n.Substring(i), 0, b);
+            MinInteger(n.Substring(i), 0, b);
             b.Append("[0-9]*");
-            return Automaton.minimize((new RegExp(b.ToString())).toAutomaton());
+            return Automaton.Minimize((new RegExp(b.ToString())).ToAutomaton());
         }
 
-        private static void minInteger(string n, int i, StringBuilder b)
+        private static void MinInteger(string n, int i, StringBuilder b)
         {
             b.Append('(');
             if (i < n.Length)
@@ -379,39 +355,22 @@ namespace NAutomaton
                     b.Append("[" + (char)(c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
                 }
                 b.Append(c);
-                minInteger(n, i + 1, b);
+                MinInteger(n, i + 1, b);
             }
             b.Append(')');
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing decimal numbers
-        ///	 * that can be written with at most the given number of digits.
-        ///	 * Surrounding whitespace is permitted. </summary>
-        ///	 * <param name="i"> max number of necessary digits </param>
-        ///	 
-        public static Automaton makeTotalDigits(int i)
+        public static Automaton MakeTotalDigits(int i)
         {
-            return Automaton.minimize((new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")).toAutomaton());
+            return Automaton.Minimize((new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")).toAutomaton());
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing decimal numbers
-        ///	 * that can be written with at most the given number of digits in the fraction part.
-        ///	 * Surrounding whitespace is permitted. </summary>
-        ///	 * <param name="i"> max number of necessary fraction digits </param>
-        ///	 
-        public static Automaton makeFractionDigits(int i)
+        public static Automaton MakeFractionDigits(int i)
         {
-            return Automaton.minimize((new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")).toAutomaton());
+            return Automaton.Minimize((new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")).toAutomaton());
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing the given integer.
-        ///	 * Surrounding whitespace is permitted. </summary>
-        ///	 * <param name="value"> string representation of integer </param>
-        ///	 
-        public static Automaton makeIntegerValue(string value)
+        public static Automaton MakeIntegerValue(string value)
         {
             bool minus = false;
             int i = 0;
@@ -428,31 +387,23 @@ namespace NAutomaton
                 }
                 i++;
             }
-            StringBuilder b = new StringBuilder();
+            var b = new StringBuilder();
             b.Append(value.Substring(i));
             if (b.Length == 0)
             {
                 b.Append("0");
             }
             Automaton s;
-            if (minus)
-            {
-                s = Automaton.makeChar('-');
-            }
-            else
-            {
-                s = Automaton.makeChar('+').optional();
-            }
+            s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
             Automaton ws = Datatypes.WhitespaceAutomaton;
-            return Automaton.minimize(ws.concatenate(s.concatenate(Automaton.makeChar('0').repeat()).concatenate(Automaton.makeString(b.ToString()))).concatenate(ws));
+            return Automaton.Minimize(
+                ws.Concatenate(
+                    s.Concatenate(Automaton.MakeChar('0').Repeat())
+                        .Concatenate(Automaton.MakeString(b.ToString())))
+                            .Concatenate(ws));
         }
 
-        ///	
-        ///	 <summary> * Constructs automaton that accept strings representing the given decimal number.
-        ///	 * Surrounding whitespace is permitted. </summary>
-        ///	 * <param name="value"> string representation of decimal number </param>
-        ///	 
-        public static Automaton makeDecimalValue(string value)
+        public static Automaton MakeDecimalValue(string value)
         {
             bool minus = false;
             int i = 0;
@@ -469,8 +420,8 @@ namespace NAutomaton
                 }
                 i++;
             }
-            StringBuilder b1 = new StringBuilder();
-            StringBuilder b2 = new StringBuilder();
+            var b1 = new StringBuilder();
+            var b2 = new StringBuilder();
             int p = value.IndexOf('.', i);
             if (p == -1)
             {
@@ -498,16 +449,16 @@ namespace NAutomaton
             Automaton s;
             if (minus)
             {
-                s = Automaton.makeChar('-');
+                s = Automaton.MakeChar('-');
             }
             else
             {
-                s = Automaton.makeChar('+').optional();
+                s = Automaton.MakeChar('+').Optional();
             }
             Automaton d;
             if (b2.Length == 0)
             {
-                d = Automaton.makeChar('.').concatenate(Automaton.makeChar('0').repeat(1)).optional();
+                d = Automaton.MakeChar('.').concatenate(Automaton.makeChar('0').repeat(1)).optional();
             }
             else
             {

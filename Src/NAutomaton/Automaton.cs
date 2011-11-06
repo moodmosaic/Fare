@@ -106,7 +106,7 @@ namespace NAutomaton
             }
         }
 
-        public bool IsDeterministic
+        public bool Deterministic
         {
             get { return this.deterministic; }
             set { this.deterministic = value; }
@@ -301,7 +301,7 @@ namespace NAutomaton
             return b;
         }
 
-        private void CheckMinimizeAlways()
+        public void CheckMinimizeAlways()
         {
             if (minimizeAlways)
             {
@@ -500,7 +500,7 @@ namespace NAutomaton
             return this.hashCode;
         }
 
-        private void RecomputeHashCode()
+        public void RecomputeHashCode()
         {
             this.hashCode = this.NumberOfStates * 3 + this.NumberOfTransitions * 2;
             if (this.hashCode == 0)

@@ -23,12 +23,17 @@ namespace NAutomaton
         private StringBuilder previous;
         private IDictionary<State, State> register = new Dictionary<State, State>();
 
+        public static IComparer<char[]> LexicographicOrderComparer
+        {
+            get { return lexicographicOrder; }
+        }
+
         public void Add(char[] current)
         {
             Debug.Assert(this.register != null, "Automaton already built.");
             Debug.Assert(current.Length > 0, "Input sequences must not be empty.");
             Debug.Assert(
-                this.previous == null || lexicographicOrder.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
+                this.previous == null || LexicographicOrderComparer.Compare(this.previous.ToString().ToCharArray(), current) <= 0,
                 "Input must be sorted: " + this.previous + " >= " + current
                 );
             Debug.Assert(this.SetPrevious(current));
