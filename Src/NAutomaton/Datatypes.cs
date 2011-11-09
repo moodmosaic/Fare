@@ -221,7 +221,7 @@ namespace NAutomaton
             xmlNames = new HashSet<string>(xmlNamesArray);
         }
 
-        private static Automaton WhitespaceAutomaton
+        public static Automaton WhitespaceAutomaton
         {
             get { return ws; }
         }
