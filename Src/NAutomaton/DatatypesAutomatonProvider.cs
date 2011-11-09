@@ -47,8 +47,6 @@ namespace NAutomaton
             this.enableXml = enableXml;
         }
 
-        #region IAutomatonProvider Members
-
         public virtual Automaton GetAutomaton(string name)
         {
             if (this.enableUnicodeBlocks && Datatypes.IsUnicodeBlockName(name) ||
@@ -60,7 +58,5 @@ namespace NAutomaton
 
             return null;
         }
-
-        #endregion
     }
 }

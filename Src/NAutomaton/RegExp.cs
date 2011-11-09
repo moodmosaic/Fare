@@ -45,5 +45,10 @@ namespace NAutomaton
         {
             throw new NotImplementedException();
         }
+
+        internal Automaton ToAutomaton(System.Collections.Generic.IDictionary<string, Automaton> map)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

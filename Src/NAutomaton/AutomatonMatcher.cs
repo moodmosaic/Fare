@@ -60,8 +60,6 @@ namespace NAutomaton
             get { return chars; }
         }
 
-        #region IMatchResult Members
-
         public virtual int End()
         {
             MatchGood();
@@ -104,8 +102,6 @@ namespace NAutomaton
             OnlyZero(group);
             return Start();
         }
-
-        #endregion
 
         public virtual bool Find()
         {
