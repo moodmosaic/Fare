@@ -73,6 +73,7 @@ namespace NAutomaton
 
         public static int Minimization
         {
+            get { return minimization; }
             set { minimization = value; }
         }
 

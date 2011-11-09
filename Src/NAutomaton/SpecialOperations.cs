@@ -83,5 +83,10 @@
         {
             throw new System.NotImplementedException();
         }
+
+        internal static System.Collections.Generic.HashSet<State> Reverse(Automaton a)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
