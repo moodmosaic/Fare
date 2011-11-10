@@ -62,7 +62,7 @@ namespace NAutomaton
             foreach (State s in a1.AcceptStates)
             {
                 s.Accept = false;
-                s.AddEpsilon(a2.InitialState);
+                s.AddEpsilon(a2.Initial);
             }
             a1.IsDeterministic = deterMinistic;
             a1.ClearHashCode();
@@ -120,7 +120,7 @@ namespace NAutomaton
                         foreach (State s in ac)
                         {
                             s.Accept = false;
-                            s.AddEpsilon(aa.InitialState);
+                            s.AddEpsilon(aa.Initial);
                             if (s.Accept)
                             {
                                 ns.Add(s);
@@ -140,9 +140,9 @@ namespace NAutomaton
         {
             a = a.CloneExpandedIfRequired();
             var s = new State();
-            s.AddEpsilon(a.InitialState);
+            s.AddEpsilon(a.Initial);
             s.Accept = true;
-            a.InitialState = s;
+            a.Initial = s;
             a.IsDeterministic = false;
             a.ClearHashCode();
             a.CheckMinimizeAlways();
@@ -154,12 +154,12 @@ namespace NAutomaton
             a = a.CloneExpanded();
             var s = new State();
             s.Accept = true;
-            s.AddEpsilon(a.InitialState);
+            s.AddEpsilon(a.Initial);
             foreach (State p in a.AcceptStates)
             {
                 p.AddEpsilon(s);
             }
-            a.InitialState = s;
+            a.Initial = s;
             a.IsDeterministic = false;
             a.ClearHashCode();
             a.CheckMinimizeAlways();
@@ -215,13 +215,13 @@ namespace NAutomaton
                     Automaton c = a.Clone();
                     foreach (State p in c.AcceptStates)
                     {
-                        p.AddEpsilon(d.InitialState);
+                        p.AddEpsilon(d.Initial);
                     }
                     d = c;
                 }
                 foreach (State p in b.AcceptStates)
                 {
-                    p.AddEpsilon(d.InitialState);
+                    p.AddEpsilon(d.Initial);
                 }
                 b.IsDeterministic = false;
                 b.ClearHashCode();
@@ -294,7 +294,7 @@ namespace NAutomaton
             var c = new Automaton();
             var worklist = new LinkedList<StatePair>();
             var newstates = new Dictionary<StatePair, StatePair>();
-            var p = new StatePair(c.InitialState, a1.InitialState, a2.InitialState);
+            var p = new StatePair(c.Initial, a1.Initial, a2.Initial);
             worklist.AddLast(p);
             newstates.Add(p, p);
             while (worklist.Count > 0)
@@ -354,7 +354,7 @@ namespace NAutomaton
             Transition[][] transitions2 = Automaton.GetSortedTransitions(a2.States);
             var worklist = new LinkedList<StatePair>();
             var visited = new HashSet<StatePair>();
-            var p = new StatePair(a1.InitialState, a2.InitialState);
+            var p = new StatePair(a1.Initial, a2.Initial);
             worklist.AddLast(p);
             visited.Add(p);
             while (worklist.Count > 0)
@@ -421,9 +421,9 @@ namespace NAutomaton
                 a2 = a2.CloneExpandedIfRequired();
             }
             var s = new State();
-            s.AddEpsilon(a1.InitialState);
-            s.AddEpsilon(a2.InitialState);
-            a1.InitialState = s;
+            s.AddEpsilon(a1.Initial);
+            s.AddEpsilon(a2.Initial);
+            a1.Initial = s;
             a1.IsDeterministic = false;
             a1.ClearHashCode();
             a1.CheckMinimizeAlways();
@@ -447,10 +447,10 @@ namespace NAutomaton
                 }
                 Automaton bb = b;
                 bb = hasAliases ? bb.CloneExpanded() : bb.CloneExpandedIfRequired();
-                s.AddEpsilon(bb.InitialState);
+                s.AddEpsilon(bb.Initial);
             }
             var a = new Automaton();
-            a.InitialState = s;
+            a.Initial = s;
             a.IsDeterministic = false;
             a.ClearHashCode();
             a.CheckMinimizeAlways();
@@ -464,7 +464,7 @@ namespace NAutomaton
                 return;
             }
             var initialset = new HashSet<State>();
-            initialset.Add(a.InitialState);
+            initialset.Add(a.Initial);
             Determinize(a, initialset);
         }
 
@@ -477,8 +477,8 @@ namespace NAutomaton
             IDictionary<HashSet<State>, State> newstate = new Dictionary<HashSet<State>, State>();
             sets.Add(initialset, initialset);
             worklist.AddLast(initialset);
-            a.InitialState = new State();
-            newstate.Add(initialset, a.InitialState);
+            a.Initial = new State();
+            newstate.Add(initialset, a.Initial);
             while (worklist.Count > 0)
             {
                 HashSet<State> s = worklist.RemoveAndReturnFirst();
@@ -604,7 +604,7 @@ namespace NAutomaton
                 return a.Singleton.Length == 0;
             }
 
-            return a.InitialState.Accept && a.InitialState.Transitions.Count == 0;
+            return a.Initial.Accept && a.Initial.Transitions.Count == 0;
         }
 
         public static bool IsEmpty(Automaton a)
@@ -613,7 +613,7 @@ namespace NAutomaton
             {
                 return false;
             }
-            return !a.InitialState.Accept && a.InitialState.Transitions.Count == 0;
+            return !a.Initial.Accept && a.Initial.Transitions.Count == 0;
         }
 
         public static bool IsTotal(Automaton a)
@@ -622,14 +622,14 @@ namespace NAutomaton
             {
                 return false;
             }
-            if (a.InitialState.Accept && a.InitialState.Transitions.Count == 1)
+            if (a.Initial.Accept && a.Initial.Transitions.Count == 1)
             {
                 // Original code (Java): Transition t = a.initial.transitions.iterator().next();
-                HashSet<Transition>.Enumerator enumerator = a.InitialState.Transitions.GetEnumerator();
+                HashSet<Transition>.Enumerator enumerator = a.Initial.Transitions.GetEnumerator();
                 enumerator.MoveNext();
                 Transition t = enumerator.Current;
 
-                return t.To == a.InitialState && t.Min == Char.MinValue && t.Max == Char.MaxValue;
+                return t.To == a.Initial && t.Min == Char.MinValue && t.Max == Char.MaxValue;
             }
             return false;
         }
@@ -650,7 +650,7 @@ namespace NAutomaton
 
                 return "\u0000";
             }
-            return GetShortestExample(a.InitialState, accepted);
+            return GetShortestExample(a.Initial, accepted);
         }
 
         public static string GetShortestExample(State s, bool accepted)
@@ -699,7 +699,7 @@ namespace NAutomaton
             }
             if (a.IsDeterministic)
             {
-                State p = a.InitialState;
+                State p = a.Initial;
                 foreach (char t in s)
                 {
                     State q = p.Step(t);
@@ -718,9 +718,9 @@ namespace NAutomaton
             var ppOther = new LinkedList<State>();
             var bb = new BitArray(states.Count);
             var bbOther = new BitArray(states.Count);
-            pp.AddLast(a.InitialState);
+            pp.AddLast(a.Initial);
             var dest = new List<State>();
-            bool accept = a.InitialState.Accept;
+            bool accept = a.Initial.Accept;
 
             foreach (char c in s)
             {

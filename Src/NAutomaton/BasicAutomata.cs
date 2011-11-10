@@ -40,7 +40,7 @@ namespace NAutomaton
         {
             return new Automaton
                        {
-                           InitialState = new State(),
+                           Initial = new State(),
                            IsDeterministic = true
                        };
         }
@@ -62,7 +62,7 @@ namespace NAutomaton
 
             return new Automaton
                        {
-                           InitialState = state,
+                           Initial = state,
                            IsDeterministic = true
                        };
         }
@@ -92,7 +92,7 @@ namespace NAutomaton
             var s1 = new State();
             var s2 = new State();
 
-            a.InitialState = s1;
+            a.Initial = s1;
             s2.Accept = true;
 
             if (min <= max)
@@ -116,7 +116,7 @@ namespace NAutomaton
             var s1 = new State();
             var s2 = new State();
 
-            a.InitialState = s1;
+            a.Initial = s1;
             s2.Accept = true;
 
             foreach (char t in set)
@@ -248,13 +248,13 @@ namespace NAutomaton
             by.Append(y);
             y = by.ToString();
             ICollection<State> initials = new List<State>();
-            a.InitialState = Between(x, y, 0, initials, digits <= 0);
+            a.Initial = Between(x, y, 0, initials, digits <= 0);
             if (digits <= 0)
             {
                 List<StatePair> pairs =
-                    (from p in initials where a.InitialState != p select new StatePair(a.InitialState, p)).ToList();
+                    (from p in initials where a.Initial != p select new StatePair(a.Initial, p)).ToList();
                 a.AddEpsilons(pairs);
-                a.InitialState.AddTransition(new Transition('0', a.InitialState));
+                a.Initial.AddTransition(new Transition('0', a.Initial));
                 a.IsDeterministic = false;
             }
             else
@@ -282,7 +282,7 @@ namespace NAutomaton
             }
             Array.Sort(strings, StringUnionOperations.LexicographicOrderComparer);
             var a = new Automaton();
-            a.InitialState = StringUnionOperations.Build(strings);
+            a.Initial = StringUnionOperations.Build(strings);
             a.IsDeterministic = true;
             a.Reduce();
             a.RecomputeHashCode();
@@ -469,7 +469,7 @@ namespace NAutomaton
         {
             var a = new Automaton();
             var states = new State[s.Length + 1];
-            states[0] = a.InitialState;
+            states[0] = a.Initial;
             for (int i = 0; i < s.Length; i++)
             {
                 states[i + 1] = new State();

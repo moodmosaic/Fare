@@ -47,13 +47,13 @@ namespace NAutomaton
         private static bool? isDebug;
 
         private int hashCode;
-        private State initialState;
+        private State initial;
         private bool isDeterministic;
         private string singleton;
 
         public Automaton()
         {
-            this.initialState = new State();
+            this.initial = new State();
             this.isDeterministic = true;
             this.singleton = null;
         }
@@ -93,17 +93,17 @@ namespace NAutomaton
             set { this.singleton = value; }
         }
 
-        public State InitialState
+        public State Initial
         {
             set
             {
-                this.initialState = value;
+                this.initial = value;
                 this.singleton = null;
             }
             get
             {
                 this.ExpandSingleton();
-                return this.initialState;
+                return this.initial;
             }
         }
 
@@ -130,8 +130,8 @@ namespace NAutomaton
                     visited = new HashSet<State>();
                 }
                 var worklist = new LinkedList<State>();
-                worklist.AddLast(this.initialState);
-                visited.Add(this.initialState);
+                worklist.AddLast(this.initial);
+                visited.Add(this.initial);
                 while (worklist.Count > 0)
                 {
                     State s = worklist.RemoveAndReturnFirst();
@@ -165,8 +165,8 @@ namespace NAutomaton
                 var accepts = new HashSet<State>();
                 var visited = new HashSet<State>();
                 var worklist = new LinkedList<State>();
-                worklist.AddLast(initialState);
-                visited.Add(initialState);
+                worklist.AddLast(initial);
+                visited.Add(initial);
                 while (worklist.Count > 0)
                 {
                     State s = worklist.RemoveAndReturnFirst();
@@ -461,7 +461,7 @@ namespace NAutomaton
             if (this.IsSingleton)
             {
                 var p = new State();
-                initialState = p;
+                initial = p;
                 foreach (char t in singleton)
                 {
                     var q = new State();
@@ -531,7 +531,7 @@ namespace NAutomaton
             {
                 HashSet<State> states = States;
                 Automaton.StateNumbers = states;
-                b.Append("initial state: ").Append(initialState.Number).Append("\n");
+                b.Append("initial state: ").Append(initial.Number).Append("\n");
                 foreach (State s in states)
                 {
                     b.Append(s.ToString());
@@ -550,7 +550,7 @@ namespace NAutomaton
             {
                 b.Append("  ").Append(s.Number);
                 b.Append(s.Accept ? " [shape=doublecircle,label=\"\"];\n" : " [shape=circle,label=\"\"];\n");
-                if (s == initialState)
+                if (s == initial)
                 {
                     b.Append("  initial [shape=plaintext,label=\"\"];\n");
                     b.Append("  initial -> ").Append(s.Number).Append("\n");
@@ -593,9 +593,9 @@ namespace NAutomaton
                 {
                     State p = m[s];
                     p.Accept = s.Accept;
-                    if (s == initialState)
+                    if (s == initial)
                     {
-                        a.initialState = p;
+                        a.initial = p;
                     }
                     foreach (Transition t in s.Transitions)
                     {

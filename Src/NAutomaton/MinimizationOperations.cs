@@ -202,8 +202,8 @@ namespace NAutomaton
             for (int n = 0; n < states.Length; n++)
             {
                 newstates[states[n].Number].Number = n;
-                if (states[n] == a.InitialState)
-                    a.InitialState = newstates[states[n].Number];
+                if (states[n] == a.Initial)
+                    a.Initial = newstates[states[n].Number];
             }
             // build transitions and set acceptance
             for (int n = 0; n < numclasses; n++)
@@ -227,13 +227,13 @@ namespace NAutomaton
         public static void MinimizeHopcroft(Automaton a)
         {
             a.Determinize();
-            HashSet<Transition> tr = a.InitialState.Transitions;
+            HashSet<Transition> tr = a.Initial.Transitions;
             if (tr.Count == 1)
             {
                 HashSet<Transition>.Enumerator enumerator = tr.GetEnumerator();
                 enumerator.MoveNext();
                 Transition t = enumerator.Current;
-                if (t.To == a.InitialState && t.Min == char.MinValue && t.Max == char.MaxValue)
+                if (t.To == a.Initial && t.Min == char.MinValue && t.Max == char.MaxValue)
                     return;
             }
             a.Totalize();
@@ -387,8 +387,8 @@ namespace NAutomaton
                 newstates[n] = s;
                 foreach (State q in partition[n])
                 {
-                    if (q == a.InitialState)
-                        a.InitialState = s;
+                    if (q == a.Initial)
+                        a.Initial = s;
                     s.Accept = q.Accept;
                     s.Number = q.Number; // select representative
                     q.Number = n;

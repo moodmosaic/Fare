@@ -77,7 +77,7 @@ namespace NAutomaton
             MatchGood();
 
             // Original code (Java): return chars.subSequence(matchStart, matchEnd).ToString();
-            return chars.ToString().Substring(matchStart, matchEnd);
+            throw new NotImplementedException();
         }
 
         public virtual string Group(int group)
@@ -131,7 +131,7 @@ namespace NAutomaton
 
             int matchStart;
             int matchEnd;
-            if (automaton.IsAccept(automaton.InitialState))
+            if (automaton.IsAccept(automaton.Initial))
             {
                 matchStart = begin;
                 matchEnd = begin;
@@ -144,7 +144,7 @@ namespace NAutomaton
             int l = Chars.Length;
             while (begin < l)
             {
-                int p = automaton.InitialState;
+                int p = automaton.Initial;
                 for (int i = begin; i < l; i++)
                 {
                     int newState = automaton.Step(p, Chars[i]);

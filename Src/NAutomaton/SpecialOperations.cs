@@ -88,5 +88,10 @@
         {
             throw new System.NotImplementedException();
         }
+
+        internal static int FindIndex(char c, char[] points)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
