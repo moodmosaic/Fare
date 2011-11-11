@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAutomaton", "NAutomaton\NAutomaton.csproj", "{24033E0E-0304-4F06-94CD-6F6416ECA509}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAutomaton.Tests.Integration", "NAutomaton.Tests.Integration\NAutomaton.Tests.Integration.csproj", "{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
