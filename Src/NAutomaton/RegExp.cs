@@ -639,7 +639,7 @@ namespace NAutomaton
                     {
                         throw new ArgumentException("integer expected at position " + pos);
                     }
-                    int n = int.Parse(b.Substring(start, pos));
+                    int n = int.Parse(b.Substring(start, pos - start));
                     int m = -1;
                     if (Match(','))
                     {
@@ -650,7 +650,7 @@ namespace NAutomaton
                         }
                         if (start != pos)
                         {
-                            m = int.Parse(b.Substring(start, pos));
+                            m = int.Parse(b.Substring(start, pos - start));
                         }
                     }
                     else
