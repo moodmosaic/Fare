@@ -32,7 +32,7 @@ using System.Text;
 
 namespace NAutomaton
 {
-    public class Transition
+    public class Transition : IEquatable<Transition>
     {
         private readonly char max;
         private readonly char min;
@@ -81,20 +81,28 @@ namespace NAutomaton
 
         public override bool Equals(object obj)
         {
-            var other = obj as Transition;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return other.Min == this.Min
-                   && other.Max == this.Max
-                   && other.To == this.To;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (Transition)) return false;
+            return Equals((Transition) obj);
         }
 
         public override int GetHashCode()
         {
-            return this.Min*2 + this.Max*3;
+            unchecked
+            {
+                int result = max.GetHashCode();
+                result = (result*397) ^ min.GetHashCode();
+                result = (result*397) ^ (to != null ? to.GetHashCode() : 0);
+                return result;
+            }
+        }
+
+        public bool Equals(Transition other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other.max == max && other.min == min && Equals(other.to, to);
         }
 
         public override string ToString()

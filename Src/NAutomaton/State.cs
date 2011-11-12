@@ -34,7 +34,7 @@ using System.Text;
 
 namespace NAutomaton
 {
-    public class State : IComparable<State>
+    public class State : IComparable<State>, IEquatable<State>
     {
         private static int nextId;
 
@@ -45,6 +45,8 @@ namespace NAutomaton
 
         public State()
         {
+            transitions = new HashSet<Transition>();
+
             this.ResetTransitions();
             this.id = nextId++;
         }
@@ -62,26 +64,9 @@ namespace NAutomaton
             get { return this.transitions; }
         }
 
-        #region IComparable<State> Members
-
-        public int CompareTo(State s)
+        public int Id
         {
-            return s.id - this.id;
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            var b = new StringBuilder();
-            b.Append("state ").Append(this.Number);
-            b.Append(accept ? " [accept]" : " [reject]");
-            b.Append(":\n");
-            foreach (Transition t in this.transitions)
-            {
-                b.Append("  ").Append(t.ToString()).Append("\n");
-            }
-            return b.ToString();
+            get { return id; }
         }
 
         internal void AddEpsilon(State to)
@@ -130,6 +115,75 @@ namespace NAutomaton
         public void ResetTransitions()
         {
             this.transitions = new HashSet<Transition>();
+        }
+
+        public override string ToString()
+        {
+            var b = new StringBuilder();
+            b.Append("state ").Append(this.Number);
+            b.Append(accept ? " [accept]" : " [reject]");
+            b.Append(":\n");
+            foreach (Transition t in this.transitions)
+            {
+                b.Append("  ").Append(t.ToString()).Append("\n");
+            }
+            return b.ToString();
+        }
+
+        public int CompareTo(State s)
+        {
+            return s.Id - this.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != typeof(State))
+            {
+                return false;
+            }
+
+            return Equals((State)obj);
+        }
+
+        public bool Equals(State other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return other.Id == Id;
+
+            //&& other.Accept.Equals(Accept) && Equals(other.Transitions, Transitions) && other.Number == Number;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = id * 397;
+            
+                //result = (result * 397) ^ accept.GetHashCode();
+                //result = (result * 397) ^ (transitions != null ? transitions.GetHashCode() : 0);
+                
+                result = (result * 397) ^ Number;
+                return result;
+            }
         }
     }
 }

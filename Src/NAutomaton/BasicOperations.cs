@@ -432,7 +432,7 @@ namespace NAutomaton
 
         public static Automaton Union(ICollection<Automaton> l)
         {
-            var ids = new HashSet<int?>();
+            var ids = new HashSet<int>();
             foreach (Automaton automaton in l)
             {
                 ids.Add(RuntimeHelpers.GetHashCode(automaton));
@@ -471,61 +471,74 @@ namespace NAutomaton
         public static void Determinize(Automaton a, HashSet<State> initialset)
         {
             char[] points = a.StartPoints;
-            // Subset construction.
-            IDictionary<HashSet<State>, HashSet<State>> sets = new Dictionary<HashSet<State>, HashSet<State>>();
-            var worklist = new LinkedList<HashSet<State>>();
+
+            IDictionary<HashSet<State>, HashSet<State>> sets = new Dictionary<HashSet<State>, HashSet<State>>(HashSet<State>.CreateSetComparer());
+
+            var worklist = new Stack<HashSet<State>>();
+            
+            
             IDictionary<HashSet<State>, State> newstate = new Dictionary<HashSet<State>, State>();
+
             sets.Add(initialset, initialset);
-            worklist.AddLast(initialset);
+            worklist.Push(initialset);
             a.Initial = new State();
             newstate.Add(initialset, a.Initial);
-            while (worklist.Count > 0)
-            {
-                HashSet<State> s = worklist.RemoveAndReturnFirst();
-                State r = newstate[s];
+            while (worklist.Count > 0) {
+			HashSet<State> s = worklist.Pop();
+			State r = newstate[s];
+			foreach (State q in s)
+				if (q.Accept) {
+					r.Accept = true;
+					break;
+				}
+			for (int n = 0; n < points.Length; n++) {
+				var p = new HashSet<State>();
                 foreach (State q in s)
                 {
-                    if (q.Accept)
+                    foreach (Transition t in q.Transitions)
                     {
-                        r.Accept = true;
-                        break;
-                    }
-                }
-                for (int n = 0; n < points.Length; n++)
-                {
-                    var p = new HashSet<State>();
-                    foreach (State state in s)
-                    {
-                        foreach (Transition t in state.Transitions)
+                        if (t.Min <= points[n] && points[n] <= t.Max)
                         {
-                            if (t.Min <= points[n] && points[n] <= t.Max)
-                            {
-                                p.Add(t.To);
-                            }
+                            p.Add(t.To);
                         }
                     }
-                    if (!sets.ContainsKey(p))
-                    {
-                        sets.Add(p, p);
-                        worklist.AddLast(p);
-                        newstate.Add(p, new State());
-                    }
-                    State q = newstate[p];
-                    char min = points[n];
-                    char max;
-                    if (n + 1 < points.Length)
-                    {
-                        max = (char) (points[n + 1] - 1);
-                    }
-                    else
-                    {
-                        max = Char.MaxValue;
-                    }
-                    r.Transitions.Add(new Transition(min, max, q));
                 }
+				if (!sets.ContainsKey(p)) {
+					sets.Add(p, p);
+					worklist.Push(p);
+					newstate.Add(p, new State());
+				}
+
+                State q1 = newstate[p];
+				char min = points[n];
+				char max;
+				if (n + 1 < points.Length)
+					max = (char)(points[n + 1] - 1);
+				else
+					max = Char.MaxValue;
+                r.Transitions.Add(new Transition(min, max, q1));
+			}
+		}
+		a.IsDeterministic = true;
+		a.RemoveDeadTransitions();
+	}
+
+        private sealed class HashSetOfStateEqualityComparer : IEqualityComparer<HashSet<State>>
+        {
+            public bool Equals(HashSet<State> x, HashSet<State> y)
+            {
+                if (x.Count != y.Count)
+                {
+                    return false;
+                }
+
+                return  x.Intersect(y).Any();
             }
-            a.IsDeterministic = true;
-            a.RemoveDeadTransitions();
+
+            public int GetHashCode(HashSet<State> obj)
+            {
+                return obj.Sum(state => state.GetHashCode());
+            }
         }
 
         public static void AddEpsilons(Automaton a, ICollection<StatePair> pairs)
