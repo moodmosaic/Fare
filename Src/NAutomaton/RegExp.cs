@@ -893,18 +893,18 @@ namespace NAutomaton
 
         private RegExp ParseCharClass()
         {
-            char c = this.ParseCharExp();
+            char @char = this.ParseCharExp();
             if (this.Match('-'))
             {
                 if (this.Peek("]"))
                 {
-                    return RegExp.MakeUnion(RegExp.MakeChar(c), RegExp.MakeChar('-'));
+                    return RegExp.MakeUnion(RegExp.MakeChar(@char), RegExp.MakeChar('-'));
                 }
 
-                return RegExp.MakeCharRange(c, this.ParseCharExp());
+                return RegExp.MakeCharRange(@char, this.ParseCharExp());
             }
 
-            return RegExp.MakeChar(c);
+            return RegExp.MakeChar(@char);
         }
 
         private static RegExp MakeCharRange(char from, char to)

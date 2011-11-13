@@ -13,5 +13,7 @@ namespace NAutomaton
         {
             throw new NotImplementedException();
         }
+
+        public char[] Number { get; set; }
     }
 }

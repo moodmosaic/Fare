@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace NAutomaton
 {
@@ -39,12 +36,12 @@ namespace NAutomaton
             throw new NotImplementedException();
         }
 
-        internal Automaton Repeat()
+        public Automaton Repeat()
         {
             throw new NotImplementedException();
         }
 
-        internal Automaton Optional()
+        public Automaton Optional()
         {
             throw new NotImplementedException();
         }

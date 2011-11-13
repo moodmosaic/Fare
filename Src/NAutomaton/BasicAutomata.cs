@@ -7,37 +7,37 @@ namespace NAutomaton
 {
     public static class BasicAutomata
     {
-        internal static Automaton MakeInterval(int min, int max, int digits)
+        public static Automaton MakeInterval(int min, int max, int digits)
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeChar(char c)
+        public static Automaton MakeChar(char c)
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeCharRange(char from, char to)
+        public static Automaton MakeCharRange(char from, char to)
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeAnyChar()
+        public static Automaton MakeAnyChar()
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeEmpty()
+        public static Automaton MakeEmpty()
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeString(string s)
+        public static Automaton MakeString(string s)
         {
             throw new NotImplementedException();
         }
 
-        internal static Automaton MakeAnyString()
+        public static Automaton MakeAnyString()
         {
             throw new NotImplementedException();
         }
