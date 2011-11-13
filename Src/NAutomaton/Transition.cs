@@ -46,10 +46,11 @@ namespace NAutomaton
         private readonly State to;
 
         /// <summary>
-        ///   Constructs a new singleton interval transition.
+        /// Initializes a new instance of the <see cref="Transition"/> class.
+        /// (Constructs a new singleton interval transition).
         /// </summary>
-        /// <param name = "c">The transition character.</param>
-        /// <param name = "to">The destination state.</param>
+        /// <param name="c">The transition character.</param>
+        /// <param name="to">The destination state.</param>
         public Transition(char c, State to)
         {
             this.min = this.max = c;
@@ -57,12 +58,12 @@ namespace NAutomaton
         }
 
         /// <summary>
-        ///   Constructs a new transition.
-        ///   Both end points are included in the interval.
+        /// Initializes a new instance of the <see cref="Transition"/> class.
+        /// (Both end points are included in the interval).
         /// </summary>
-        /// <param name = "min">The transition interval minimum.</param>
-        /// <param name = "max">The transition interval maximum.</param>
-        /// <param name = "to">The destination state.</param>
+        /// <param name="min">The transition interval minimum.</param>
+        /// <param name="max">The transition interval maximum.</param>
+        /// <param name="to">The destination state.</param>
         public Transition(char min, char max, State to)
         {
             if (max < min)
@@ -78,34 +79,60 @@ namespace NAutomaton
         }
 
         /// <summary>
-        ///   Returns minimum of this transition interval.
+        /// Gets the minimum of this transition interval.
         /// </summary>
-        public int Min
+        public char Min
         {
             get { return this.min; }
         }
 
         /// <summary>
-        ///   Returns maximum of this transition interval.
+        /// Gets the maximum of this transition interval.
         /// </summary>
-        public int Max
+        public char Max
         {
             get { return this.max; }
         }
 
         /// <summary>
-        ///   Returns destination of this transition.
+        /// Gets the destination of this transition.
         /// </summary>
-        public State Destination
+        public State To
         {
             get { return this.to; }
         }
 
         /// <summary>
-        ///   Returns a <see cref = "System.String" /> describing this state.
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(Transition left, Transition right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(Transition left, Transition right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <summary>
+        ///  Returns a <see cref = "System.String" /> describing this state.
         /// </summary>
         /// <returns>
-        ///   A <see cref = "System.String" /> describing this state.
+        ///  A <see cref = "System.String" /> describing this state.
         /// </returns>
         public override string ToString()
         {
@@ -116,6 +143,7 @@ namespace NAutomaton
                 sb.Append("-");
                 Transition.AppendCharString(max, sb);
             }
+
             sb.Append(" -> ").Append(to.Number);
             return sb.ToString();
         }
@@ -141,16 +169,18 @@ namespace NAutomaton
             {
                 return false;
             }
+
             if (object.ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if (obj.GetType() != typeof (Transition))
+
+            if (obj.GetType() != typeof(Transition))
             {
                 return false;
             }
 
-            return this.Equals((Transition) obj);
+            return this.Equals((Transition)obj);
         }
 
         /// <summary>
@@ -171,16 +201,6 @@ namespace NAutomaton
             }
         }
 
-        public static bool operator ==(Transition left, Transition right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(Transition left, Transition right)
-        {
-            return !Equals(left, right);
-        }
-
         /// <summary>
         ///   Indicates whether the current object is equal to another object of the same type.
         /// </summary>
@@ -195,6 +215,7 @@ namespace NAutomaton
             {
                 return false;
             }
+
             if (object.ReferenceEquals(this, other))
             {
                 return true;
@@ -214,7 +235,7 @@ namespace NAutomaton
             else
             {
                 sb.Append("\\u");
-                string s = ((int) c).ToString("x");
+                string s = ((int)c).ToString("x");
                 if (c < 0x10)
                 {
                     sb.Append("000").Append(s);
@@ -243,6 +264,7 @@ namespace NAutomaton
                 sb.Append("-");
                 Transition.AppendCharString(this.max, sb);
             }
+
             sb.Append("\"]\n");
         }
     }

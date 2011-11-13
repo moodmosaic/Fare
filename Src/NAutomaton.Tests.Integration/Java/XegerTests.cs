@@ -90,6 +90,13 @@ namespace NAutomaton.Tests.Integration.Java
                 return builder.ToString();
             }
 
+            private static int GetRandomInt(int min, int max, Random random)
+            {
+                int dif = max - min;
+                double number = random.NextDouble();
+                return min + (int)Math.Round(number * dif);
+            }
+
             private void Generate(StringBuilder builder, dk.brics.automaton.State state)
             {
                 java.util.List transitions = state.getSortedTransitions(true);
@@ -99,6 +106,7 @@ namespace NAutomaton.Tests.Integration.Java
                     {
                         throw new InvalidOperationException("state");
                     }
+
                     return;
                 }
 
@@ -111,22 +119,15 @@ namespace NAutomaton.Tests.Integration.Java
                 }
 
                 // Moving on to next transition.
-                var transition = (dk.brics.automaton.Transition) transitions.get(option - (state.isAccept() ? 1 : 0));
+                var transition = (dk.brics.automaton.Transition)transitions.get(option - (state.isAccept() ? 1 : 0));
                 AppendChoice(builder, transition);
                 Generate(builder, transition.getDest());
             }
 
             private void AppendChoice(StringBuilder builder, dk.brics.automaton.Transition transition)
             {
-                var c = (char) GetRandomInt(transition.getMin(), transition.getMax(), random);
+                var c = (char)GetRandomInt(transition.getMin(), transition.getMax(), random);
                 builder.Append(c);
-            }
-
-            private static int GetRandomInt(int min, int max, Random random)
-            {
-                int dif = max - min;
-                double number = random.NextDouble();
-                return min + (int) Math.Round(number*dif);
             }
         }
 

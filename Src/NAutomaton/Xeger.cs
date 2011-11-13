@@ -70,6 +70,20 @@ namespace NAutomaton
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Generates a random number within the given bounds.
+        /// </summary>
+        /// <param name="min">The minimum number (inclusive).</param>
+        /// <param name="max">The maximum number (inclusive).</param>
+        /// <param name="random">The object used as the randomizer.</param>
+        /// <returns>A random number in the given range.</returns>
+        private static int GetRandomInt(int min, int max, Random random)
+        {
+            int dif = max - min;
+            double number = random.NextDouble();
+            return min + (int)Math.Round(number * dif);
+        }
+
         private void Generate(StringBuilder builder, State state)
         {
             var transitions = state.GetSortedTransitions(true);
@@ -79,6 +93,7 @@ namespace NAutomaton
                 {
                     throw new InvalidOperationException("state");
                 }
+
                 return;
             }
 
@@ -93,27 +108,13 @@ namespace NAutomaton
             // Moving on to next transition.
             Transition transition = transitions[option - (state.Accept ? 1 : 0)];
             this.AppendChoice(builder, transition);
-            Generate(builder, transition.Destination);
+            Generate(builder, transition.To);
         }
 
         private void AppendChoice(StringBuilder builder, Transition transition)
         {
-            var c = (char) Xeger.GetRandomInt(transition.Min, transition.Max, random);
+            var c = (char)Xeger.GetRandomInt(transition.Min, transition.Max, random);
             builder.Append(c);
-        }
-
-        /// <summary>
-        /// Generates a random number within the given bounds.
-        /// </summary>
-        /// <param name="min">The minimum number (inclusive).</param>
-        /// <param name="max">The maximum number (inclusive).</param>
-        /// <param name="random">The object used as the randomizer.</param>
-        /// <returns>A random number in the given range.</returns>
-        private static int GetRandomInt(int min, int max, Random random)
-        {
-            int dif = max - min;
-            double number = random.NextDouble();
-            return min + (int) Math.Round(number*dif);
         }
     }
 }

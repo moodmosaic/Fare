@@ -39,45 +39,46 @@ namespace NAutomaton
     /// </summary>
     public class RegExp
     {
+        private readonly string b;
+        private readonly int flags;
+
         /// <summary>
         ///   Syntax flag, enables intersection.
         /// </summary>
-        public static int intersection = 0x0001;
+        private static int intersection = 0x0001;
 
         /// <summary>
         ///   Syntax flag, enables complement.
         /// </summary>
-        public static int complement = 0x0002;
+        private static int complement = 0x0002;
 
         /// <summary>
         ///   Syntax flag, enables empty language.
         /// </summary>
-        public static int empty = 0x0004;
+        private static int empty = 0x0004;
 
         /// <summary>
         ///   Syntax flag, enables anystring.
         /// </summary>
-        public static int anystring = 0x0008;
+        private static int anystring = 0x0008;
 
         /// <summary>
         ///   Syntax flag, enables named automata.
         /// </summary>
-        public static int automaton = 0x0010;
+        private static int automaton = 0x0010;
 
         /// <summary>
         ///   Syntax flag, enables numerical intervals.
         /// </summary>
-        public static int interval = 0x0020;
+        private static int interval = 0x0020;
 
         /// <summary>
         ///   Syntax flag, enables all optional regexp syntax.
         /// </summary>
-        public static int all = 0xffff;
+        private static int all = 0xffff;
 
         private static bool allowMutation;
 
-        private readonly string b;
-        private readonly int flags;
         private char c;
         private int digits;
         private RegExp exp1;
@@ -118,7 +119,7 @@ namespace NAutomaton
             RegExp e;
             if (s.Length == 0)
             {
-                e = RegExp.MakeString("");
+                e = RegExp.MakeString(string.Empty);
             }
             else
             {
@@ -128,6 +129,7 @@ namespace NAutomaton
                     throw new ArgumentException("end-of-string expected at position " + this.pos);
                 }
             }
+
             this.kind = e.kind;
             this.exp1 = e.exp1;
             this.exp2 = e.exp2;
@@ -152,9 +154,10 @@ namespace NAutomaton
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   Same as <code>toAutomaton(null,minimize)</code> (empty automaton map).
+        /// Constructs new <code>Automaton</code> from this <code>RegExp</code>.
+        /// Same as <code>toAutomaton(null,minimize)</code> (empty automaton map).
         /// </summary>
+        /// <param name="minimize">if set to <c>true</c> [minimize].</param>
         /// <returns></returns>
         public Automaton ToAutomaton(bool minimize)
         {
@@ -223,21 +226,227 @@ namespace NAutomaton
             return @bool;
         }
 
+        /// <summary>
+        ///   Returns a <see cref = "System.String" /> that represents the parsed regular expression.
+        /// </summary>
+        /// <returns>
+        ///   A <see cref = "System.String" /> that represents the parsed regular expression.
+        /// </returns>
+        public override string ToString()
+        {
+            return this.ToStringBuilder(new StringBuilder()).ToString();
+        }
+
+        /// <summary>
+        /// Returns the set of automaton identifiers that occur in this regular expression.
+        /// </summary>
+        /// <returns>The set of automaton identifiers that occur in this regular expression.</returns>
+        public HashSet<String> GetIdentifiers()
+        {
+            var set = new HashSet<String>();
+            this.GetIdentifiers(set);
+            return set;
+        }
+
+        private static RegExp MakeUnion(RegExp exp1, RegExp exp2)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpUnion;
+            r.exp1 = exp1;
+            r.exp2 = exp2;
+            return r;
+        }
+
+        private static RegExp MakeIntersection(RegExp exp1, RegExp exp2)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpIntersection;
+            r.exp1 = exp1;
+            r.exp2 = exp2;
+            return r;
+        }
+
+        private static RegExp MakeConcatenation(RegExp exp1, RegExp exp2)
+        {
+            if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
+                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
+            {
+                return RegExp.MakeString(exp1, exp2);
+            }
+
+            var r = new RegExp();
+            r.kind = Kind.RegexpConcatenation;
+            if (exp1.kind == Kind.RegexpConcatenation
+                && (exp1.exp2.kind == Kind.RegexpChar || exp1.exp2.kind == Kind.RegexpString)
+                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
+            {
+                r.exp1 = exp1.exp1;
+                r.exp2 = RegExp.MakeString(exp1.exp2, exp2);
+            }
+            else if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
+                     && exp2.kind == Kind.RegexpConcatenation
+                     && (exp2.exp1.kind == Kind.RegexpChar || exp2.exp1.kind == Kind.RegexpString))
+            {
+                r.exp1 = RegExp.MakeString(exp1, exp2.exp1);
+                r.exp2 = exp2.exp2;
+            }
+            else
+            {
+                r.exp1 = exp1;
+                r.exp2 = exp2;
+            }
+
+            return r;
+        }
+
+        private static RegExp MakeRepeat(RegExp exp)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpRepeat;
+            r.exp1 = exp;
+            return r;
+        }
+
+        private static RegExp MakeRepeat(RegExp exp, int min)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpRepeatMin;
+            r.exp1 = exp;
+            r.min = min;
+            return r;
+        }
+
+        private static RegExp MakeRepeat(RegExp exp, int min, int max)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpRepeatMinMax;
+            r.exp1 = exp;
+            r.min = min;
+            r.max = max;
+            return r;
+        }
+
+        private static RegExp MakeOptional(RegExp exp)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpOptional;
+            r.exp1 = exp;
+            return r;
+        }
+
+        private static RegExp MakeChar(char @char)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpChar;
+            r.c = @char;
+            return r;
+        }
+
+        private static RegExp MakeInterval(int min, int max, int digits)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpInterval;
+            r.min = min;
+            r.max = max;
+            r.digits = digits;
+            return r;
+        }
+
+        private static RegExp MakeAutomaton(string s)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpAutomaton;
+            r.s = s;
+            return r;
+        }
+
+        private static RegExp MakeAnyString()
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpAnyString;
+            return r;
+        }
+
+        private static RegExp MakeEmpty()
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpEmpty;
+            return r;
+        }
+
+        private static RegExp MakeAnyChar()
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpAnyChar;
+            return r;
+        }
+
+        private static RegExp MakeCharRange(char from, char to)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpCharRange;
+            r.from = from;
+            r.to = to;
+            return r;
+        }
+
+        private static RegExp MakeComplement(RegExp exp)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpComplement;
+            r.exp1 = exp;
+            return r;
+        }
+
+        private static RegExp MakeString(string @string)
+        {
+            var r = new RegExp();
+            r.kind = Kind.RegexpString;
+            r.s = @string;
+            return r;
+        }
+
+        private static RegExp MakeString(RegExp exp1, RegExp exp2)
+        {
+            var sb = new StringBuilder();
+            if (exp1.kind == Kind.RegexpString)
+            {
+                sb.Append(exp1.s);
+            }
+            else
+            {
+                sb.Append(exp1.c);
+            }
+
+            if (exp2.kind == Kind.RegexpString)
+            {
+                sb.Append(exp2.s);
+            }
+            else
+            {
+                sb.Append(exp2.c);
+            }
+
+            return RegExp.MakeString(sb.ToString());
+        }
+
         private Automaton ToAutomatonAllowMutate(
-            IDictionary<String, Automaton> automata,
-            IAutomatonProvider automatonProvider,
-            bool minimize)
+    IDictionary<String, Automaton> automata,
+    IAutomatonProvider automatonProvider,
+    bool minimize)
         {
             bool @bool = false;
             if (allowMutation)
             {
                 @bool = this.SetAllowMutate(true); // This is not thead safe.
             }
+
             Automaton a = this.ToAutomaton(automata, automatonProvider, minimize);
             if (allowMutation)
             {
                 this.SetAllowMutate(@bool);
             }
+
             return a;
         }
 
@@ -313,7 +522,9 @@ namespace NAutomaton
                     {
                         automata.TryGetValue(s, out aa);
                     }
+
                     if (aa == null && automatonProvider != null)
+                    {
                         try
                         {
                             aa = automatonProvider.GetAutomaton(s);
@@ -322,16 +533,20 @@ namespace NAutomaton
                         {
                             throw new ArgumentException(string.Empty, e);
                         }
+                    }
+
                     if (aa == null)
                     {
                         throw new ArgumentException("'" + s + "' not found");
                     }
+
                     a = aa.Clone(); // Always clone here (ignore allowMutate).
                     break;
                 case Kind.RegexpInterval:
                     a = BasicAutomata.MakeInterval(min, max, digits);
                     break;
             }
+
             return a;
         }
 
@@ -352,17 +567,6 @@ namespace NAutomaton
             {
                 list.Add(exp.ToAutomaton(automata, automatonProvider, minimize));
             }
-        }
-
-        /// <summary>
-        ///   Returns a <see cref = "System.String" /> that represents the parsed regular expression.
-        /// </summary>
-        /// <returns>
-        ///   A <see cref = "System.String" /> that represents the parsed regular expression.
-        /// </returns>
-        public override string ToString()
-        {
-            return this.ToStringBuilder(new StringBuilder()).ToString();
         }
 
         private StringBuilder ToStringBuilder(StringBuilder sb)
@@ -444,6 +648,7 @@ namespace NAutomaton
                             sb.Append('0');
                         }
                     }
+
                     sb.Append(s1).Append("-");
                     if (digits > 0)
                     {
@@ -452,21 +657,12 @@ namespace NAutomaton
                             sb.Append('0');
                         }
                     }
+
                     sb.Append(s2).Append(">");
                     break;
             }
-            return sb;
-        }
 
-        /// <summary>
-        /// Returns the set of automaton identifiers that occur in this regular expression.
-        /// </summary>
-        /// <returns>The set of automaton identifiers that occur in this regular expression.</returns>
-        public HashSet<String> GetIdentifiers()
-        {
-            var set = new HashSet<String>();
-            this.GetIdentifiers(set);
-            return set;
+            return sb;
         }
 
         private void GetIdentifiers(HashSet<String> set)
@@ -499,6 +695,7 @@ namespace NAutomaton
             {
                 e = RegExp.MakeUnion(e, this.ParseUnionExp());
             }
+
             return e;
         }
 
@@ -518,15 +715,6 @@ namespace NAutomaton
             return false;
         }
 
-        private static RegExp MakeUnion(RegExp exp1, RegExp exp2)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpUnion;
-            r.exp1 = exp1;
-            r.exp2 = exp2;
-            return r;
-        }
-
         private RegExp ParseInterExp()
         {
             RegExp e = this.ParseConcatExp();
@@ -534,21 +722,13 @@ namespace NAutomaton
             {
                 e = RegExp.MakeIntersection(e, this.ParseInterExp());
             }
+
             return e;
         }
 
         private bool Check(int flag)
         {
             return (flags & flag) != 0;
-        }
-
-        private static RegExp MakeIntersection(RegExp exp1, RegExp exp2)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpIntersection;
-            r.exp1 = exp1;
-            r.exp2 = exp2;
-            return r;
         }
 
         private RegExp ParseConcatExp()
@@ -558,38 +738,8 @@ namespace NAutomaton
             {
                 e = RegExp.MakeConcatenation(e, this.ParseConcatExp());
             }
-            return e;
-        }
 
-        private static RegExp MakeConcatenation(RegExp exp1, RegExp exp2)
-        {
-            if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
-                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
-            {
-                return RegExp.MakeString(exp1, exp2);
-            }
-            var r = new RegExp();
-            r.kind = Kind.RegexpConcatenation;
-            if (exp1.kind == Kind.RegexpConcatenation
-                && (exp1.exp2.kind == Kind.RegexpChar || exp1.exp2.kind == Kind.RegexpString)
-                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
-            {
-                r.exp1 = exp1.exp1;
-                r.exp2 = RegExp.MakeString(exp1.exp2, exp2);
-            }
-            else if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
-                     && exp2.kind == Kind.RegexpConcatenation
-                     && (exp2.exp1.kind == Kind.RegexpChar || exp2.exp1.kind == Kind.RegexpString))
-            {
-                r.exp1 = RegExp.MakeString(exp1, exp2.exp1);
-                r.exp2 = exp2.exp2;
-            }
-            else
-            {
-                r.exp1 = exp1;
-                r.exp2 = exp2;
-            }
-            return r;
+            return e;
         }
 
         private bool More()
@@ -626,10 +776,12 @@ namespace NAutomaton
                     {
                         this.Next();
                     }
+
                     if (start == pos)
                     {
                         throw new ArgumentException("integer expected at position " + pos);
                     }
+
                     int n = int.Parse(b.Substring(start, pos - start));
                     int m = -1;
                     if (this.Match(','))
@@ -639,6 +791,7 @@ namespace NAutomaton
                         {
                             this.Next();
                         }
+
                         if (start != pos)
                         {
                             m = int.Parse(b.Substring(start, pos - start));
@@ -648,10 +801,12 @@ namespace NAutomaton
                     {
                         m = n;
                     }
+
                     if (!this.Match('}'))
                     {
                         throw new ArgumentException("expected '}' at position " + pos);
                     }
+
                     e = m == -1 ? RegExp.MakeRepeat(e, n) : RegExp.MakeRepeat(e, n, m);
                 }
             }
@@ -669,46 +824,11 @@ namespace NAutomaton
             return b[pos++];
         }
 
-        private static RegExp MakeRepeat(RegExp exp)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpRepeat;
-            r.exp1 = exp;
-            return r;
-        }
-
-        private static RegExp MakeRepeat(RegExp exp, int min)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpRepeatMin;
-            r.exp1 = exp;
-            r.min = min;
-            return r;
-        }
-
-        private static RegExp MakeRepeat(RegExp exp, int min, int max)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpRepeatMinMax;
-            r.exp1 = exp;
-            r.min = min;
-            r.max = max;
-            return r;
-        }
-
-        private static RegExp MakeOptional(RegExp exp)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpOptional;
-            r.exp1 = exp;
-            return r;
-        }
-
         private RegExp ParseComplExp()
         {
             if (this.Check(complement) && this.Match('~'))
             {
-                return this.MakeComplement(this.ParseComplExp());
+                return RegExp.MakeComplement(this.ParseComplExp());
             }
 
             return this.ParseCharClassExp();
@@ -723,11 +843,13 @@ namespace NAutomaton
                 {
                     negate = true;
                 }
+
                 RegExp e = this.ParseCharClasses();
                 if (negate)
                 {
-                    e = RegExp.MakeIntersection(RegExp.MakeAnyChar(), this.MakeComplement(e));
+                    e = RegExp.MakeIntersection(RegExp.MakeAnyChar(), RegExp.MakeComplement(e));
                 }
+
                 if (!this.Match(']'))
                 {
                     throw new ArgumentException("expected ']' at position " + pos);
@@ -745,14 +867,17 @@ namespace NAutomaton
             {
                 return RegExp.MakeAnyChar();
             }
+
             if (this.Check(empty) && this.Match('#'))
             {
                 return RegExp.MakeEmpty();
             }
+
             if (this.Check(anystring) && this.Match('@'))
             {
                 return RegExp.MakeAnyString();
             }
+
             if (this.Match('"'))
             {
                 int start = pos;
@@ -760,25 +885,31 @@ namespace NAutomaton
                 {
                     this.Next();
                 }
+
                 if (!this.Match('"'))
                 {
                     throw new ArgumentException("expected '\"' at position " + pos);
                 }
+
                 return RegExp.MakeString(b.Substring(start, ((pos - 1) - start)));
             }
+
             if (this.Match('('))
             {
                 if (this.Match(')'))
                 {
-                    return RegExp.MakeString("");
+                    return RegExp.MakeString(string.Empty);
                 }
+
                 RegExp e = this.ParseUnionExp();
                 if (!this.Match(')'))
                 {
                     throw new ArgumentException("expected ')' at position " + pos);
                 }
+
                 return e;
             }
+
             if ((this.Check(automaton) || this.Check(interval)) && this.Match('<'))
             {
                 int start = pos;
@@ -786,26 +917,36 @@ namespace NAutomaton
                 {
                     this.Next();
                 }
+
                 if (!this.Match('>'))
                 {
                     throw new ArgumentException("expected '>' at position " + pos);
                 }
+
                 string str = b.Substring(start, ((pos - 1) - start));
                 int i = str.IndexOf('-');
                 if (i == -1)
                 {
                     if (!this.Check(automaton))
+                    {
                         throw new ArgumentException("interval syntax error at position " + (pos - 1));
+                    }
+
                     return RegExp.MakeAutomaton(str);
                 }
+
                 if (!this.Check(interval))
+                {
                     throw new ArgumentException("illegal identifier at position " + (pos - 1));
+                }
+
                 try
                 {
                     if (i == 0 || i == str.Length - 1 || i != str.LastIndexOf('-'))
                     {
                         throw new FormatException();
                     }
+
                     string smin = str.Substring(0, i - 0);
                     string smax = str.Substring(i + 1, (str.Length - (i + 1)));
                     int imin = int.Parse(smin);
@@ -817,6 +958,7 @@ namespace NAutomaton
                         imin = imax;
                         imax = t;
                     }
+
                     return RegExp.MakeInterval(imin, imax, numdigits);
                 }
                 catch (FormatException)
@@ -828,57 +970,10 @@ namespace NAutomaton
             return RegExp.MakeChar(this.ParseCharExp());
         }
 
-        private static RegExp MakeChar(char @char)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpChar;
-            r.c = @char;
-            return r;
-        }
-
         private char ParseCharExp()
         {
             this.Match('\\');
             return this.Next();
-        }
-
-        private static RegExp MakeInterval(int min, int max, int digits)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpInterval;
-            r.min = min;
-            r.max = max;
-            r.digits = digits;
-            return r;
-        }
-
-        private static RegExp MakeAutomaton(string s)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpAutomaton;
-            r.s = s;
-            return r;
-        }
-
-        private static RegExp MakeAnyString()
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpAnyString;
-            return r;
-        }
-
-        private static RegExp MakeEmpty()
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpEmpty;
-            return r;
-        }
-
-        private static RegExp MakeAnyChar()
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpAnyChar;
-            return r;
         }
 
         private RegExp ParseCharClasses()
@@ -888,6 +983,7 @@ namespace NAutomaton
             {
                 e = RegExp.MakeUnion(e, this.ParseCharClass());
             }
+
             return e;
         }
 
@@ -905,53 +1001,6 @@ namespace NAutomaton
             }
 
             return RegExp.MakeChar(@char);
-        }
-
-        private static RegExp MakeCharRange(char from, char to)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpCharRange;
-            r.from = from;
-            r.to = to;
-            return r;
-        }
-
-        private RegExp MakeComplement(RegExp exp)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpComplement;
-            r.exp1 = exp;
-            return r;
-        }
-
-        private static RegExp MakeString(string @string)
-        {
-            var r = new RegExp();
-            r.kind = Kind.RegexpString;
-            r.s = @string;
-            return r;
-        }
-
-        private static RegExp MakeString(RegExp exp1, RegExp exp2)
-        {
-            var sb = new StringBuilder();
-            if (exp1.kind == Kind.RegexpString)
-            {
-                sb.Append(exp1.s);
-            }
-            else
-            {
-                sb.Append(exp1.c);
-            }
-            if (exp2.kind == Kind.RegexpString)
-            {
-                sb.Append(exp2.s);
-            }
-            else
-            {
-                sb.Append(exp2.c);
-            }
-            return RegExp.MakeString(sb.ToString());
         }
 
         private enum Kind

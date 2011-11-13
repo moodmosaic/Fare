@@ -32,10 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="automaton">
-      <HintPath>..\..\Java\automaton.dll</HintPath>
+      <HintPath>Java\automaton 1.11-8\automaton.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\Java\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>Java\automaton 1.11-8\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Ploeh.AutoFixture">
       <HintPath>..\packages\AutoFixture.2.4.1\lib\Ploeh.AutoFixture.dll</HintPath>
