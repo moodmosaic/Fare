@@ -35,36 +35,67 @@ namespace NAutomaton
 {
     /// <summary>
     /// Finite-state automaton with regular expression operations.
-    /// <p>
-    /// Class invariants:
-    /// <ul>
-    /// <li>
-    ///  An automaton is either represented explicitly (with State and Transition} objects)
-    ///  or with a singleton string (see Singleton property ExpandSingleton() method) in case the
-    ///  automaton is known to accept exactly one string. (Implicitly, all states and transitions of
-    ///  an automaton are reachable from its initial state.)</li>
-    /// <li>
-    ///  Automata are always reduced (see method Rreduce()) and have no transitions to dead states 
-    /// (see RemoveDeadTransitions() method).
-    /// </li>
-    /// <li>
-    /// If an automaton is non deterministic, then IsDeterministic property returns false (but the 
-    /// converse is not required).
-    /// </li>
-    /// <li>
-    /// Automata provided as input to operations are generally assumed to be disjoint.</li>
-    /// </ul>
-    /// </p>
-    /// If the states or transitions are manipulated manually, the RestoreInvariant() method and 
-    /// SetDeterministic(bool) methods should be used afterwards to restore representation invariants
-    /// that are assumed by the built-in automata operations.
+    ///   <p>
+    ///     Class invariants:
+    ///     <ul>
+    ///       <li>
+    ///         An automaton is either represented explicitly (with State and Transition} objects)
+    ///         or with a singleton string (see Singleton property ExpandSingleton() method) in case the
+    ///         automaton is known to accept exactly one string. (Implicitly, all states and transitions of
+    ///         an automaton are reachable from its initial state.)</li>
+    ///       <li>
+    ///         Automata are always reduced (see method Rreduce()) and have no transitions to dead states 
+    ///         (see RemoveDeadTransitions() method).
+    ///       </li>
+    ///       <li>
+    ///         If an automaton is non deterministic, then IsDeterministic property returns false (but the 
+    ///         converse is not required).
+    ///       </li>
+    ///       <li>
+    ///         Automata provided as input to operations are generally assumed to be disjoint.</li>
+    ///     </ul>
+    ///   </p>
+    ///   If the states or transitions are manipulated manually, the RestoreInvariant() method and 
+    ///   SetDeterministic(bool) methods should be used afterwards to restore representation invariants
+    ///   that are assumed by the built-in automata operations.
     /// </summary>
     public class Automaton
     {
         /// <summary>
+        /// Minimize using Huffman's O(n<sup>2</sup>) algorithm.
+        ///   This is the standard text-book algorithm.
+        /// </summary>
+        public const int MinimizeHuffman = 0;
+
+        /// <summary>
+        /// Minimize using Brzozowski's O(2<sup>n</sup>) algorithm. 
+        ///   This algorithm uses the reverse-determinize-reverse-determinize trick, which has a bad
+        ///   worst-case behavior but often works very well in practice even better than Hopcroft's!).
+        /// </summary>
+        public const int MinimizeBrzozowski = 1;
+
+        /// <summary>
+        /// Minimize using Hopcroft's O(n log n) algorithm.
+        ///   This is regarded as one of the most generally efficient algorithms that exist.
+        /// </summary>
+        public const int MinimizeHopcroft = 2;
+
+        private static bool minimizeAlways = false;
+
+        /// <summary>
+        /// The hash code.
+        /// </summary>
+        private int hashCode;
+
+        /// <summary>
+        /// The initial.
+        /// </summary>
+        private State initial;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Automaton"/> class that accepts the empty 
-        /// language. Using this constructor, automata can be constructed manually from 
-        /// <see cref="State"/> and <see cref="Transition"/> objects.
+        ///   language. Using this constructor, automata can be constructed manually from 
+        ///   <see cref="State"/> and <see cref="Transition"/> objects.
         /// </summary>
         public Automaton()
         {
@@ -74,21 +105,36 @@ namespace NAutomaton
         }
 
         /// <summary>
+        /// Gets the minimization algorithm (default: 
+        /// <code>
+        /// MINIMIZE_HOPCROFT
+        /// </code>
+        /// ).
+        /// </summary>
+        public static int Minimization
+        {
+            get { return Automaton.MinimizeHopcroft; }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether operations may modify the input automata (default:
-        ///  <code>false</code>).
+        ///   <code>
+        /// false
+        /// </code>
+        /// ).
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [allow mutation]; otherwise, <c>false</c>.
+        /// <c>true</c> if [allow mutation]; otherwise, <c>false</c>.
         /// </value>
         public static bool AllowMutation { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this automaton is definitely deterministic (i.e.,
-        /// there are no choices for any run, but a run may crash).
+        ///   there are no choices for any run, but a run may crash).
         /// </summary>
         /// <value>
-        /// 	<c>true</c> then this automaton is definitely deterministic (i.e., there are no 
-        /// choices for any run, but a run may crash)., <c>false</c>.
+        /// <c>true</c> then this automaton is definitely deterministic (i.e., there are no 
+        ///   choices for any run, but a run may crash)., <c>false</c>.
         /// </value>
         public bool IsDeterministic { get; set; }
 
@@ -98,7 +144,20 @@ namespace NAutomaton
         /// <value>
         /// The initial state of this automaton.
         /// </value>
-        public State Initial { get; set; }
+        public State Initial
+        {
+            get
+            {
+                this.ExpandSingleton();
+                return this.initial;
+            }
+
+            set
+            {
+                this.Singleton = null;
+                this.initial = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the singleton string. Null if not applicable.
@@ -112,27 +171,83 @@ namespace NAutomaton
         /// Gets or sets a value indicating whether this instance is singleton.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if this instance is singleton; otherwise, <c>false</c>.
+        /// <c>true</c> if this instance is singleton; otherwise, <c>false</c>.
         /// </value>
         public bool IsSingleton
         {
-            get
-            {
-                return this.Singleton != null;
-            }
+            get { return this.Singleton != null; }
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is debug.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is debug; otherwise, <c>false</c>.
+        /// <c>true</c> if this instance is debug; otherwise, <c>false</c>.
         /// </value>
         public bool IsDebug { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether IsEmpty.
+        /// </summary>
+        public bool IsEmpty { get; set; }
+
+        /// <summary>
+        /// Gets the number of states in this automaton.
+        /// </summary>
+        /// Returns the number of states in this automaton.
+        public int NumberOfStates
+        {
+            get
+            {
+                if (this.IsSingleton)
+                {
+                    return this.Singleton.Length + 1;
+                }
+
+                return this.GetStates().Count;
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of transitions in this automaton. This number is counted
+        ///   as the total number of edges, where one edge may be a character interval.
+        /// </summary>
+        public int NumberOfTransitions
+        {
+            get
+            {
+                if (this.IsSingleton)
+                {
+                    return this.Singleton.Length;
+                }
+
+                return this.GetStates().Sum(s => s.Transitions.Count);
+            }
+        }
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures
+        /// like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            if (this.hashCode == 0)
+            {
+                this.Minimize();
+            }
+
+            return this.hashCode;
+        }
+
+        /// <summary>
+        /// The minimize.
+        /// </summary>
         public void Minimize()
         {
-            throw new NotImplementedException();
+            MinimizationOperations.Minimize(this);
         }
 
         public Automaton Intersection(Automaton automaton)
@@ -143,7 +258,9 @@ namespace NAutomaton
         /// <summary>
         /// Creates a shallow copy of the current Automaton.
         /// </summary>
-        /// <returns>A shallow copy of the current Automaton.</returns>
+        /// <returns>
+        /// A shallow copy of the current Automaton.
+        /// </returns>
         public Automaton Clone()
         {
             var a = (Automaton)this.MemberwiseClone();
@@ -181,14 +298,16 @@ namespace NAutomaton
         /// <summary>
         /// Gets the set of states that are reachable from the initial state.
         /// </summary>
-        /// <returns>The set of states that are reachable from the initial state.</returns>
+        /// <returns>
+        /// The set of states that are reachable from the initial state.
+        /// </returns>
         public HashSet<State> GetStates()
         {
             this.ExpandSingleton();
             HashSet<State> visited;
             if (this.IsDebug)
             {
-                visited = new HashSet/*LinkedHashSet*/<State>();
+                visited = new HashSet<State>(); // LinkedHashSet
             }
             else
             {
@@ -201,9 +320,9 @@ namespace NAutomaton
             while (worklist.Count > 0)
             {
                 State s = worklist.RemoveAndReturnFirst();
-                HashSet<Transition> tr = this.IsDebug 
-                    ? new HashSet<Transition>(s.GetSortedTransitions(false)) 
-                    : new HashSet<Transition>(s.Transitions);
+                HashSet<Transition> tr = this.IsDebug
+                                             ? new HashSet<Transition>(s.GetSortedTransitions(false))
+                                             : new HashSet<Transition>(s.Transitions);
                 foreach (Transition t in tr)
                 {
                     if (!visited.Contains(t.To))
@@ -242,12 +361,12 @@ namespace NAutomaton
             throw new NotImplementedException();
         }
 
-        public bool IsEmpty { get; set; }
-
         /// <summary>
         /// A clone of this automaton, expands if singleton.
         /// </summary>
-        /// <returns>Returns a clone of this automaton, expands if singleton.</returns>
+        /// <returns>
+        /// Returns a clone of this automaton, expands if singleton.
+        /// </returns>
         public Automaton CloneExpanded()
         {
             Automaton a = this.Clone();
@@ -256,9 +375,19 @@ namespace NAutomaton
         }
 
         /// <summary>
-        /// A clone of this automaton unless <code>allowMutation</code> is set, expands if singleton.
+        /// A clone of this automaton unless 
+        /// <code>
+        /// allowMutation
+        /// </code>
+        /// is set, expands if singleton.
         /// </summary>
-        /// <returns>Returns a clone of this automaton unless <code>allowMutation</code> is set, expands if singleton.</returns>
+        /// <returns>
+        /// Returns a clone of this automaton unless 
+        /// <code>
+        /// allowMutation
+        /// </code>
+        /// is set, expands if singleton.
+        /// </returns>
         public Automaton CloneExpandedIfRequired()
         {
             if (Automaton.AllowMutation)
@@ -270,19 +399,58 @@ namespace NAutomaton
             return this.CloneExpanded();
         }
 
+        /// <summary>
+        /// The expand singleton.
+        /// </summary>
         private void ExpandSingleton()
         {
-            throw new NotImplementedException();
+            if (this.IsSingleton)
+            {
+                var p = new State();
+                initial = p;
+                foreach (char t in this.Singleton)
+                {
+                    var q = new State();
+                    p.Transitions.Add(new Transition(t, q));
+                    p = q;
+                }
+
+                p.Accept = true;
+                this.IsDeterministic = true;
+                this.Singleton = null;
+            }
         }
 
+        /// <summary>
+        /// The check minimize always.
+        /// </summary>
         public void CheckMinimizeAlways()
         {
-            throw new NotImplementedException();
+            if (minimizeAlways)
+            {
+                this.Minimize();
+            }
         }
 
+        /// <summary>
+        /// The clear hash code.
+        /// </summary>
         public void ClearHashCode()
         {
-            throw new NotImplementedException();
+            this.hashCode = 0;
+        }
+
+        /// <summary>
+        /// Recomputes the hash code.
+        ///   The automaton must be minimal when this operation is performed.
+        /// </summary>
+        public void RecomputeHashCode()
+        {
+            this.hashCode = (this.NumberOfStates * 3) + (this.NumberOfTransitions * 2);
+            if (hashCode == 0)
+            {
+                hashCode = 1;
+            }
         }
     }
 }

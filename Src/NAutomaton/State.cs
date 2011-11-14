@@ -41,10 +41,8 @@ namespace NAutomaton
     /// </summary>
     public class State : IComparable<State>
     {
-        /// <summary>
-        /// The id.
-        /// </summary>
         private readonly int id;
+        private static int nextId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="State"/> class. Initially, the new state is a 
@@ -53,7 +51,7 @@ namespace NAutomaton
         public State()
         {
             this.ResetTransitions();
-            Interlocked.Increment(ref this.id);
+            id = Interlocked.Increment(ref nextId);
         }
 
         /// <summary>
