@@ -35,29 +35,29 @@ namespace NAutomaton
 {
     /// <summary>
     /// Finite-state automaton with regular expression operations.
-    ///   <p>
-    ///     Class invariants:
-    ///     <ul>
-    ///       <li>
-    ///         An automaton is either represented explicitly (with State and Transition} objects)
-    ///         or with a singleton string (see Singleton property ExpandSingleton() method) in case the
-    ///         automaton is known to accept exactly one string. (Implicitly, all states and transitions of
-    ///         an automaton are reachable from its initial state.)</li>
-    ///       <li>
-    ///         Automata are always reduced (see method Rreduce()) and have no transitions to dead states 
-    ///         (see RemoveDeadTransitions() method).
-    ///       </li>
-    ///       <li>
-    ///         If an automaton is non deterministic, then IsDeterministic property returns false (but the 
-    ///         converse is not required).
-    ///       </li>
-    ///       <li>
-    ///         Automata provided as input to operations are generally assumed to be disjoint.</li>
-    ///     </ul>
-    ///   </p>
-    ///   If the states or transitions are manipulated manually, the RestoreInvariant() method and 
-    ///   SetDeterministic(bool) methods should be used afterwards to restore representation invariants
-    ///   that are assumed by the built-in automata operations.
+    /// <p>
+    /// Class invariants:
+    /// <ul>
+    /// 			<li>
+    /// An automaton is either represented explicitly (with State and Transition} objects)
+    /// or with a singleton string (see Singleton property ExpandSingleton() method) in case the
+    /// automaton is known to accept exactly one string. (Implicitly, all states and transitions of
+    /// an automaton are reachable from its initial state.)</li>
+    /// 			<li>
+    /// Automata are always reduced (see method Rreduce()) and have no transitions to dead states
+    /// (see RemoveDeadTransitions() method).
+    /// </li>
+    /// 			<li>
+    /// If an automaton is non deterministic, then IsDeterministic property returns false (but the
+    /// converse is not required).
+    /// </li>
+    /// 			<li>
+    /// Automata provided as input to operations are generally assumed to be disjoint.</li>
+    /// 		</ul>
+    /// 	</p>
+    /// If the states or transitions are manipulated manually, the RestoreInvariant() method and
+    /// SetDeterministic(bool) methods should be used afterwards to restore representation invariants
+    /// that are assumed by the built-in automata operations.
     /// </summary>
     public class Automaton
     {
@@ -243,16 +243,22 @@ namespace NAutomaton
         }
 
         /// <summary>
-        /// The minimize.
+        /// The check minimize always.
         /// </summary>
-        public void Minimize()
+        public void CheckMinimizeAlways()
         {
-            MinimizationOperations.Minimize(this);
+            if (minimizeAlways)
+            {
+                this.Minimize();
+            }
         }
 
-        public Automaton Intersection(Automaton automaton)
+        /// <summary>
+        /// The clear hash code.
+        /// </summary>
+        public void ClearHashCode()
         {
-            throw new NotImplementedException();
+            this.hashCode = 0;
         }
 
         /// <summary>
@@ -296,72 +302,6 @@ namespace NAutomaton
         }
 
         /// <summary>
-        /// Gets the set of states that are reachable from the initial state.
-        /// </summary>
-        /// <returns>
-        /// The set of states that are reachable from the initial state.
-        /// </returns>
-        public HashSet<State> GetStates()
-        {
-            this.ExpandSingleton();
-            HashSet<State> visited;
-            if (this.IsDebug)
-            {
-                visited = new HashSet<State>(); // LinkedHashSet
-            }
-            else
-            {
-                visited = new HashSet<State>();
-            }
-
-            var worklist = new LinkedList<State>();
-            worklist.AddLast(this.Initial);
-            visited.Add(this.Initial);
-            while (worklist.Count > 0)
-            {
-                State s = worklist.RemoveAndReturnFirst();
-                HashSet<Transition> tr = this.IsDebug
-                                             ? new HashSet<Transition>(s.GetSortedTransitions(false))
-                                             : new HashSet<Transition>(s.Transitions);
-                foreach (Transition t in tr)
-                {
-                    if (!visited.Contains(t.To))
-                    {
-                        visited.Add(t.To);
-                        worklist.AddLast(t.To);
-                    }
-                }
-            }
-
-            return visited;
-        }
-
-        public Automaton Complement()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Automaton Repeat(int min, int max)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Automaton Repeat(int min)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Automaton Repeat()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Automaton Optional()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// A clone of this automaton, expands if singleton.
         /// </summary>
         /// <returns>
@@ -399,10 +339,21 @@ namespace NAutomaton
             return this.CloneExpanded();
         }
 
+        public Automaton Complement()
+        {
+            return BasicOperations.Complement(this);
+        }
+
+        public void Determinize()
+        {
+            BasicOperations.Determinize(this);
+        }
+
         /// <summary>
-        /// The expand singleton.
+        /// Expands singleton representation to normal representation.
+        /// Does nothing if not in singleton representation.
         /// </summary>
-        private void ExpandSingleton()
+        public void ExpandSingleton()
         {
             if (this.IsSingleton)
             {
@@ -422,22 +373,152 @@ namespace NAutomaton
         }
 
         /// <summary>
-        /// The check minimize always.
+        /// The set of reachable accept states.
         /// </summary>
-        public void CheckMinimizeAlways()
+        /// <returns>Returns the set of reachable accept states.</returns>
+        public HashSet<State> GetAcceptStates()
         {
-            if (minimizeAlways)
+            this.ExpandSingleton();
+
+            var accepts = new HashSet<State>();
+            var visited = new HashSet<State>();
+
+            var worklist = new LinkedList<State>();
+            worklist.AddLast(this.Initial);
+
+            visited.Add(this.Initial);
+
+            while (worklist.Count > 0)
             {
-                this.Minimize();
+                State s = worklist.RemoveAndReturnFirst();
+                if (s.Accept)
+                {
+                    accepts.Add(s);
+                }
+
+                foreach (Transition t in s.Transitions)
+                {
+                    // TODO:
+                    if (t.To == null)
+                    {
+                        continue;
+                    }
+
+                    if (!visited.Contains(t.To))
+                    {
+                        visited.Add(t.To);
+                        worklist.AddLast(t.To);
+                    }
+                }
             }
+
+            return accepts;
         }
 
         /// <summary>
-        /// The clear hash code.
+        /// Returns the set of live states. A state is "live" if an accept state is reachable from it.
         /// </summary>
-        public void ClearHashCode()
+        /// <returns></returns>
+        public HashSet<State> GetLiveStates()
         {
-            this.hashCode = 0;
+            this.ExpandSingleton();
+            return this.GetLiveStates(this.GetStates());
+        }
+
+        /// <summary>
+        /// The sorted array of all interval start points.
+        /// </summary>
+        /// <returns>Returns sorted array of all interval start points.</returns>
+        public char[] GetStartPoints()
+        {
+            var pointSet = new HashSet<char>();
+            foreach (State s in this.GetStates())
+            {
+                pointSet.Add(char.MinValue);
+                foreach (Transition t in s.Transitions)
+                {
+                    pointSet.Add(t.Min);
+                    if (t.Max < char.MaxValue)
+                    {
+                        pointSet.Add((char)(t.Max + 1));
+                    }
+                }
+            }
+
+            var points = new char[pointSet.Count];
+            int n = 0;
+            foreach (char m in pointSet)
+            {
+                points[n++] = m;
+            }
+
+            Array.Sort(points);
+            return points;
+        }
+
+        /// <summary>
+        /// Gets the set of states that are reachable from the initial state.
+        /// </summary>
+        /// <returns>
+        /// The set of states that are reachable from the initial state.
+        /// </returns>
+        public HashSet<State> GetStates()
+        {
+            this.ExpandSingleton();
+            HashSet<State> visited;
+            if (this.IsDebug)
+            {
+                visited = new HashSet<State>(); // LinkedHashSet
+            }
+            else
+            {
+                visited = new HashSet<State>();
+            }
+
+            var worklist = new LinkedList<State>();
+            worklist.AddLast(this.Initial);
+            visited.Add(this.Initial);
+            while (worklist.Count > 0)
+            {
+                State s = worklist.RemoveAndReturnFirst();
+                if (s == null)
+                {
+                    continue;
+                }
+
+                HashSet<Transition> tr = this.IsDebug
+                    ? new HashSet<Transition>(s.GetSortedTransitions(false))
+                    : new HashSet<Transition>(s.Transitions);
+
+                foreach (Transition t in tr)
+                {
+                    if (!visited.Contains(t.To))
+                    {
+                        visited.Add(t.To);
+                        worklist.AddLast(t.To);
+                    }
+                }
+            }
+
+            return visited;
+        }
+
+        public Automaton Intersection(Automaton a)
+        {
+            return BasicOperations.Intersection(this, a);
+        }
+
+        /// <summary>
+        /// The minimize.
+        /// </summary>
+        public void Minimize()
+        {
+            MinimizationOperations.Minimize(this);
+        }
+
+        public Automaton Optional()
+        {
+            return BasicOperations.Optional(this);
         }
 
         /// <summary>
@@ -450,6 +531,217 @@ namespace NAutomaton
             if (hashCode == 0)
             {
                 hashCode = 1;
+            }
+        }
+
+        /// <summary>
+        /// Reduces this automaton.
+        /// An automaton is "reduced" by combining overlapping and adjacent edge intervals with same 
+        /// destination.
+        /// </summary>
+        public void Reduce()
+        {
+            if (this.IsSingleton)
+            {
+                return;
+            }
+
+            HashSet<State> states = this.GetStates();
+            Automaton.SetStateNumbers(states);
+            foreach (State s in states)
+            {
+                IList<Transition> st = s.GetSortedTransitions(true);
+                s.ResetTransitions();
+                State p = null;
+                int min = -1, max = -1;
+                foreach (Transition t in st)
+                {
+                    if (p == t.To)
+                    {
+                        if (t.Min <= max + 1)
+                        {
+                            if (t.Max > max)
+                            {
+                                max = t.Max;
+                            }
+                        }
+                        else
+                        {
+                            if (p != null)
+                            {
+                                s.Transitions.Add(new Transition((char)min, (char)max, p));
+                            }
+
+                            min = t.Min;
+                            max = t.Max;
+                        }
+                    }
+                    else
+                    {
+                        if (p != null)
+                        {
+                            s.Transitions.Add(new Transition((char)min, (char)max, p));
+                        }
+
+                        p = t.To;
+                        min = t.Min;
+                        max = t.Max;
+                    }
+                }
+
+                if (p != null)
+                {
+                    s.Transitions.Add(new Transition((char)min, (char)max, p));
+                }
+            }
+
+            this.ClearHashCode();
+        }
+
+        /// <summary>
+        /// Removes transitions to dead states and calls Reduce() and ClearHashCode().
+        /// (A state is "dead" if no accept state is reachable from it).
+        /// </summary>
+        public void RemoveDeadTransitions()
+        {
+            this.ClearHashCode();
+            if (this.IsSingleton)
+            {
+                return;
+            }
+
+            // TODO:
+            var states = new HashSet<State>(this.GetStates().Where(state => state != null));
+            var live = this.GetLiveStates(states);
+            foreach (State s in states)
+            {
+                var st = s.Transitions;
+                s.ResetTransitions();
+                foreach (Transition t in st)
+                {
+                    // TODO:
+                    if (t.To == null)
+                    {
+                        continue;
+                    }
+
+                    if (live.Contains(t.To))
+                    {
+                        s.Transitions.Add(t);
+                    }
+                }
+            }
+
+            this.Reduce();
+        }
+
+        public Automaton Repeat(int min, int max)
+        {
+            return BasicOperations.Repeat(this, min, max);
+        }
+
+        public Automaton Repeat()
+        {
+            return BasicOperations.Repeat(this);
+        }
+
+        public Automaton Repeat(int min)
+        {
+            return BasicOperations.Repeat(this, min);
+        }
+
+        /// <summary>
+        /// Adds transitions to explicit crash state to ensure that transition function is total.
+        /// </summary>
+        public void Totalize()
+        {
+            var s = new State();
+            s.Transitions.Add(new Transition(char.MinValue, char.MaxValue, s));
+
+            foreach (State p in this.GetStates())
+            {
+                int maxi = char.MinValue;
+                foreach (Transition t in p.GetSortedTransitions(false))
+                {
+                    if (t.Min > maxi)
+                    {
+                        p.Transitions.Add(new Transition((char)maxi, (char)(t.Min - 1), s));
+                    }
+
+                    if (t.Max + 1 > maxi)
+                    {
+                        maxi = t.Max + 1;
+                    }
+                }
+
+                if (maxi <= char.MaxValue)
+                {
+                    p.Transitions.Add(new Transition((char)maxi, char.MaxValue, s));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Assigns consecutive numbers to the given states.
+        /// </summary>
+        /// <param name="states">The states.</param>
+        private static void SetStateNumbers(IEnumerable<State> states)
+        {
+            int number = 0;
+            foreach (State s in states)
+            {
+                s.Number = number++;
+            }
+        }
+
+        private HashSet<State> GetLiveStates(HashSet<State> states)
+        {
+            var dictionary = states.ToDictionary(s => s, s => new HashSet<State>());
+
+            foreach (State s in states)
+            {
+                foreach (Transition t in s.Transitions)
+                {
+                    // TODO:
+                    if (t.To == null)
+                    {
+                        continue;
+                    }
+
+                    dictionary[t.To].Add(s);
+                }
+            }
+
+            var comparer = new StateEqualityComparer();
+
+            var live = new HashSet<State>(this.GetAcceptStates(), comparer);
+            var worklist = new LinkedList<State>(live);
+            while (worklist.Count > 0)
+            {
+                State s = worklist.RemoveAndReturnFirst();
+                foreach (State p in dictionary[s])
+                {
+                    if (!live.Contains(p))
+                    {
+                        live.Add(p);
+                        worklist.AddLast(p);
+                    }
+                }
+            }
+
+            return live;
+        }
+
+        private sealed class StateEqualityComparer : IEqualityComparer<State>
+        {
+            public bool Equals(State x, State y)
+            {
+                return x.Equals(y);
+            }
+
+            public int GetHashCode(State obj)
+            {
+                return obj.GetHashCode();
             }
         }
     }

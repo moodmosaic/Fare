@@ -39,7 +39,7 @@ namespace NAutomaton
     /// <summary>
     /// <tt>Automaton</tt> state.
     /// </summary>
-    public class State : IComparable<State>
+    public class State : IEquatable<State>, IComparable<State>
     {
         private readonly int id;
         private static int nextId;
@@ -78,6 +78,108 @@ namespace NAutomaton
         public IList<Transition> Transitions { get; set; }
 
         /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(State left, State right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(State left, State right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current
+        ///  <see cref="T:System.Object"/>.
+        /// </summary>
+        /// <returns>
+        /// true if the specified <see cref="T:System.Object"/> is equal to the current
+        ///  <see cref="T:System.Object"/>; otherwise, false.
+        /// </returns>
+        /// <param name="obj">The <see cref="T:System.Object"/> to compare with the current 
+        /// <see cref="T:System.Object"/>. 
+        ///                 </param><exception cref="T:System.NullReferenceException">
+        /// The <paramref name="obj"/> parameter is null.
+        ///                 </exception><filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (object.ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != typeof(State))
+            {
+                return false;
+            }
+
+            return this.Equals((State)obj);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a particular type. 
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="T:System.Object"/>.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = id;
+                result = (result * 397) ^ Accept.GetHashCode();
+                result = (result * 397) ^ Number;
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.
+        ///                 </param>
+        public bool Equals(State other)
+        {
+            if (object.ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return other.id == id 
+                && other.Accept.Equals(Accept)
+                && other.Number == Number;
+        }
+
+        /// <summary>
         /// Compares the current object with another object of the same type.
         ///   States are ordered by the time of construction.
         /// </summary>
@@ -110,14 +212,6 @@ namespace NAutomaton
             }
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// The reset transitions.
-        /// </summary>
-        private void ResetTransitions()
-        {
-            this.Transitions = new List<Transition>();
         }
 
         /// <summary>
@@ -192,6 +286,11 @@ namespace NAutomaton
             {
                 this.Transitions.Add(t);
             }
+        }
+
+        internal void ResetTransitions()
+        {
+            this.Transitions = new List<Transition>();
         }
     }
 }
