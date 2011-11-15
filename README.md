@@ -10,7 +10,6 @@ Development environment
 
 * Visual Studio 2010
   * Microsoft .NET Framework 3.5
-  
 * ReSharper 6.0 Build 6.0.2202.688
 * StyleCop 4.6.3.0
 * AutoFixture 2.4.1
@@ -21,7 +20,7 @@ Design changes
 --------------
 
 * NAutomaton also includes a .NET port of [Xeger] (http://code.google.com/p/xeger/), a library for generating random text from regular expressions.
-* A lot of foreach loops were converted to LINQ-expressions.
+* A lot of foreach loops have been converted to LINQ-expressions.
  
 NAutomaton in use
 -----------------
