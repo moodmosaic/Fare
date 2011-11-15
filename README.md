@@ -19,7 +19,7 @@ Development environment
 Design changes
 --------------
 
-* Included a .NET port of [Xeger] (http://code.google.com/p/xeger/), for generating random text from regular expressions. Xeger does <i>not</i> support all valid Java regular expressions. The full set of what is defined here and is summarized at (http://code.google.com/p/xeger/wiki/XegerLimitations). Future versions might support a more complete set, in case of popular demand.
+* Included a .NET port of [Xeger] (http://code.google.com/p/xeger/), for generating random text from regular expressions. Xeger does <i>not</i> support all valid Java regular expressions. The full set of what is defined here and is summarized at (http://code.google.com/p/xeger/wiki/XegerLimitations).
 * Implemented object equality.
 * Many getters and setters have been replaced by .NET properties.
 * Many foreach loops have been converted to LINQ-expressions.
