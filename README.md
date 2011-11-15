@@ -21,8 +21,8 @@ Design changes
 
 * Included a .NET port of [Xeger] (http://code.google.com/p/xeger/), for generating random text from regular expressions.
 * Implemented object equality.
-* Many foreach loops have been converted to LINQ-expressions.
 * Many getters and setters have been replaced by .NET properties.
+* Many foreach loops have been converted to LINQ-expressions.
  
 NAutomaton in use
 -----------------
