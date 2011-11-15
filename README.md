@@ -19,7 +19,7 @@ Development environment
 Design changes
 --------------
 
-* NAutomaton also includes a .NET port of [Xeger] (http://code.google.com/p/xeger/), a library for generating random text from regular expressions.
+* NAutomaton comes bundled with a .NET port of [Xeger] (http://code.google.com/p/xeger/), a library for generating random text from regular expressions.
 * Many foreach loops have been converted to LINQ-expressions.
 * Many getters and setters have been replaced by .NET properties.
  
