@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace NAutomaton
 {
@@ -77,9 +78,146 @@ namespace NAutomaton
             return automaton;
         }
 
-        public static Automaton Concatenate(IList<Automaton> list)
+        public static Automaton Complement(Automaton automaton)
         {
             throw new NotImplementedException();
+        }
+
+        public static Automaton Concatenate(Automaton a1, Automaton a2)
+        {
+            if (a1.IsSingleton && a2.IsSingleton)
+            {
+                return BasicAutomata.MakeString(a1.Singleton + a2.Singleton);
+            }
+
+            if (BasicOperations.IsEmpty(a1) || BasicOperations.IsEmpty(a2))
+            {
+                return BasicAutomata.MakeEmpty();
+            }
+
+            bool deterministic = a1.IsSingleton && a2.IsDeterministic;
+            if (a1 == a2)
+            {
+                a1 = a1.CloneExpanded();
+                a2 = a2.CloneExpanded();
+            }
+            else
+            {
+                a1 = a1.CloneExpandedIfRequired();
+                a2 = a2.CloneExpandedIfRequired();
+            }
+
+            foreach (State s in a1.GetAcceptStates())
+            {
+                s.Accept = false;
+                s.AddEpsilon(a2.Initial);
+            }
+
+            a1.IsDeterministic = deterministic;
+            a1.ClearHashCode();
+            a1.CheckMinimizeAlways();
+            return a1;
+        }
+
+        public static Automaton Concatenate(IList<Automaton> l)
+        {
+            if (l.Count == 0)
+            {
+                return BasicAutomata.MakeEmptyString();
+            }
+
+            bool allSingleton = true;
+            foreach (Automaton a in l)
+            {
+                if (!a.IsSingleton)
+                {
+                    allSingleton = false;
+                    break;
+                }
+            }
+
+            if (allSingleton)
+            {
+                var b = new StringBuilder();
+                foreach (Automaton a in l)
+                {
+                    b.Append(a.Singleton);
+                }
+
+                return BasicAutomata.MakeString(b.ToString());
+            }
+            else
+            {
+                foreach (Automaton a in l)
+                {
+                    if (a.IsEmpty)
+                    {
+                        return BasicAutomata.MakeEmpty();
+                    }
+                }
+
+                var ids = new HashSet<int>();
+                foreach (Automaton a in l)
+                {
+                    ids.Add(RuntimeHelpers.GetHashCode(a));
+                }
+
+                bool hasAliases = ids.Count != l.Count;
+                Automaton b = l[0];
+                if (hasAliases)
+                {
+                    b = b.CloneExpanded();
+                }
+                else
+                {
+                    b = b.CloneExpandedIfRequired();
+                }
+
+                var ac = b.GetAcceptStates();
+                bool first = true;
+                foreach (Automaton a in l)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        if (a.IsEmptyString())
+                        {
+                            continue;
+                        }
+
+                        Automaton aa = a;
+                        if (hasAliases)
+                        {
+                            aa = aa.CloneExpanded();
+                        }
+                        else
+                        {
+                            aa = aa.CloneExpandedIfRequired();
+                        }
+
+                        HashSet<State> ns = aa.GetAcceptStates();
+                        foreach (State s in ac)
+                        {
+                            s.Accept = false;
+                            s.AddEpsilon(aa.Initial);
+                            if (s.Accept)
+                            {
+                                ns.Add(s);
+                            }
+                        }
+
+                        ac = ns;
+                    }
+                }
+
+                b.IsDeterministic = false;
+                b.ClearHashCode();
+                b.CheckMinimizeAlways();
+                return b;
+            }
         }
 
         /// <summary>
@@ -111,7 +249,7 @@ namespace NAutomaton
             char[] points = a.GetStartPoints();
 
             var comparer = new ListOfStateComparer();
-            
+
             // Subset construction.
             var sets = new Dictionary<List<State>, List<State>>(comparer);
             var worklist = new LinkedList<List<State>>();
@@ -121,7 +259,7 @@ namespace NAutomaton
             worklist.AddLast(initialset);
             a.Initial = new State();
             newstate.Add(initialset, a.Initial);
-            
+
             while (worklist.Count > 0)
             {
                 List<State> s = worklist.RemoveAndReturnFirst();
@@ -186,9 +324,38 @@ namespace NAutomaton
             }
         }
 
-        public static Automaton Complement(Automaton automaton)
+        /// <summary>
+        /// Determines whether the given automaton accepts no strings.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <returns>
+        ///   <c>true</c> if the given automaton accepts no strings; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsEmpty(Automaton a)
         {
-            throw new NotImplementedException();
+            if (a.IsSingleton)
+            {
+                return false;
+            }
+
+            return !a.Initial.Accept && a.Initial.Transitions.Count == 0;
+        }
+
+        /// <summary>
+        /// Determines whether the given automaton accepts the empty string and nothing else.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <returns>
+        ///   <c>true</c> if the given automaton accepts the empty string and nothing else; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsEmptyString(Automaton a)
+        {
+            if (a.IsSingleton)
+            {
+                return a.Singleton.Length == 0;
+            }
+
+            return a.Initial.Accept && a.Initial.Transitions.Count == 0;
         }
 
         public static Automaton Intersection(Automaton automaton, Automaton a)
@@ -201,19 +368,136 @@ namespace NAutomaton
             throw new NotImplementedException();
         }
 
-        public static Automaton Repeat(Automaton automaton)
+        /// <summary>
+        /// Accepts the Kleene star (zero or more concatenated repetitions) of the language of the
+        /// given automaton. Never modifies the input automaton language.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <returns>
+        /// An automaton that accepts the Kleene star (zero or more concatenated repetitions)
+        /// of the language of the given automaton. Never modifies the input automaton language.
+        /// </returns>
+        /// <remarks>
+        /// Complexity: linear in number of states.
+        /// </remarks>
+        public static Automaton Repeat(Automaton a)
         {
-            throw new NotImplementedException();
+            a = a.CloneExpanded();
+            var s = new State();
+            s.Accept = true;
+            s.AddEpsilon(a.Initial);
+            foreach (State p in a.GetAcceptStates())
+            {
+                p.AddEpsilon(s);
+            }
+
+            a.Initial = s;
+            a.IsDeterministic = false;
+            a.ClearHashCode();
+            a.CheckMinimizeAlways();
+            return a;
         }
 
-        public static Automaton Repeat(Automaton automaton, int min)
+        /// <summary>
+        /// Accepts <code>min</code> or more concatenated repetitions of the language of the given 
+        /// automaton.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <param name="min">The minimum concatenated repetitions of the language of the given 
+        /// automaton.</param>
+        /// <returns>Returns an automaton that accepts <code>min</code> or more concatenated 
+        /// repetitions of the language of the given automaton.
+        /// </returns>
+        /// <remarks>
+        /// Complexity: linear in number of states and in <code>min</code>.
+        /// </remarks>
+        public static Automaton Repeat(Automaton a, int min)
         {
-            throw new NotImplementedException();
+            if (min == 0)
+            {
+                return BasicOperations.Repeat(a);
+            }
+
+            var @as = new List<Automaton>();
+            while (min-- > 0)
+            {
+                @as.Add(a);
+            }
+            
+            @as.Add(BasicOperations.Repeat(a));
+            return BasicOperations.Concatenate(@as);
         }
 
-        public static Automaton Repeat(Automaton automaton, int min, int max)
+        /// <summary>
+        /// Accepts between <code>min</code> and <code>max</code> (including both) concatenated
+        /// repetitions of the language of the given automaton.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <param name="min">The minimum concatenated repetitions of the language of the given
+        /// automaton.</param>
+        /// <param name="max">The maximum concatenated repetitions of the language of the given
+        /// automaton.</param>
+        /// <returns>
+        /// Returns an automaton that accepts between <code>min</code> and <code>max</code>
+        /// (including both) concatenated repetitions of the language of the given automaton.
+        /// </returns>
+        /// <remarks>
+        /// Complexity: linear in number of states and in <code>min</code> and <code>max</code>.
+        /// </remarks>
+        public static Automaton Repeat(Automaton a, int min, int max)
         {
-            throw new NotImplementedException();
+            if (min > max)
+            {
+                return BasicAutomata.MakeEmpty();
+            }
+
+            max -= min;
+            a.ExpandSingleton();
+            Automaton b;
+            if (min == 0)
+            {
+                b = BasicAutomata.MakeEmptyString();
+            }
+            else if (min == 1)
+            {
+                b = a.Clone();
+            }
+            else
+            {
+                var @as = new List<Automaton>();
+                while (min-- > 0)
+                {
+                    @as.Add(a);
+                }
+
+                b = BasicOperations.Concatenate(@as);
+            }
+
+            if (max > 0)
+            {
+                Automaton d = a.Clone();
+                while (--max > 0)
+                {
+                    Automaton c = a.Clone();
+                    foreach (State p in c.GetAcceptStates())
+                    {
+                        p.AddEpsilon(d.Initial);
+                    }
+
+                    d = c;
+                }
+
+                foreach (State p in b.GetAcceptStates())
+                {
+                    p.AddEpsilon(d.Initial);
+                }
+
+                b.IsDeterministic = false;
+                b.ClearHashCode();
+                b.CheckMinimizeAlways();
+            }
+
+            return b;
         }
     }
 }

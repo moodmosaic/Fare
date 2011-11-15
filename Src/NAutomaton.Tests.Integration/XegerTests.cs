@@ -12,7 +12,7 @@ namespace NAutomaton.Tests.Integration
         public void ShouldGenerateTextCorrectly(string regex)
         {
             var generator = new Xeger(regex);
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 string text = generator.Generate();
                 Assert.True(Regex.IsMatch(text, regex));

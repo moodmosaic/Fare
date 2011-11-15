@@ -508,6 +508,11 @@ namespace NAutomaton
             return BasicOperations.Intersection(this, a);
         }
 
+        public bool IsEmptyString()
+        {
+            return BasicOperations.IsEmptyString(this);
+        }
+
         /// <summary>
         /// The minimize.
         /// </summary>

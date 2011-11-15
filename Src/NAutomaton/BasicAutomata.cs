@@ -33,7 +33,12 @@ namespace NAutomaton
 {
     public static class BasicAutomata
     {
-        public static Automaton MakeInterval(int min, int max, int digits)
+        public static Automaton MakeAnyChar()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Automaton MakeAnyString()
         {
             throw new NotImplementedException();
         }
@@ -42,7 +47,7 @@ namespace NAutomaton
         /// Returns a new (deterministic) automaton that accepts a single character of the given value.
         /// </summary>
         /// <param name="c">The c.</param>
-        /// <returns></returns>
+        /// <returns>A new (deterministic) automaton that accepts a single character of the given value.</returns>
         public static Automaton MakeChar(char c)
         {
             var a = new Automaton();
@@ -56,24 +61,32 @@ namespace NAutomaton
             throw new NotImplementedException();
         }
 
-        public static Automaton MakeAnyChar()
-        {
-            throw new NotImplementedException();
-        }
-
         public static Automaton MakeEmpty()
         {
             throw new NotImplementedException();
         }
 
-        public static Automaton MakeString(string s)
+        public static Automaton MakeEmptyString()
         {
             throw new NotImplementedException();
         }
 
-        public static Automaton MakeAnyString()
+        public static Automaton MakeInterval(int min, int max, int digits)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts the single given string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>A new (deterministic) automaton that accepts the single given string.</returns>
+        public static Automaton MakeString(string s)
+        {
+            var a = new Automaton();
+            a.Singleton = s;
+            a.IsDeterministic = true;
+            return a;
         }
     }
 }
