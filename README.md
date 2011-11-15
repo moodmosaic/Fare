@@ -13,9 +13,9 @@ Development environment
   
 * ReSharper 6.0 Build 6.0.2202.688
 * StyleCop 4.6.3.0
-* xUnit.net 1.8.0.1549
 * AutoFixture 2.4.1
   * xUnit.net data theories
+* xUnit.net 1.8.0.1549
 
 Design changes
 --------------
