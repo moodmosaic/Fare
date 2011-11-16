@@ -33,9 +33,13 @@ namespace NAutomaton
 {
     public static class BasicAutomata
     {
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts any single character.
+        /// </summary>
+        /// <returns>A new (deterministic) automaton that accepts any single character.</returns>
         public static Automaton MakeAnyChar()
         {
-            throw new NotImplementedException();
+            return BasicAutomata.MakeCharRange(char.MinValue, char.MaxValue);
         }
 
         public static Automaton MakeAnyString()
@@ -56,9 +60,35 @@ namespace NAutomaton
             return a;
         }
 
-        public static Automaton MakeCharRange(char from, char to)
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts a single char whose value is in the
+        /// given interval (including both end points).
+        /// </summary>
+        /// <param name="min">The min.</param>
+        /// <param name="max">The max.</param>
+        /// <returns>
+        /// A new (deterministic) automaton that accepts a single char whose value is in the
+        /// given interval (including both end points).
+        /// </returns>
+        public static Automaton MakeCharRange(char min, char max)
         {
-            throw new NotImplementedException();
+            if (min == max)
+            {
+                return BasicAutomata.MakeChar(min);
+            }
+
+            var a = new Automaton();
+            var s1 = new State();
+            var s2 = new State();
+            a.Initial = s1;
+            s2.Accept = true;
+            if (min <= max)
+            {
+                s1.Transitions.Add(new Transition(min, max, s2));
+            }
+
+            a.IsDeterministic = true;
+            return a;
         }
 
         public static Automaton MakeEmpty()

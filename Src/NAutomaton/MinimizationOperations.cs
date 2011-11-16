@@ -87,7 +87,7 @@ namespace NAutomaton
             
             // Initialize data structures.
             var reverse = new List<List<LinkedList<State>>>();
-            for (int q = 0; q < states.Length; q++)
+            foreach (State t in states)
             {
                 var v = new List<LinkedList<State>>();
                 Initialize(ref v, sigma.Length);
@@ -124,9 +124,8 @@ namespace NAutomaton
             }
 
             // Find initial partition and reverse edges.
-            for (int q = 0; q < states.Length; q++)
+            foreach (State qq in states)
             {
-                State qq = states[q];
                 int j = qq.Accept ? 0 : 1;
 
                 partition[j].AddLast(qq);
@@ -270,9 +269,8 @@ namespace NAutomaton
             }
 
             // Build transitions and set acceptance.
-            for (int n = 0; n < newstates.Length; n++)
+            foreach (State s in newstates)
             {
-                State s = newstates[n];
                 s.Accept = states[s.Number].Accept;
                 foreach (Transition t in states[s.Number].Transitions)
                 {

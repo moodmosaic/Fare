@@ -78,9 +78,28 @@ namespace NAutomaton
             return automaton;
         }
 
-        public static Automaton Complement(Automaton automaton)
+        /// <summary>
+        /// Returns a (deterministic) automaton that accepts the complement of the language of the 
+        /// given automaton.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <returns>A (deterministic) automaton that accepts the complement of the language of the 
+        /// given automaton.</returns>
+        /// <remarks>
+        /// Complexity: linear in number of states (if already deterministic).
+        /// </remarks>
+        public static Automaton Complement(Automaton a)
         {
-            throw new NotImplementedException();
+            a = a.CloneExpandedIfRequired();
+            a.Determinize();
+            a.Totalize();
+            foreach (State p in a.GetStates())
+            {
+                p.Accept = !p.Accept;
+            }
+
+            a.RemoveDeadTransitions();
+            return a;
         }
 
         public static Automaton Concatenate(Automaton a1, Automaton a2)
@@ -126,15 +145,7 @@ namespace NAutomaton
                 return BasicAutomata.MakeEmptyString();
             }
 
-            bool allSingleton = true;
-            foreach (Automaton a in l)
-            {
-                if (!a.IsSingleton)
-                {
-                    allSingleton = false;
-                    break;
-                }
-            }
+            bool allSingleton = l.All(a => a.IsSingleton);
 
             if (allSingleton)
             {
@@ -148,12 +159,9 @@ namespace NAutomaton
             }
             else
             {
-                foreach (Automaton a in l)
+                if (l.Any(a => a.IsEmpty))
                 {
-                    if (a.IsEmpty)
-                    {
-                        return BasicAutomata.MakeEmpty();
-                    }
+                    return BasicAutomata.MakeEmpty();
                 }
 
                 var ids = new HashSet<int>();
@@ -164,14 +172,7 @@ namespace NAutomaton
 
                 bool hasAliases = ids.Count != l.Count;
                 Automaton b = l[0];
-                if (hasAliases)
-                {
-                    b = b.CloneExpanded();
-                }
-                else
-                {
-                    b = b.CloneExpandedIfRequired();
-                }
+                b = hasAliases ? b.CloneExpanded() : b.CloneExpandedIfRequired();
 
                 var ac = b.GetAcceptStates();
                 bool first = true;
@@ -189,14 +190,7 @@ namespace NAutomaton
                         }
 
                         Automaton aa = a;
-                        if (hasAliases)
-                        {
-                            aa = aa.CloneExpanded();
-                        }
-                        else
-                        {
-                            aa = aa.CloneExpandedIfRequired();
-                        }
+                        aa = hasAliases ? aa.CloneExpanded() : aa.CloneExpandedIfRequired();
 
                         HashSet<State> ns = aa.GetAcceptStates();
                         foreach (State s in ac)
@@ -306,24 +300,6 @@ namespace NAutomaton
             a.RemoveDeadTransitions();
         }
 
-        private sealed class ListOfStateComparer : IEqualityComparer<List<State>>
-        {
-            public bool Equals(List<State> x, List<State> y)
-            {
-                if (x.Count != y.Count)
-                {
-                    return false;
-                }
-
-                return x.SequenceEqual(y);
-            }
-
-            public int GetHashCode(List<State> obj)
-            {
-                return obj.Sum(o => o.GetHashCode());
-            }
-        }
-
         /// <summary>
         /// Determines whether the given automaton accepts no strings.
         /// </summary>
@@ -358,7 +334,14 @@ namespace NAutomaton
             return a.Initial.Accept && a.Initial.Transitions.Count == 0;
         }
 
-        public static Automaton Intersection(Automaton automaton, Automaton a)
+        /// <summary>
+        /// Returns an automaton that accepts the intersection of the languages of the given automata.
+        /// Never modifies the input automata languages.
+        /// </summary>
+        /// <param name="a1">The a1.</param>
+        /// <param name="a2">The a2.</param>
+        /// <returns></returns>
+        public static Automaton Intersection(Automaton a1, Automaton a2)
         {
             throw new NotImplementedException();
         }
@@ -499,5 +482,27 @@ namespace NAutomaton
 
             return b;
         }
+
+        #region Nested type: ListOfStateComparer
+
+        private sealed class ListOfStateComparer : IEqualityComparer<List<State>>
+        {
+            public bool Equals(List<State> x, List<State> y)
+            {
+                if (x.Count != y.Count)
+                {
+                    return false;
+                }
+
+                return x.SequenceEqual(y);
+            }
+
+            public int GetHashCode(List<State> obj)
+            {
+                return obj.Sum(o => o.GetHashCode());
+            }
+        }
+
+        #endregion
     }
 }
