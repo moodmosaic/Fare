@@ -28,6 +28,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -343,7 +344,79 @@ namespace NAutomaton
         /// <returns></returns>
         public static Automaton Intersection(Automaton a1, Automaton a2)
         {
-            throw new NotImplementedException();
+            if (a1.IsSingleton)
+            {
+                if (a2.Run(a1.Singleton))
+                {
+                    return a1.CloneIfRequired();
+                }
+
+                return BasicAutomata.MakeEmpty();
+            }
+
+            if (a2.IsSingleton)
+            {
+                if (a1.Run(a2.Singleton))
+                {
+                    return a2.CloneIfRequired();
+                }
+
+                return BasicAutomata.MakeEmpty();
+            }
+
+            if (a1 == a2)
+            {
+                return a1.CloneIfRequired();
+            }
+
+            Transition[][] transitions1 = Automaton.GetSortedTransitions(a1.GetStates());
+            Transition[][] transitions2 = Automaton.GetSortedTransitions(a2.GetStates());
+            var c = new Automaton();
+            var worklist = new LinkedList<StatePair>();
+            var newstates = new Dictionary<StatePair, StatePair>();
+            var p = new StatePair(c.Initial, a1.Initial, a2.Initial);
+            worklist.AddLast(p);
+            newstates.Add(p, p);
+            while (worklist.Count > 0)
+            {
+                p = worklist.RemoveAndReturnFirst();
+                p.S.Accept = p.FirstState.Accept && p.SecondState.Accept;
+                Transition[] t1 = transitions1[p.FirstState.Number];
+                Transition[] t2 = transitions2[p.SecondState.Number];
+                for (int n1 = 0, b2 = 0; n1 < t1.Length; n1++)
+                {
+                    while (b2 < t2.Length && t2[b2].Max < t1[n1].Min)
+                    {
+                        b2++;
+                    }
+
+                    for (int n2 = b2; n2 < t2.Length && t1[n1].Max >= t2[n2].Min; n2++)
+                    {
+                        if (t2[n2].Max >= t1[n1].Min)
+                        {
+                            var q = new StatePair(t1[n1].To, t2[n2].To);
+                            StatePair r;
+                            newstates.TryGetValue(q, out r);
+                            if (r == null)
+                            {
+                                q.S = new State();
+                                worklist.AddLast(q);
+                                newstates.Add(q, q);
+                                r = q;
+                            }
+
+                            char min = t1[n1].Min > t2[n2].Min ? t1[n1].Min : t2[n2].Min;
+                            char max = t1[n1].Max < t2[n2].Max ? t1[n1].Max : t2[n2].Max;
+                            p.S.Transitions.Add(new Transition(min, max, r.S));
+                        }
+                    }
+                }
+            }
+
+            c.IsDeterministic = a1.IsDeterministic && a2.IsDeterministic;
+            c.RemoveDeadTransitions();
+            c.CheckMinimizeAlways();
+            return c;
         }
 
         public static Automaton Optional(Automaton automaton)
@@ -406,7 +479,7 @@ namespace NAutomaton
             {
                 @as.Add(a);
             }
-            
+
             @as.Add(BasicOperations.Repeat(a));
             return BasicOperations.Concatenate(@as);
         }
@@ -481,6 +554,85 @@ namespace NAutomaton
             }
 
             return b;
+        }
+
+        /// <summary>
+        /// Returns true if the given string is accepted by the automaton.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Complexity: linear in the length of the string.
+        /// Note: for full performance, use the <see cref="RunAutomaton"/> class.
+        /// </remarks>
+        public static bool Run(Automaton a, string s)
+        {
+            if (a.IsSingleton)
+            {
+                return s.Equals(a.IsSingleton);
+            }
+
+            if (a.IsDeterministic)
+            {
+                State p = a.Initial;
+                foreach (char t in s)
+                {
+                    State q = p.Step(t);
+                    if (q == null)
+                    {
+                        return false;
+                    }
+
+                    p = q;
+                }
+
+                return p.Accept;
+            }
+
+            HashSet<State> states = a.GetStates();
+            Automaton.SetStateNumbers(states);
+            var pp = new LinkedList<State>();
+            var ppOther = new LinkedList<State>();
+            var bb = new BitArray(states.Count);
+            var bbOther = new BitArray(states.Count);
+            pp.AddLast(a.Initial);
+            var dest = new List<State>();
+            bool accept = a.Initial.Accept;
+
+            foreach (char c in s)
+            {
+                accept = false;
+                ppOther.Clear();
+                bbOther.SetAll(false);
+                foreach (State p in pp)
+                {
+                    dest.Clear();
+                    p.Step(c, dest);
+                    foreach (State q in dest)
+                    {
+                        if (q.Accept)
+                        {
+                            accept = true;
+                        }
+
+                        if (!bbOther.Get(q.Number))
+                        {
+                            bbOther.Set(q.Number, true);
+                            ppOther.AddLast(q);
+                        }
+                    }
+                }
+
+                LinkedList<State> tp = pp;
+                pp = ppOther;
+                ppOther = tp;
+                BitArray tb = bb;
+                bb = bbOther;
+                bbOther = tb;
+            }
+
+            return accept;
         }
 
         #region Nested type: ListOfStateComparer

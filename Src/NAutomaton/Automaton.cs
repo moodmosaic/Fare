@@ -80,6 +80,14 @@ namespace NAutomaton
         /// </summary>
         public const int MinimizeHopcroft = 2;
 
+        /// <summary>
+        /// Selects whether operations may modify the input automata (default: <code>false</code>).
+        /// </summary>
+        private static bool allowMutation  = false;
+
+        /// <summary>
+        /// Minimize always flag.
+        /// </summary>
         private static bool minimizeAlways = false;
 
         /// <summary>
@@ -225,6 +233,31 @@ namespace NAutomaton
             }
         }
 
+        public static Transition[][] GetSortedTransitions(HashSet<State> states)
+        {
+            Automaton.SetStateNumbers(states);
+            var transitions = new Transition[states.Count][];
+            foreach (State s in states)
+            {
+                transitions[s.Number] = s.GetSortedTransitions(false).ToArray();
+            }
+
+            return transitions;
+        }
+
+        /// <summary>
+        /// Assigns consecutive numbers to the given states.
+        /// </summary>
+        /// <param name="states">The states.</param>
+        public static void SetStateNumbers(IEnumerable<State> states)
+        {
+            int number = 0;
+            foreach (State s in states)
+            {
+                s.Number = number++;
+            }
+        }
+
         /// <summary>
         /// Returns a hash code for this instance.
         /// </summary>
@@ -337,6 +370,22 @@ namespace NAutomaton
             }
 
             return this.CloneExpanded();
+        }
+
+        /// <summary>
+        /// Returns a clone of this automaton, or this automaton itself if <code>allow_mutation</code>
+        /// flag is set.
+        /// </summary>
+        /// <returns>A clone of this automaton, or this automaton itself if <code>allow_mutation</code>
+        /// flag is set.</returns>
+        public Automaton CloneIfRequired()
+        {
+            if (allowMutation)
+            {
+                return this;
+            }
+
+            return this.Clone();
         }
 
         public Automaton Complement()
@@ -655,6 +704,11 @@ namespace NAutomaton
             return BasicOperations.Repeat(this, min);
         }
 
+        public bool Run(string s)
+        {
+            return BasicOperations.Run(this, s);
+        }
+
         /// <summary>
         /// Adds transitions to explicit crash state to ensure that transition function is total.
         /// </summary>
@@ -683,19 +737,6 @@ namespace NAutomaton
                 {
                     p.Transitions.Add(new Transition((char)maxi, char.MaxValue, s));
                 }
-            }
-        }
-
-        /// <summary>
-        /// Assigns consecutive numbers to the given states.
-        /// </summary>
-        /// <param name="states">The states.</param>
-        private static void SetStateNumbers(IEnumerable<State> states)
-        {
-            int number = 0;
-            foreach (State s in states)
-            {
-                s.Number = number++;
             }
         }
 

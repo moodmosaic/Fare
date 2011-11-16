@@ -29,7 +29,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -248,15 +247,9 @@ namespace NAutomaton
         /// <param name="dest">
         /// The collection where destination states are stored.
         /// </param>
-        public void Step(char c, Collection<State> dest)
+        public void Step(char c, List<State> dest)
         {
-            foreach (Transition t in this.Transitions)
-            {
-                if (t.Min <= c && c <= t.Max)
-                {
-                    dest.Add(t.To);
-                }
-            }
+            dest.AddRange(from t in this.Transitions where t.Min <= c && c <= t.Max select t.To);
         }
 
         /// <summary>
