@@ -27,8 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NAutomaton
 {
@@ -59,6 +59,21 @@ namespace NAutomaton
             a.RecomputeHashCode();
         }
 
+        /// <summary>
+        /// Minimizes the given automaton using Brzozowski's algorithm.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        public static void MinimizeBrzozowski(Automaton a)
+        {
+            if (a.IsSingleton)
+            {
+                return;
+            }
+
+            BasicOperations.Determinize(a, SpecialOperations.Reverse(a).ToList());
+            BasicOperations.Determinize(a, SpecialOperations.Reverse(a).ToList());
+        }
+
         public static void MinimizeHopcroft(Automaton a)
         {
             a.Determinize();
@@ -83,12 +98,12 @@ namespace NAutomaton
                 states[number] = q;
                 q.Number = number++;
             }
-            
+
             char[] sigma = a.GetStartPoints();
-            
+
             // Initialize data structures.
             var reverse = new List<List<LinkedList<State>>>();
-            foreach (State t in states)
+            foreach (State s in states)
             {
                 var v = new List<LinkedList<State>>();
                 Initialize(ref v, sigma.Length);
@@ -96,23 +111,23 @@ namespace NAutomaton
             }
 
             var reverseNonempty = new bool[states.Length, sigma.Length];
-            
+
             var partition = new List<LinkedList<State>>();
             Initialize(ref partition, states.Length);
 
-            var block      = new int[states.Length];
-            var active     = new StateList[states.Length, sigma.Length];
-            var active2    = new StateListNode[states.Length, sigma.Length];
-            var pending    = new LinkedList<IntPair>();
-            var pending2   = new bool[sigma.Length, states.Length];
-            var split      = new List<State>();
-            var split2     = new bool[states.Length];
-            var refine     = new List<int>();
-            var refine2    = new bool[states.Length];
+            var block = new int[states.Length];
+            var active = new StateList[states.Length, sigma.Length];
+            var active2 = new StateListNode[states.Length, sigma.Length];
+            var pending = new LinkedList<IntPair>();
+            var pending2 = new bool[sigma.Length, states.Length];
+            var split = new List<State>();
+            var split2 = new bool[states.Length];
+            var refine = new List<int>();
+            var refine2 = new bool[states.Length];
 
             var splitblock = new List<List<State>>();
             Initialize(ref splitblock, states.Length);
-            
+
             for (int q = 0; q < states.Length; q++)
             {
                 splitblock[q] = new List<State>();
@@ -160,7 +175,7 @@ namespace NAutomaton
             {
                 int a0 = active[0, x].Size;
                 int a1 = active[1, x].Size;
-                int j  = a0 <= a1 ? 0 : 1;
+                int j = a0 <= a1 ? 0 : 1;
                 pending.AddLast(new IntPair(j, x));
                 pending2[x, j] = true;
             }
@@ -216,7 +231,7 @@ namespace NAutomaton
                                 }
                             }
                         }
-                        
+
                         // Update pending.
                         for (int c = 0; c < sigma.Length; c++)
                         {
@@ -282,6 +297,115 @@ namespace NAutomaton
             a.RemoveDeadTransitions();
         }
 
+        /// <summary>
+        /// Minimizes the given automaton using Huffman's algorithm.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        public static void MinimizeHuffman(Automaton a)
+        {
+            a.Determinize();
+            a.Totalize();
+            HashSet<State> ss = a.GetStates();
+            var transitions = new Transition[ss.Count][];
+            State[] states = ss.ToArray();
+
+            var mark = new List<List<bool>>();
+            var triggers = new List<List<HashSet<IntPair>>>();
+            foreach (State t in states)
+            {
+                var v = new List<HashSet<IntPair>>();
+                Initialize(ref v, states.Length);
+                triggers.Add(v);
+            }
+
+            // Initialize marks based on acceptance status and find transition arrays.
+            for (int n1 = 0; n1 < states.Length; n1++)
+            {
+                states[n1].Number = n1;
+                transitions[n1] = states[n1].GetSortedTransitions(false).ToArray();
+                for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                {
+                    if (states[n1].Accept != states[n2].Accept)
+                    {
+                        mark[n1][n2] = true;
+                    }
+                }
+            }
+
+            // For all pairs, see if states agree.
+            for (int n1 = 0; n1 < states.Length; n1++)
+            {
+                for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                {
+                    if (!mark[n1][n2])
+                    {
+                        if (MinimizationOperations.StatesAgree(transitions, mark, n1, n2))
+                        {
+                            MinimizationOperations.AddTriggers(transitions, triggers, n1, n2);
+                        }
+                        else
+                        {
+                            MinimizationOperations.MarkPair(mark, triggers, n1, n2);
+                        }
+                    }
+                }
+            }
+
+            // Assign equivalence class numbers to states.
+            int numclasses = 0;
+            foreach (State t in states)
+            {
+                t.Number = -1;
+            }
+
+            for (int n1 = 0; n1 < states.Length; n1++)
+            {
+                if (states[n1].Number == -1)
+                {
+                    states[n1].Number = numclasses;
+                    for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                    {
+                        if (!mark[n1][n2])
+                        {
+                            states[n2].Number = numclasses;
+                        }
+                    }
+
+                    numclasses++;
+                }
+            }
+
+            // Make a new state for each equivalence class.
+            var newstates = new State[numclasses];
+            for (int n = 0; n < numclasses; n++)
+            {
+                newstates[n] = new State();
+            }
+
+            // Select a class representative for each class and find the new initial state.
+            for (int n = 0; n < states.Length; n++)
+            {
+                newstates[states[n].Number].Number = n;
+                if (states[n] == a.Initial)
+                {
+                    a.Initial = newstates[states[n].Number];
+                }
+            }
+
+            // Build transitions and set acceptance.
+            for (int n = 0; n < numclasses; n++)
+            {
+                State s = newstates[n];
+                s.Accept = states[s.Number].Accept;
+                foreach (Transition t in states[s.Number].Transitions)
+                {
+                    s.Transitions.Add(new Transition(t.Min, t.Max, newstates[t.To.Number]));
+                }
+            }
+
+            a.RemoveDeadTransitions();
+        }
+
         private static void Initialize<T>(ref List<T> list, int size)
         {
             for (int i = 0; i < size; i++)
@@ -290,14 +414,119 @@ namespace NAutomaton
             }
         }
 
-        public static void MinimizeBrzozowski(Automaton a)
+        private static void AddTriggers(Transition[][] transitions, IList<List<HashSet<IntPair>>> triggers, int n1, int n2)
         {
-            throw new NotImplementedException();
+            Transition[] t1 = transitions[n1];
+            Transition[] t2 = transitions[n2];
+            for (int k1 = 0, k2 = 0; k1 < t1.Length && k2 < t2.Length;)
+            {
+                if (t1[k1].Max < t2[k2].Min)
+                {
+                    k1++;
+                }
+                else if (t2[k2].Max < t1[k1].Min)
+                {
+                    k2++;
+                }
+                else
+                {
+                    if (t1[k1].To != t2[k2].To)
+                    {
+                        int m1 = t1[k1].To.Number;
+                        int m2 = t2[k2].To.Number;
+                        if (m1 > m2)
+                        {
+                            int t = m1;
+                            m1 = m2;
+                            m2 = t;
+                        }
+
+                        if (triggers[m1][m2] == null)
+                        {
+                            triggers[m1].Insert(m2, new HashSet<IntPair>());
+                        }
+
+                        triggers[m1][m2].Add(new IntPair(n1, n2));
+                    }
+
+                    if (t1[k1].Max < t2[k2].Max)
+                    {
+                        k1++;
+                    }
+                    else
+                    {
+                        k2++;
+                    }
+                }
+            }
         }
 
-        public static void MinimizeHuffman(Automaton a)
+        private static void MarkPair(List<List<bool>> mark, IList<List<HashSet<IntPair>>> triggers, int n1, int n2)
         {
-            throw new NotImplementedException();
+            mark[n1][n2] = true;
+            if (triggers[n1][n2] != null)
+            {
+                foreach (IntPair p in triggers[n1][n2])
+                {
+                    int m1 = p.N1;
+                    int m2 = p.N2;
+                    if (m1 > m2)
+                    {
+                        int t = m1;
+                        m1 = m2;
+                        m2 = t;
+                    }
+
+                    if (!mark[m1][m2])
+                    {
+                        MarkPair(mark, triggers, m1, m2);
+                    }
+                }
+            }
+        }
+
+        private static bool StatesAgree(Transition[][] transitions, List<List<bool>> mark, int n1, int n2)
+        {
+            Transition[] t1 = transitions[n1];
+            Transition[] t2 = transitions[n2];
+            for (int k1 = 0, k2 = 0; k1 < t1.Length && k2 < t2.Length;)
+            {
+                if (t1[k1].Max < t2[k2].Min)
+                {
+                    k1++;
+                }
+                else if (t2[k2].Max < t1[k1].Min)
+                {
+                    k2++;
+                }
+                else
+                {
+                    int m1 = t1[k1].To.Number;
+                    int m2 = t2[k2].To.Number;
+                    if (m1 > m2)
+                    {
+                        int t = m1;
+                        m1 = m2;
+                        m2 = t;
+                    }
+
+                    if (mark[m1][m2])
+                    {
+                        return false;
+                    }
+
+                    if (t1[k1].Max < t2[k2].Max)
+                    {
+                        k1++;
+                    }
+                    else
+                    {
+                        k2++;
+                    }
+                }
+            }
+
+            return true;
         }
 
         #region Nested type: IntPair

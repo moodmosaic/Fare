@@ -27,7 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -319,7 +318,7 @@ namespace NAutomaton
         /// </summary>
         /// <param name="a">The automaton.</param>
         /// <param name="initialset">The initial states.</param>
-        private static void Determinize(Automaton a, List<State> initialset)
+        public static void Determinize(Automaton a, List<State> initialset)
         {
             char[] points = a.GetStartPoints();
 
@@ -500,9 +499,27 @@ namespace NAutomaton
             return c;
         }
 
-        public static Automaton Optional(Automaton automaton)
+        /// <summary>
+        /// Returns an automaton that accepts the union of the empty string and the language of the 
+        /// given automaton.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <remarks>
+        /// Complexity: linear in number of states.
+        /// </remarks>
+        /// <returns>An automaton that accepts the union of the empty string and the language of the 
+        /// given automaton.</returns>
+        public static Automaton Optional(Automaton a)
         {
-            throw new NotImplementedException();
+            a = a.CloneExpandedIfRequired();
+            var s = new State();
+            s.AddEpsilon(a.Initial);
+            s.Accept = true;
+            a.Initial = s;
+            a.IsDeterministic = false;
+            a.ClearHashCode();
+            a.CheckMinimizeAlways();
+            return a;
         }
 
         /// <summary>
