@@ -38,23 +38,25 @@ namespace NAutomaton
     /// <p>
     /// Class invariants:
     /// <ul>
-    /// 			<li>
+    /// <li>
     /// An automaton is either represented explicitly (with State and Transition} objects)
     /// or with a singleton string (see Singleton property ExpandSingleton() method) in case the
     /// automaton is known to accept exactly one string. (Implicitly, all states and transitions of
-    /// an automaton are reachable from its initial state.)</li>
-    /// 			<li>
+    /// an automaton are reachable from its initial state.)
+    /// </li>
+    /// <li>
     /// Automata are always reduced (see method Rreduce()) and have no transitions to dead states
     /// (see RemoveDeadTransitions() method).
     /// </li>
-    /// 			<li>
+    /// <li>
     /// If an automaton is non deterministic, then IsDeterministic property returns false (but the
     /// converse is not required).
     /// </li>
-    /// 			<li>
-    /// Automata provided as input to operations are generally assumed to be disjoint.</li>
-    /// 		</ul>
-    /// 	</p>
+    /// <li>
+    /// Automata provided as input to operations are generally assumed to be disjoint.
+    /// </li>
+    /// </ul>
+    /// </p>
     /// If the states or transitions are manipulated manually, the RestoreInvariant() method and
     /// SetDeterministic(bool) methods should be used afterwards to restore representation invariants
     /// that are assumed by the built-in automata operations.
