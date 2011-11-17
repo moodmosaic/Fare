@@ -39,6 +39,86 @@ namespace NAutomaton
     public static class BasicOperations
     {
         /// <summary>
+        /// Adds epsilon transitions to the given automaton. This method adds extra character interval
+        /// transitions that are equivalent to the given set of epsilon transitions.
+        /// </summary>
+        /// <param name="a">The automaton.</param>
+        /// <param name="pairs">A collection of <see cref="StatePair"/> objects representing pairs of
+        /// source/destination states where epsilon transitions should be added.</param>
+        public static void AddEpsilons(Automaton a, ICollection<StatePair> pairs)
+        {
+            a.ExpandSingleton();
+            var forward = new Dictionary<State, HashSet<State>>();
+            var back = new Dictionary<State, HashSet<State>>();
+            foreach (StatePair p in pairs)
+            {
+                HashSet<State> to = forward[p.FirstState];
+                if (to == null)
+                {
+                    to = new HashSet<State>();
+                    forward.Add(p.FirstState, to);
+                }
+
+                to.Add(p.SecondState);
+                HashSet<State> from = back[p.SecondState];
+                if (from == null)
+                {
+                    from = new HashSet<State>();
+                    back.Add(p.SecondState, from);
+                }
+
+                from.Add(p.FirstState);
+            }
+
+            var worklist = new LinkedList<StatePair>(pairs);
+            var workset = new HashSet<StatePair>(pairs);
+            while (worklist.Count != 0)
+            {
+                StatePair p = worklist.RemoveAndReturnFirst();
+                workset.Remove(p);
+                HashSet<State> to = forward[p.SecondState];
+                HashSet<State> from = back[p.FirstState];
+                if (to != null)
+                {
+                    foreach (State s in to)
+                    {
+                        var pp = new StatePair(p.FirstState, s);
+                        if (!pairs.Contains(pp))
+                        {
+                            pairs.Add(pp);
+                            forward[p.FirstState].Add(s);
+                            back[s].Add(p.FirstState);
+                            worklist.AddLast(pp);
+                            workset.Add(pp);
+                            if (from != null)
+                            {
+                                foreach (State q in from)
+                                {
+                                    var qq = new StatePair(q, p.FirstState);
+                                    if (!workset.Contains(qq))
+                                    {
+                                        worklist.AddLast(qq);
+                                        workset.Add(qq);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Add transitions.
+            foreach (StatePair p in pairs)
+            {
+                p.FirstState.AddEpsilon(p.SecondState);
+            }
+
+            a.IsDeterministic = false;
+            a.ClearHashCode();
+            a.CheckMinimizeAlways();
+        }
+
+        /// <summary>
         /// Returns an automaton that accepts the union of the languages of the given automata.
         /// </summary>
         /// <param name="automatons">The l.</param>
@@ -243,7 +323,7 @@ namespace NAutomaton
         {
             char[] points = a.GetStartPoints();
 
-            var comparer = new ListOfStateComparer();
+            var comparer = new ListEqualityComparer<State>();
 
             // Subset construction.
             var sets = new Dictionary<List<State>, List<State>>(comparer);
@@ -323,7 +403,8 @@ namespace NAutomaton
         /// </summary>
         /// <param name="a">The automaton.</param>
         /// <returns>
-        ///   <c>true</c> if the given automaton accepts the empty string and nothing else; otherwise, <c>false</c>.
+        ///   <c>true</c> if the given automaton accepts the empty string and nothing else; otherwise,
+        /// <c>false</c>.
         /// </returns>
         public static bool IsEmptyString(Automaton a)
         {
@@ -564,7 +645,7 @@ namespace NAutomaton
         /// <returns></returns>
         /// <remarks>
         /// Complexity: linear in the length of the string.
-        /// Note: for full performance, use the <see cref="RunAutomaton"/> class.
+        /// For full performance, use the <see cref="RunAutomaton"/> class.
         /// </remarks>
         public static bool Run(Automaton a, string s)
         {
@@ -634,27 +715,5 @@ namespace NAutomaton
 
             return accept;
         }
-
-        #region Nested type: ListOfStateComparer
-
-        private sealed class ListOfStateComparer : IEqualityComparer<List<State>>
-        {
-            public bool Equals(List<State> x, List<State> y)
-            {
-                if (x.Count != y.Count)
-                {
-                    return false;
-                }
-
-                return x.SequenceEqual(y);
-            }
-
-            public int GetHashCode(List<State> obj)
-            {
-                return obj.Sum(o => o.GetHashCode());
-            }
-        }
-
-        #endregion
     }
 }

@@ -27,6 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace NAutomaton
@@ -291,12 +292,12 @@ namespace NAutomaton
 
         public static void MinimizeBrzozowski(Automaton a)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public static void MinimizeHuffman(Automaton a)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         #region Nested type: IntPair

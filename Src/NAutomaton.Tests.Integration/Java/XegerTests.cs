@@ -44,6 +44,14 @@ namespace NAutomaton.Tests.Integration.Java
         [InlineData("[^ \t\r\n\v\f]")]
         [InlineData("[A-Z]")]
         [InlineData("[A-Fa-f0-9]")]
+        [InlineData("in[du]")]
+        [InlineData("x[0-9A-Z]")]
+        [InlineData("[^A-M]in")]
+        [InlineData(".gr")]
+        [InlineData(@"\(.*l")]
+        [InlineData("W*in")]
+        [InlineData("[xX][0-9a-z]")]
+        [InlineData(@"\(\(\(ab\)*c\)*d\)\(ef\)*\(gh\)\{2\}\(ij\)*\(kl\)*\(mn\)*\(op\)*\(qr\)*")]
         public void GeneratedTextIsCorrect(string pattern)
         {
             var sut = new Xeger(pattern);

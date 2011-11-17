@@ -28,6 +28,9 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace NAutomaton
 {
@@ -42,9 +45,22 @@ namespace NAutomaton
             return BasicAutomata.MakeCharRange(char.MinValue, char.MaxValue);
         }
 
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts all strings.
+        /// </summary>
+        /// <returns>
+        /// A new (deterministic) automaton that accepts all strings.
+        /// </returns>
         public static Automaton MakeAnyString()
         {
-            throw new NotImplementedException();
+            var state = new State();
+            state.Accept = true;
+            state.Transitions.Add(new Transition(char.MinValue, char.MaxValue, state));
+
+            var a = new Automaton();
+            a.Initial = state;
+            a.IsDeterministic = true;
+            return a;
         }
 
         /// <summary>
@@ -91,19 +107,91 @@ namespace NAutomaton
             return a;
         }
 
+        /// <summary>
+        /// Returns a new (deterministic) automaton with the empty language.
+        /// </summary>
+        /// <returns>
+        /// A new (deterministic) automaton with the empty language.
+        /// </returns>
         public static Automaton MakeEmpty()
         {
-            throw new NotImplementedException();
+            var a = new Automaton();
+            var s = new State();
+            a.Initial = s;
+            a.IsDeterministic = true;
+            return a;
         }
 
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts only the empty string.
+        /// </summary>
+        /// <returns>
+        /// A new (deterministic) automaton that accepts only the empty string.
+        /// </returns>
         public static Automaton MakeEmptyString()
         {
-            throw new NotImplementedException();
+            var a = new Automaton();
+            a.Singleton = string.Empty;
+            a.IsDeterministic = true;
+            return a;
         }
 
+        /// <summary>
+        /// Returns a new automaton that accepts strings representing decimal non-negative integers in
+        /// the given interval.
+        /// </summary>
+        /// <param name="min">The minimum value of interval.</param>
+        /// <param name="max">The maximum value of inverval (both end points are included in the 
+        /// interval).</param>
+        /// <param name="digits">If f >0, use fixed number of digits (strings must be prefixed by 0's 
+        /// to obtain the right length) otherwise, the number of digits is not fixed.</param>
+        /// <returns>A new automaton that accepts strings representing decimal non-negative integers 
+        /// in the given interval.</returns>
         public static Automaton MakeInterval(int min, int max, int digits)
         {
-            throw new NotImplementedException();
+            var a = new Automaton();
+            string x = Convert.ToString(min);
+            string y = Convert.ToString(max);
+            if (min > max || (digits > 0 && y.Length > digits))
+            {
+                throw new ArgumentException();
+            }
+
+            int d = digits > 0 ? digits : y.Length;
+            var bx = new StringBuilder();
+            for (int i = x.Length; i < d; i++)
+            {
+                bx.Append('0');
+            }
+
+            bx.Append(x);
+            x = bx.ToString();
+            var by = new StringBuilder();
+            for (int i = y.Length; i < d; i++)
+            {
+                by.Append('0');
+            }
+
+            by.Append(y);
+            y = by.ToString();
+            ICollection<State> initials = new List<State>();
+            a.Initial = BasicAutomata.Between(x, y, 0, initials, digits <= 0);
+            if (digits <= 0)
+            {
+                List<StatePair> pairs = (from p in initials
+                                         where a.Initial != p
+                                         select new StatePair(a.Initial, p)).ToList();
+                a.AddEpsilons(pairs);
+                a.Initial.AddTransition(new Transition('0', a.Initial));
+                a.IsDeterministic = false;
+            }
+            else
+            {
+                a.IsDeterministic = true;
+            }
+
+            a.CheckMinimizeAlways();
+            return a;
         }
 
         /// <summary>
@@ -117,6 +205,137 @@ namespace NAutomaton
             a.Singleton = s;
             a.IsDeterministic = true;
             return a;
+        }
+
+        /// <summary>
+        /// Constructs sub-automaton corresponding to decimal numbers of length x.Substring(n).Length.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="n">The n.</param>
+        /// <returns></returns>
+        private static State AnyOfRightLength(string x, int n)
+        {
+            var s = new State();
+
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                s.AddTransition(new Transition('0', '9', AnyOfRightLength(x, n + 1)));
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Constructs sub-automaton corresponding to decimal numbers of value at least x.Substring(n)
+        /// and length x.Substring(n).Length.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="n">The n.</param>
+        /// <param name="initials">The initials.</param>
+        /// <param name="zeros">if set to <c>true</c> [zeros].</param>
+        /// <returns></returns>
+        private static State AtLeast(string x, int n, ICollection<State> initials, bool zeros)
+        {
+            var s = new State();
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                if (zeros)
+                {
+                    initials.Add(s);
+                }
+
+                char c = x[n];
+                s.AddTransition(new Transition(c, AtLeast(x, n + 1, initials, zeros && c == '0')));
+                if (c < '9')
+                {
+                    s.AddTransition(new Transition((char)(c + 1), '9', AnyOfRightLength(x, n + 1)));
+                }
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Constructs sub-automaton corresponding to decimal numbers of value at most x.Substring(n)
+        /// and length x.Substring(n).Length.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="n">The n.</param>
+        /// <returns></returns>
+        private static State AtMost(string x, int n)
+        {
+            var s = new State();
+
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                char c = x[n];
+                s.AddTransition(new Transition(c, AtMost(x, (char)n + 1)));
+                if (c > '0')
+                {
+                    s.AddTransition(new Transition('0', (char)(c - 1), AnyOfRightLength(x, n + 1)));
+                }
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Constructs sub-automaton corresponding to decimal numbers of value between x.Substring(n)
+        /// and y.Substring(n) and of length x.Substring(n).Length (which must be equal to 
+        /// y.Substring(n).Length).
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="n">The n.</param>
+        /// <param name="initials">The initials.</param>
+        /// <param name="zeros">if set to <c>true</c> [zeros].</param>
+        /// <returns></returns>
+        private static State Between(string x, string y, int n, ICollection<State> initials, bool zeros)
+        {
+            var s = new State();
+
+            if (x.Length == n)
+            {
+                s.Accept = true;
+            }
+            else
+            {
+                if (zeros)
+                {
+                    initials.Add(s);
+                }
+
+                char cx = x[n];
+                char cy = y[n];
+                if (cx == cy)
+                {
+                    s.AddTransition(new Transition(cx, Between(x, y, n + 1, initials, zeros && cx == '0')));
+                }
+                else
+                {
+                    // cx < cy
+                    s.AddTransition(new Transition(cx, BasicAutomata.AtLeast(x, n + 1, initials, zeros && cx == '0')));
+                    s.AddTransition(new Transition(cy, BasicAutomata.AtMost(y, n + 1)));
+                    if (cx + 1 < cy)
+                    {
+                        s.AddTransition(new Transition((char)(cx + 1), (char)(cy - 1), BasicAutomata.AnyOfRightLength(x, n + 1)));
+                    }
+                }
+            }
+
+            return s;
         }
     }
 }

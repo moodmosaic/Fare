@@ -277,6 +277,11 @@ namespace NAutomaton
             return this.hashCode;
         }
 
+        public void AddEpsilons(ICollection<StatePair> pairs)
+        {
+            BasicOperations.AddEpsilons(this, pairs);
+        }
+
         /// <summary>
         /// The check minimize always.
         /// </summary>
@@ -449,7 +454,7 @@ namespace NAutomaton
 
                 foreach (Transition t in s.Transitions)
                 {
-                    // TODO:
+                    // TODO: Java code does not check for null states.
                     if (t.To == null)
                     {
                         continue;
@@ -666,7 +671,7 @@ namespace NAutomaton
                 return;
             }
 
-            // TODO:
+            // TODO: Java code does not check for null states.
             var states = new HashSet<State>(this.GetStates().Where(state => state != null));
             var live = this.GetLiveStates(states);
             foreach (State s in states)
@@ -675,7 +680,7 @@ namespace NAutomaton
                 s.ResetTransitions();
                 foreach (Transition t in st)
                 {
-                    // TODO:
+                    // TODO: Java code does not check for null states.
                     if (t.To == null)
                     {
                         continue;
@@ -750,7 +755,7 @@ namespace NAutomaton
             {
                 foreach (Transition t in s.Transitions)
                 {
-                    // TODO:
+                    // TODO: Java code does not check for null states.
                     if (t.To == null)
                     {
                         continue;
@@ -778,19 +783,6 @@ namespace NAutomaton
             }
 
             return live;
-        }
-
-        private sealed class StateEqualityComparer : IEqualityComparer<State>
-        {
-            public bool Equals(State x, State y)
-            {
-                return x.Equals(y);
-            }
-
-            public int GetHashCode(State obj)
-            {
-                return obj.GetHashCode();
-            }
         }
     }
 }

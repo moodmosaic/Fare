@@ -34,7 +34,7 @@ namespace NAutomaton
         /// </summary>
         /// <param name="regex">The regex.</param>
         /// <param name="random">The random.</param>
-        public Xeger(String regex, Random random)
+        public Xeger(string regex, Random random)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -54,7 +54,7 @@ namespace NAutomaton
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
         /// <param name="regex">The regex.</param>
-        public Xeger(String regex)
+        public Xeger(string regex)
             : this(regex, new Random())
         {
         }

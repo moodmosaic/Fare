@@ -207,7 +207,7 @@ namespace NAutomaton
         /// <param name = "automata">The map from automaton identifiers to automata.</param>
         /// <param name = "minimize">if set to <c>true</c> the automaton is minimized and determinized.</param>
         /// <returns></returns>
-        public Automaton ToAutomaton(IDictionary<String, Automaton> automata, bool minimize)
+        public Automaton ToAutomaton(IDictionary<string, Automaton> automata, bool minimize)
         {
             return this.ToAutomatonAllowMutate(automata, null, minimize);
         }
@@ -241,9 +241,9 @@ namespace NAutomaton
         /// Returns the set of automaton identifiers that occur in this regular expression.
         /// </summary>
         /// <returns>The set of automaton identifiers that occur in this regular expression.</returns>
-        public HashSet<String> GetIdentifiers()
+        public HashSet<string> GetIdentifiers()
         {
-            var set = new HashSet<String>();
+            var set = new HashSet<string>();
             this.GetIdentifiers(set);
             return set;
         }
@@ -431,9 +431,9 @@ namespace NAutomaton
         }
 
         private Automaton ToAutomatonAllowMutate(
-    IDictionary<String, Automaton> automata,
-    IAutomatonProvider automatonProvider,
-    bool minimize)
+            IDictionary<string, Automaton> automata,
+            IAutomatonProvider automatonProvider,
+            bool minimize)
         {
             bool @bool = false;
             if (allowMutation)
@@ -451,7 +451,7 @@ namespace NAutomaton
         }
 
         private Automaton ToAutomaton(
-            IDictionary<String, Automaton> automata,
+            IDictionary<string, Automaton> automata,
             IAutomatonProvider automatonProvider,
             bool minimize)
         {
@@ -665,7 +665,7 @@ namespace NAutomaton
             return sb;
         }
 
-        private void GetIdentifiers(HashSet<String> set)
+        private void GetIdentifiers(HashSet<string> set)
         {
             switch (kind)
             {
