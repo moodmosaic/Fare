@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -43,14 +44,11 @@ namespace NAutomaton.Tests.Integration.Java
         [InlineData("[^ \t\r\n\v\f]")]
         [InlineData("[A-Z]")]
         [InlineData("[A-Fa-f0-9]")]
-        public void ShouldGenerateTextCorrectly(string regex)
+        public void GeneratedTextIsCorrect(string pattern)
         {
-            var generator = new Xeger(regex);
-            for (int i = 0; i < 100; i++)
-            {
-                string text = generator.Generate();
-                Assert.True(Regex.IsMatch(text, regex));
-            }
+            var sut = new Xeger(pattern);
+            var result = Enumerable.Range(1, 3).Select(i => sut.Generate()).ToArray();
+            Array.ForEach(result, regex => Assert.True(Regex.IsMatch(regex, pattern)));
         }
 
         #region Nested type: Xeger
