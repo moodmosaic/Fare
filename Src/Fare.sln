@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAutomaton", "NAutomaton\NAutomaton.csproj", "{24033E0E-0304-4F06-94CD-6F6416ECA509}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fare", "Fare\Fare.csproj", "{24033E0E-0304-4F06-94CD-6F6416ECA509}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAutomaton.Tests.Integration", "NAutomaton.Tests.Integration\NAutomaton.Tests.Integration.csproj", "{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fare.Tests.Integration", "Fare.Tests.Integration\Fare.Tests.Integration.csproj", "{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
