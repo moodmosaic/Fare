@@ -33,7 +33,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace NAutomaton
+namespace Fare
 {
     public static class BasicOperations
     {

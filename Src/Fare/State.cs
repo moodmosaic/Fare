@@ -33,7 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace NAutomaton
+namespace Fare
 {
     /// <summary>
     /// <tt>Automaton</tt> state.

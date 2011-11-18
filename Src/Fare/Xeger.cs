@@ -17,7 +17,7 @@
 using System;
 using System.Text;
 
-namespace NAutomaton
+namespace Fare
 {
     /// <summary>
     /// An object that will generate text from a regular expression. In a way, 

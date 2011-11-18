@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace NAutomaton
+namespace Fare
 {
     /// <summary>
     /// Special automata operations.

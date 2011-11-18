@@ -29,7 +29,7 @@
 
 using System;
 
-namespace NAutomaton
+namespace Fare
 {
     public class StatePair : IEquatable<StatePair>
     {

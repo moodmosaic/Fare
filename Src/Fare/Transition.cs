@@ -30,7 +30,7 @@
 using System;
 using System.Text;
 
-namespace NAutomaton
+namespace Fare
 {
     ///<summary>
     ///  <tt>Automaton</tt> transition. 

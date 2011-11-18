@@ -8,8 +8,8 @@
     <ProjectGuid>{24033E0E-0304-4F06-94CD-6F6416ECA509}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NAutomaton</RootNamespace>
-    <AssemblyName>NAutomaton</AssemblyName>
+    <RootNamespace>Fare</RootNamespace>
+    <AssemblyName>Fare</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

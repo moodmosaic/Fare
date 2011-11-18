@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Extensions;
 
-namespace NAutomaton.Tests.Integration
+namespace Fare.Tests.Integration
 {
     public sealed class XegerTests
     {

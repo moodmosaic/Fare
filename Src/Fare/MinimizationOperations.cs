@@ -30,7 +30,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NAutomaton
+namespace Fare
 {
     public static class MinimizationOperations
     {

@@ -29,7 +29,7 @@
 
 using System.Collections.Generic;
 
-namespace NAutomaton
+namespace Fare
 {
     internal sealed class TransitionComparer : IComparer<Transition>
     {

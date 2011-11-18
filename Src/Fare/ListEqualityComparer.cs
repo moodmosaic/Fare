@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace NAutomaton
+namespace Fare
 {
     internal sealed class ListEqualityComparer<T> : IEqualityComparer<List<T>>
     {

@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NAutomaton
+namespace Fare
 {
     /// <summary>
     /// Regular Expression extension to Automaton.

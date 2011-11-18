@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Extensions;
 
-namespace NAutomaton.Tests.Integration.Java
+namespace Fare.Tests.Integration.Java
 {
     public sealed class XegerTests
     {

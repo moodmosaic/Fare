@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NAutomaton
+namespace Fare
 {
     /// <summary>
     /// Finite-state automaton with regular expression operations.

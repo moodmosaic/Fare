@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NAutomaton
+namespace Fare
 {
     internal static class LinkedListExtensions
     {

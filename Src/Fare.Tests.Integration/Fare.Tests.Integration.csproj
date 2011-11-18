@@ -8,8 +8,8 @@
     <ProjectGuid>{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NAutomaton.Tests.Integration</RootNamespace>
-    <AssemblyName>NAutomaton.Tests.Integration</AssemblyName>
+    <RootNamespace>Fare.Tests.Integration</RootNamespace>
+    <AssemblyName>Fare.Tests.Integration</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -63,9 +63,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NAutomaton\NAutomaton.csproj">
+    <ProjectReference Include="..\Fare\Fare.csproj">
       <Project>{24033E0E-0304-4F06-94CD-6F6416ECA509}</Project>
-      <Name>NAutomaton</Name>
+      <Name>Fare</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
