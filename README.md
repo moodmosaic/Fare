@@ -1,9 +1,9 @@
-NAutomaton
+Fare - [F]inite [A]utomata and [R]egular [E]xpressions
 ===================
 
 A library that contains a DFA/NFA (finite-state automata) implementation with Unicode alphabet (UTF16) and support for the standard regular expression operations (concatenation, union, Kleene star) and a number of non-standard ones (intersection, complement, etc.). 
 
-NAutomaton is a .NET port of the well established Java library [dk.brics.automaton](http://www.brics.dk/automaton/) with API as close as possible to the corresponding dk.brics.automaton classes.
+Fare is a .NET port of the well established Java library [dk.brics.automaton](http://www.brics.dk/automaton/) with API as close as possible to the corresponding dk.brics.automaton classes.
 
 Development environment
 -----------------------
@@ -23,6 +23,3 @@ Design changes
 * Implemented object equality.
 * Many getters and setters have been replaced by .NET properties.
 * Many foreach loops have been converted to LINQ-expressions.
- 
-NAutomaton in use
------------------
