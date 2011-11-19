@@ -116,5 +116,20 @@ namespace Fare
         {
             throw new NotImplementedException();
         }
+        
+        /// <summary>
+        /// Returns an automaton where all transition labels have been substituted. 
+        /// <p> Each transition labeled <code>c</code> is changed to a set of transitions, one for 
+        /// each character in <code>map(c)</code>. If <code>map(c)</code> is null, then the 
+        /// transition is unchanged.
+        /// </summary>
+        /// <param name="a">The a.</param>
+        /// <param name="map">The map from characters to sets of characters (where characters 
+        /// are <code>Character</code> objects).</param>
+        /// <returns></returns>
+        public static Automaton Subst(Automaton a, Map<Character, Set<Character>> map) 
+        {
+            throw new NotImplementedException();
+        }
     }
 }
