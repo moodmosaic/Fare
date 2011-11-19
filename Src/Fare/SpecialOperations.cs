@@ -92,12 +92,12 @@ namespace Fare
         /// <param name="set">The set of characters to be trimmed.</param>
         /// <param name="c">The canonical trim character (assumed to be in <code>set</code>).</param>
         /// <returns></returns>
-        public static Automaton Trim(Automaton a, String set, char c)
+        public static Automaton Trim(Automaton a, string set, char c)
         {
             throw new NotImplementedException();
         }
 
-        private static void AddSetTransitions(State s, String set, State p)
+        private static void AddSetTransitions(State s, string set, State p)
         {
             throw new NotImplementedException();
         }
@@ -112,7 +112,7 @@ namespace Fare
         /// <param name="c">The canonical compress character (assumed to be in <code>set</code>).
         /// </param>
         /// <returns></returns>
-        public static Automaton Compress(Automaton a, String set, char c)
+        public static Automaton Compress(Automaton a, string set, char c)
         {
             throw new NotImplementedException();
         }
@@ -124,10 +124,10 @@ namespace Fare
         /// transition is unchanged.
         /// </summary>
         /// <param name="a">The a.</param>
-        /// <param name="map">The map from characters to sets of characters (where characters 
+        /// <param name="dictionary">The dictionary from characters to sets of characters (where characters 
         /// are <code>Character</code> objects).</param>
         /// <returns></returns>
-        public static Automaton Subst(Automaton a, Map<Character, Set<Character>> map) 
+        public static Automaton Subst(Automaton a, IDictionary<Character, HashSet<Character>> dictionary) 
         {
             throw new NotImplementedException();
         }
@@ -147,7 +147,7 @@ namespace Fare
         /// <param name="c">The c.</param>
         /// <param name="s">The s.</param>
         /// <returns>A new automaton.</returns>
-        public static Automaton Subst(Automaton a, char c, String s) 
+        public static Automaton Subst(Automaton a, char c, string s) 
         {
             throw new NotImplementedException();
         }
@@ -155,7 +155,7 @@ namespace Fare
         /// <summary>
         /// Returns an automaton accepting the homomorphic image of the given automaton using the 
         /// given function. <p> This method maps each transition label to a new value.
-	    /// <code>source</code> and <code>dest</code> are assumed to be arrays of same length, 
+	/// <code>source</code> and <code>dest</code> are assumed to be arrays of same length, 
         /// and <code>source</code> must be sorted in increasing order and contain no duplicates. 
         /// <code>source</code> defines the starting points of char intervals, and the corresponding 
         /// entries in <code>dest</code> define the starting points of corresponding new intervals.
@@ -172,7 +172,7 @@ namespace Fare
         /// the intervals u0000-uDFFF and uF900-uFFFF (i.e., the non-private code points). It is assumed 
         /// that all other characters from <code>chars</code> are in the interval uE000-uF8FF.
         /// </summary>
-        public static Automaton ProjectChars(Automaton a, Set<Character> chars) 
+        public static Automaton ProjectChars(Automaton a, HashSet<Character> chars) 
         {
             throw new NotImplementedException();
         }
@@ -180,7 +180,7 @@ namespace Fare
         /// <summary>
         /// Returns true if the language of this automaton is finite.
         /// </summary>
-        public static boolean IsFinite(Automaton a) 
+        public static bool IsFinite(Automaton a) 
         {
             throw new NotImplementedException();
         }
@@ -189,7 +189,7 @@ namespace Fare
         /// Checks whether there is a loop containing s. (This is sufficient since there are never 
         /// transitions to dead states.) 
         /// </summary>
-        private static boolean IsFinite(State s, HashSet<State> path, HashSet<State> visited) 
+        private static bool IsFinite(State s, HashSet<State> path, HashSet<State> visited) 
         {
             throw new NotImplementedException();
         }
@@ -197,12 +197,12 @@ namespace Fare
         /// <summary>
         /// Returns the set of accepted strings of the given length.
         /// </summary>
-        public static Set<String> GetStrings(Automaton a, int length) 
+        public static HashSet<string> GetStrings(Automaton a, int length) 
         {
            throw new NotImplementedException();
         }
         
-        private static void GetStrings(State s, Set<String> strings, StringBuilder path, int length) 
+        private static void GetStrings(State s, HashSet<string> strings, StringBuilder path, int length) 
         {
             throw new NotImplementedException();
         }
@@ -211,7 +211,7 @@ namespace Fare
         /// Returns the set of accepted strings, assuming this automaton has a finite language. If the 
         /// language is not finite, null is returned.
         /// </summary>
-        public static Set<String> GetFiniteStrings(Automaton a) 
+        public static HashSet<string> GetFiniteStrings(Automaton a) 
         {
             throw new NotImplementedException();
         }
@@ -221,7 +221,7 @@ namespace Fare
         /// accepted. If more than <code>limit</code> strings are accepted, null is returned. If 
         /// <code>limit</code>&lt;0, then this methods works like {@link #getFiniteStrings(Automaton)}.
         /// </summary>
-        public static Set<String> GetFiniteStrings(Automaton a, int limit) 
+        public static HashSet<string> GetFiniteStrings(Automaton a, int limit) 
         {
             throw new NotImplementedException();
         }
@@ -230,7 +230,7 @@ namespace Fare
         /// Returns the strings that can be produced from the given state, or false if more than 
         /// <code>limit</code> strings are found. <code>limit</code>&lt;0 means "infinite". 
         /// </summary>
-        private static boolean GetFiniteStrings(State s, HashSet<State> pathstates, HashSet<String> strings, 
+        private static bool GetFiniteStrings(State s, HashSet<State> pathStates, HashSet<string> strings, 
         StringBuilder path, int limit) 
         {
             throw new NotImplementedException();
@@ -241,26 +241,25 @@ namespace Fare
         /// at most once.
         /// </summary>
         /// <returns>A common prefix.</returns>
-        public static String GetCommonPrefix(Automaton a) 
+        public static string GetCommonPrefix(Automaton a) 
         {
             throw new NotImplementedException();
         }
         
         /// <summary>
-        /// RPrefix closes the given automaton.
+        /// Prefix closes the given automaton.
         /// </summary>
         public static void PrefixClose(Automaton a) 
         {
             throw new NotImplementedException();
         }
         
-        
         /// <summary>
         /// Constructs automaton that accepts the same strings as the given automaton but ignores upper/lower 
         /// case of A-F.
         /// </summary>
-        /// <param name="a">A automaton.</param>
-        /// <returns>A automaton.</returns>
+        /// <param name="a">The automaton.</param>
+        /// <returns>An automaton.</returns>
         public static Automaton HexCases(Automaton a) 
         {
             throw new NotImplementedException();
@@ -270,12 +269,11 @@ namespace Fare
         /// Constructs automaton that accepts 0x20, 0x9, 0xa, and 0xd in place of each 0x20 transition
         /// in the given automaton.
         /// </summary>
-        /// <param name="a">A automaton.</param>
-        /// <returns>A automaton.</returns> 
+        /// <param name="a">The automaton.</param>
+        /// <returns>An automaton.</returns> 
         public static Automaton ReplaceWhitespace(Automaton a) 
         {
             throw new NotImplementedException();
         }
-
     }
 }
