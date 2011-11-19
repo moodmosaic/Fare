@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Fare
@@ -38,7 +39,7 @@ namespace Fare
             {
                 r.Transitions = m[r].ToList();
             }
-            
+
             // Make new initial+final states.
             a.Initial.Accept = true;
             a.Initial = new State();
@@ -49,6 +50,71 @@ namespace Fare
 
             a.IsDeterministic = false;
             return accept;
+        }
+
+        /// <summary>
+        /// Returns an automaton that accepts the overlap of strings that in more than one way can be 
+        /// split into a left part being accepted by <code>a1</code> and a right part being accepted 
+        /// by <code>a2</code>.
+        /// </summary>
+        /// <param name="a1">The a1.</param>
+        /// <param name="a2">The a2.</param>
+        /// <returns></returns>
+        public static Automaton Overlap(Automaton a1, Automaton a2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void AcceptToAccept(Automaton a)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns an automaton that accepts the single chars that occur in strings that are accepted
+        /// by the given automaton. Never modifies the input automaton.
+        /// </summary>
+        /// <param name="a">The a.</param>
+        /// <returns></returns>
+        public static Automaton SingleChars(Automaton a)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns an automaton that accepts the trimmed language of the given automaton. The 
+        /// resulting automaton is constructed as follows: 1) Whenever a <code>c</code> character is
+        /// allowed in the original automaton, one or more <code>set</code> characters are allowed in
+        /// the new automaton. 2) The automaton is prefixed and postfixed with any number of <code>
+        /// set</code> characters.
+        /// </summary>
+        /// <param name="a">The a.</param>
+        /// <param name="set">The set of characters to be trimmed.</param>
+        /// <param name="c">The canonical trim character (assumed to be in <code>set</code>).</param>
+        /// <returns></returns>
+        public static Automaton Trim(Automaton a, String set, char c)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void AddSetTransitions(State s, String set, State p)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns an automaton that accepts the compressed language of the given automaton. 
+        /// Whenever a <code>c</code> character is allowed in the original automaton, one or more 
+        /// <code>set</code> characters are allowed in the new automaton.
+        /// </summary>
+        /// <param name="a">The a.</param>
+        /// <param name="set">The set of characters to be compressed.</param>
+        /// <param name="c">The canonical compress character (assumed to be in <code>set</code>).
+        /// </param>
+        /// <returns></returns>
+        public static Automaton Compress(Automaton a, String set, char c)
+        {
+            throw new NotImplementedException();
         }
     }
 }

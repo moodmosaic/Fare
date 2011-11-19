@@ -31,6 +31,9 @@ using System;
 
 namespace Fare
 {
+    /// <summary>
+    /// Pair of states.
+    /// </summary>
     public class StatePair : IEquatable<StatePair>
     {
         /// <summary>
