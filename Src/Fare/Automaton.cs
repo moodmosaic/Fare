@@ -85,12 +85,12 @@ namespace Fare
         /// <summary>
         /// Selects whether operations may modify the input automata (default: <code>false</code>).
         /// </summary>
-        private static bool allowMutation  = false;
+        private static bool allowMutation;
 
         /// <summary>
         /// Minimize always flag.
         /// </summary>
-        private static bool minimizeAlways = false;
+        private static bool minimizeAlways;
 
         /// <summary>
         /// The hash code.
@@ -170,11 +170,11 @@ namespace Fare
         }
 
         /// <summary>
-        /// Gets or sets the singleton string. Null if not applicable.
+        /// Gets or sets the singleton string for this automaton. An automaton that accepts exactly one
+        ///  string <i>may</i> be represented in singleton mode. In that case, this method may be 
+        /// used to obtain the string.
         /// </summary>
-        /// <value>
-        /// The singleton string. Null if not applicable.
-        /// </value>
+        /// <value>The singleton string, null if this automaton is not in singleton mode.</value>
         public string Singleton { get; set; }
 
         /// <summary>
@@ -245,6 +245,33 @@ namespace Fare
             }
 
             return transitions;
+        }
+
+        /// <summary>
+        /// Sets or resets allow mutate flag. If this flag is set, then all automata operations
+        /// may modify automata given as input; otherwise, operations will always leave input
+        /// automata languages unmodified. By default, the flag is not set.
+        /// </summary>
+        /// <param name="flag">if set to <c>true</c> then all automata operations may modify 
+        /// automata given as input; otherwise, operations will always leave input automata 
+        /// languages unmodified..</param>
+        /// <returns>The previous value of the flag.</returns>
+        public static bool SetAllowMutate(bool flag)
+        {
+            bool b = allowMutation;
+            allowMutation = flag;
+            return b;
+        }
+
+        /// <summary>
+        /// Sets or resets minimize always flag. If this flag is set, then {@link #minimize()} 
+        /// will automatically be invoked after all operations that otherwise may produce 
+        /// non-minimal automata. By default, the flag is not set.
+        /// </summary>
+        /// <param name="flag">The flag if true, the flag is set.</param>
+        public static void SetMinimizeAlways(bool flag)
+        {
+            minimizeAlways = flag;
         }
 
         /// <summary>

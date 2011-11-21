@@ -337,5 +337,115 @@ namespace Fare
 
             return s;
         }
+
+        /// <summary>
+        /// Returns a new (deterministic) automaton that accepts a single character in the given set.
+        /// </summary>
+        /// <param name="set">The set.</param>
+        /// <returns></returns>
+        public static Automaton MakeCharSet(String set)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns a new (deterministic and minimal) automaton that accepts the union of the given
+        /// set of strings. The input character sequences are internally sorted in-place, so the 
+        /// input array is modified. @see StringUnionOperations.
+        /// </summary>
+        /// <param name="strings">The strings.</param>
+        /// <returns></returns>
+        public static Automaton MakeStringUnion(params char[] strings) // TODO: CharSequence... strings
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing nonnegative integer that are not 
+        /// larger than the given value.
+        /// </summary>
+        /// <param name="n">The n string representation of maximum value.</param>
+        /// <returns></returns>
+        public static Automaton MakeMaxInteger(String n)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void MaxInteger(String n, int i, StringBuilder b) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing nonnegative integers that are not
+        /// less that the given value.
+        /// </summary>
+        /// <param name="n">The n string representation of minimum value.</param>
+        /// <returns></returns>
+        public static Automaton MakeMinInteger(String n) 
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void MinInteger(String n, int i, StringBuilder b) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing decimal numbers that can be 
+        /// written with at most the given number of digits. Surrounding whitespace is permitted.
+        /// </summary>
+        /// <param name="i">The i max number of necessary digits.</param>
+        /// <returns></returns>
+        public static Automaton MakeTotalDigits(int i) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing decimal numbers that can be 
+        /// written with at most the given number of digits in the fraction part. Surrounding
+        /// whitespace is permitted.
+        /// </summary>
+        /// <param name="i">The i max number of necessary fraction digits.</param>
+        /// <returns></returns>
+        public static Automaton MakeFractionDigits(int i) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing the given integer. Surrounding 
+        /// whitespace is permitted.
+        /// </summary>
+        /// <param name="value">The value string representation of integer.</param>
+        /// <returns></returns>
+        public static Automaton MakeIntegerValue(String value) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs automaton that accept strings representing the given decimal number.
+        /// Surrounding whitespace is permitted.
+        /// </summary>
+        /// <param name="value">The value string representation of decimal number.</param>
+        /// <returns></returns>
+        public static Automaton MakeDecimalValue(String value) 
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Constructs deterministic automaton that matches strings that contain the given substring.
+        /// </summary>
+        /// <param name="s">The s.</param>
+        /// <returns></returns>
+        public static Automaton MakeStringMatcher(String s) 
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
