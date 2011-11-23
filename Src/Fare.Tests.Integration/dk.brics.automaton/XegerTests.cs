@@ -1,57 +1,16 @@
-﻿/**
- * Copyright 2009 Wilfred Springer
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Fare.Tests.Integration.Java
+namespace Fare.Tests.Integration.Dk.Brics.Automaton
 {
     public sealed class XegerTests
     {
         [Theory]
-        [InlineData("[ab]{4,6}c")]
-        [InlineData("(a|b)*ab")]
-        [InlineData("[A-Za-z0-9]")]
-        [InlineData("[A-Za-z0-9_]")]
-        [InlineData("[A-Za-z]")]
-        [InlineData("[ \t]")]
-        [InlineData(@"[(?<=\W)(?=\w)|(?<=\w)(?=\W)]")]
-        [InlineData("[\x00-\x1F\x7F]")]
-        [InlineData("[0-9]")]
-        [InlineData("[^0-9]")]
-        [InlineData("[\x21-\x7E]")]
-        [InlineData("[a-z]")]
-        [InlineData("[\x20-\x7E]")]
-        [InlineData(@"[\]\[!\""#$%&'()*+,./:;<=>?@\^_`{|}~-]")]
-        [InlineData("[ \t\r\n\v\f]")]
-        [InlineData("[^ \t\r\n\v\f]")]
-        [InlineData("[A-Z]")]
-        [InlineData("[A-Fa-f0-9]")]
-        [InlineData("in[du]")]
-        [InlineData("x[0-9A-Z]")]
-        [InlineData("[^A-M]in")]
-        [InlineData(".gr")]
-        [InlineData(@"\(.*l")]
-        [InlineData("W*in")]
-        [InlineData("[xX][0-9a-z]")]
-        [InlineData(@"\(\(\(ab\)*c\)*d\)\(ef\)*\(gh\)\{2\}\(ij\)*\(kl\)*\(mn\)*\(op\)*\(qr\)*")]
+        [ClassData(typeof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
             var sut = new Xeger(pattern);
@@ -68,7 +27,7 @@ namespace Fare.Tests.Integration.Java
         /// </summary>
         private sealed class Xeger
         {
-            private readonly dk.brics.automaton.Automaton automaton;
+            private readonly global::dk.brics.automaton.Automaton automaton;
             private readonly Random random;
 
             /// <summary>
@@ -88,7 +47,7 @@ namespace Fare.Tests.Integration.Java
                     throw new ArgumentNullException("random");
                 }
 
-                automaton = new dk.brics.automaton.RegExp(regex).toAutomaton();
+                automaton = new global::dk.brics.automaton.RegExp(regex).toAutomaton();
                 this.random = random;
             }
 
@@ -119,7 +78,7 @@ namespace Fare.Tests.Integration.Java
                 return min + (int)Math.Round(number * dif);
             }
 
-            private void Generate(StringBuilder builder, dk.brics.automaton.State state)
+            private void Generate(StringBuilder builder, global::dk.brics.automaton.State state)
             {
                 java.util.List transitions = state.getSortedTransitions(true);
                 if (transitions.size() == 0)
@@ -141,12 +100,12 @@ namespace Fare.Tests.Integration.Java
                 }
 
                 // Moving on to next transition.
-                var transition = (dk.brics.automaton.Transition)transitions.get(option - (state.isAccept() ? 1 : 0));
+                var transition = (global::dk.brics.automaton.Transition)transitions.get(option - (state.isAccept() ? 1 : 0));
                 AppendChoice(builder, transition);
                 Generate(builder, transition.getDest());
             }
 
-            private void AppendChoice(StringBuilder builder, dk.brics.automaton.Transition transition)
+            private void AppendChoice(StringBuilder builder, global::dk.brics.automaton.Transition transition)
             {
                 var c = (char)GetRandomInt(transition.getMin(), transition.getMax(), random);
                 builder.Append(c);
