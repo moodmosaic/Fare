@@ -32,10 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="automaton">
-      <HintPath>Java\automaton 1.11-8\automaton.dll</HintPath>
+      <HintPath>dk.brics.automaton\automaton 1.11-8\automaton.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>Java\automaton 1.11-8\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>dk.brics.automaton\automaton 1.11-8\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Ploeh.AutoFixture">
       <HintPath>..\packages\AutoFixture.2.4.1\lib\Ploeh.AutoFixture.dll</HintPath>
@@ -47,7 +47,7 @@
       <HintPath>..\packages\AutoFixture.2.4.1\lib\Ploeh.SemanticComparison.dll</HintPath>
     </Reference>
     <Reference Include="Rex">
-      <HintPath>..\..\..\..\Downloads\NotInclude\Rex (signed)\Rex.exe</HintPath>
+      <HintPath>Rex\Rex 1.0\Rex.exe</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="xunit">
