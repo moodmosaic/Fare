@@ -459,6 +459,7 @@ namespace Fare
         /// The set of reachable accept states.
         /// </summary>
         /// <returns>Returns the set of reachable accept states.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is not executing immediately nor returns the same value each time it is invoked.")]
         public HashSet<State> GetAcceptStates()
         {
             this.ExpandSingleton();
@@ -545,6 +546,7 @@ namespace Fare
         /// <returns>
         /// The set of states that are reachable from the initial state.
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is not executing immediately nor returns the same value each time it is invoked.")]
         public HashSet<State> GetStates()
         {
             this.ExpandSingleton();
