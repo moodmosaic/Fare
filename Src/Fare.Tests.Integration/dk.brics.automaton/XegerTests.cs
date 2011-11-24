@@ -92,7 +92,7 @@ namespace Fare.Tests.Integration.Dk.Brics.Automaton
                 }
 
                 int nroptions = state.isAccept() ? transitions.size() : transitions.size() - 1;
-                int option = GetRandomInt(0, nroptions, random);
+                int option = Xeger.GetRandomInt(0, nroptions, random);
                 if (state.isAccept() && option == 0)
                 {
                     // 0 is considered stop.
@@ -107,7 +107,7 @@ namespace Fare.Tests.Integration.Dk.Brics.Automaton
 
             private void AppendChoice(StringBuilder builder, global::dk.brics.automaton.Transition transition)
             {
-                var c = (char)GetRandomInt(transition.getMin(), transition.getMax(), random);
+                var c = (char)Xeger.GetRandomInt(transition.getMin(), transition.getMax(), random);
                 builder.Append(c);
             }
         }

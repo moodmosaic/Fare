@@ -34,6 +34,7 @@ namespace Fare.Tests.Integration
             yield return new object[] { "W*in" };
             yield return new object[] { "[xX][0-9a-z]" };
             yield return new object[] { @"\(\(\(ab\)*c\)*d\)\(ef\)*\(gh\)\{2\}\(ij\)*\(kl\)*\(mn\)*\(op\)*\(qr\)*" };
+            //yield return new object[] { @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()

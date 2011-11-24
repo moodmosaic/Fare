@@ -61,7 +61,7 @@
     <Compile Include="dk.brics.automaton\XegerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexPatternTestCases.cs" />
-    <Compile Include="Rex\XegerTests.cs" />
+    <Compile Include="Rex\RexEngineTests.cs" />
     <Compile Include="XegerTests.cs" />
   </ItemGroup>
   <ItemGroup>
