@@ -7,6 +7,9 @@ using Xunit.Extensions;
 
 namespace Fare.Tests.Integration.Rex
 {
+    /// <summary>
+    /// Regex pattern test cases for Rex.
+    /// </summary>
     public class RexEngineTests
     {
         [Theory]

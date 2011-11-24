@@ -50,6 +50,9 @@
       <HintPath>Rex\Rex 1.0\Rex.exe</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="xeger">
+      <HintPath>Xeger\xeger 1.0\xeger.dll</HintPath>
+    </Reference>
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.1.8.0.1549\lib\xunit.dll</HintPath>
     </Reference>
@@ -58,7 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="dk.brics.automaton\XegerTests.cs" />
+    <Compile Include="Xeger\XegerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexPatternTestCases.cs" />
     <Compile Include="Rex\RexEngineTests.cs" />

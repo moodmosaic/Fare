@@ -67,7 +67,7 @@ namespace Fare
         {
             var builder = new StringBuilder();
             this.Generate(builder, automaton.Initial);
-            return builder.ToString();
+            return builder.ToString().TrimStart('^').TrimEnd('$');
         }
 
         /// <summary>
