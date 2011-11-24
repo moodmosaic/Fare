@@ -13,7 +13,7 @@ namespace Fare.Tests.Integration.Rex
         [ClassData(typeof(RegexPatternTestCases))]
         public void GeneratedTextWithRexIsCorrect(string pattern)
         {
-            var settings = new RexSettings(pattern) { encoding = CharacterEncoding.ASCII };
+            var settings = new RexSettings(pattern) { encoding = CharacterEncoding.ASCII, k = 1 };
             var result = Enumerable.Range(1, 3).Select(i => RexEngine.GenerateMembers(settings).Single()).ToArray();
             Array.ForEach(result, regex => Assert.True(Regex.IsMatch(regex, pattern)));
         }
