@@ -343,9 +343,29 @@ namespace Fare
         /// </summary>
         /// <param name="set">The set.</param>
         /// <returns></returns>
-        public static Automaton MakeCharSet(String set)
+        public static Automaton MakeCharSet(string set)
         {
-            throw new NotImplementedException();
+            if (set.Length == 1)
+            {
+                return MakeChar(set[0]);
+            }
+
+            var a = new Automaton();
+            var s1 = new State();
+            var s2 = new State();
+
+            a.Initial = s1;
+            s2.Accept = true;
+
+            foreach (char t in set)
+            {
+                s1.Transitions.Add(new Transition(t, s2));
+            }
+
+            a.IsDeterministic = true;
+            a.Reduce();
+
+            return a;
         }
 
         /// <summary>
@@ -355,9 +375,20 @@ namespace Fare
         /// </summary>
         /// <param name="strings">The strings.</param>
         /// <returns></returns>
-        public static Automaton MakeStringUnion(params char[] strings) // TODO: CharSequence... strings
+        public static Automaton MakeStringUnion(params char[][] strings)
         {
-            throw new NotImplementedException();
+            if (strings.Length == 0)
+            {
+                return MakeEmpty();
+            }
+
+            Array.Sort(strings, StringUnionOperations.LexicographicOrderComparer);
+            var a = new Automaton();
+            a.Initial = StringUnionOperations.Build(strings);
+            a.IsDeterministic = true;
+            a.Reduce();
+            a.RecomputeHashCode();
+            return a;
         }
 
         /// <summary>
@@ -368,12 +399,40 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeMaxInteger(String n)
         {
-            throw new NotImplementedException();
+            int i = 0;
+            while (i < n.Length && n[i] == '0')
+            {
+                i++;
+            }
+
+            var b = new StringBuilder();
+            b.Append("0*(0|");
+            if (i < n.Length)
+            {
+                b.Append("[0-9]{1," + (n.Length - i - 1) + "}|");
+            }
+
+            MaxInteger(n.Substring(i), 0, b);
+            b.Append(")");
+            return Automaton.Minimize((new RegExp(b.ToString())).ToAutomaton());
         }
 
         private static void MaxInteger(String n, int i, StringBuilder b) 
         {
-            throw new NotImplementedException();
+            b.Append('(');
+            if (i < n.Length)
+            {
+                char c = n[i];
+                if (c != '0')
+                {
+                    b.Append("[0-" + (char)(c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
+                }
+
+                b.Append(c);
+                MaxInteger(n, i + 1, b);
+            }
+
+            b.Append(')');
         }
 
         /// <summary>
@@ -384,12 +443,35 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeMinInteger(String n) 
         {
-            throw new NotImplementedException();
+            int i = 0;
+            while (i + 1 < n.Length && n[i] == '0')
+            {
+                i++;
+            }
+
+            var b = new StringBuilder();
+            b.Append("0*");
+            MinInteger(n.Substring(i), 0, b);
+            b.Append("[0-9]*");
+            return Automaton.Minimize((new RegExp(b.ToString())).ToAutomaton());
         }
 
         private static void MinInteger(String n, int i, StringBuilder b) 
         {
-            throw new NotImplementedException();
+            b.Append('(');
+            if (i < n.Length)
+            {
+                char c = n[i];
+                if (c != '9')
+                {
+                    b.Append("[" + (char)(c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
+                }
+
+                b.Append(c);
+                MinInteger(n, i + 1, b);
+            }
+
+            b.Append(')');
         }
 
         /// <summary>
@@ -400,7 +482,10 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeTotalDigits(int i) 
         {
-            throw new NotImplementedException();
+            return
+               Automaton.Minimize(
+                    new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")
+                       .ToAutomaton());
         }
 
         /// <summary>
@@ -412,7 +497,10 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeFractionDigits(int i) 
         {
-            throw new NotImplementedException();
+            return
+                Automaton.Minimize(
+                    new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")
+                        .ToAutomaton());
         }
 
         /// <summary>
@@ -423,7 +511,34 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeIntegerValue(String value) 
         {
-            throw new NotImplementedException();
+            bool minus = false;
+            int i = 0;
+            while (i < value.Length)
+            {
+                char c = value[i];
+                if (c == '-')
+                {
+                    minus = true;
+                }
+                if (c >= '1' && c <= '9')
+                {
+                    break;
+                }
+                i++;
+            }
+            var b = new StringBuilder();
+            b.Append(value.Substring(i));
+            if (b.Length == 0)
+            {
+                b.Append("0");
+            }
+            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
+            Automaton ws = Datatypes.WhitespaceAutomaton;
+            return Automaton.Minimize(
+                ws.Concatenate(
+                    s.Concatenate(Automaton.MakeChar('0').Repeat())
+                        .Concatenate(Automaton.MakeString(b.ToString())))
+                    .Concatenate(ws));
         }
 
         /// <summary>
@@ -434,7 +549,75 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeDecimalValue(String value) 
         {
-            throw new NotImplementedException();
+            bool minus = false;
+            int i = 0;
+            while (i < value.Length)
+            {
+                char c = value[i];
+                if (c == '-')
+                {
+                    minus = true;
+                }
+
+                if ((c >= '1' && c <= '9') || c == '.')
+                {
+                    break;
+                }
+
+                i++;
+            }
+
+            var b1 = new StringBuilder();
+            var b2 = new StringBuilder();
+            int p = value.IndexOf('.', i);
+            if (p == -1)
+            {
+                b1.Append(value.Substring(i));
+            }
+            else
+            {
+                b1.Append(value.Substring(i, p - i));
+                i = value.Length - 1;
+                while (i > p)
+                {
+                    char c = value[i];
+                    if (c >= '1' && c <= '9')
+                    {
+                        break;
+                    }
+
+                    i--;
+                }
+
+                b2.Append(value.Substring(p + 1, i + 1 - (p + 1)));
+            }
+
+            if (b1.Length == 0)
+            {
+                b1.Append("0");
+            }
+
+            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
+            Automaton d;
+            if (b2.Length == 0)
+            {
+                d = Automaton.MakeChar('.').Concatenate(Automaton.MakeChar('0').Repeat(1)).Optional();
+            }
+            else
+            {
+                d = Automaton.MakeChar('.')
+                    .Concatenate(Automaton.MakeString(b2.ToString()))
+                    .Concatenate(Automaton.MakeChar('0')
+                                     .Repeat());
+            }
+
+            Automaton ws = Datatypes.WhitespaceAutomaton;
+            return Automaton.Minimize(
+                ws.Concatenate(
+                    s.Concatenate(Automaton.MakeChar('0').Repeat())
+                        .Concatenate(Automaton.MakeString(b1.ToString()))
+                        .Concatenate(d))
+                    .Concatenate(ws));
         }
 
         /// <summary>
@@ -444,8 +627,68 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeStringMatcher(String s) 
         {
-            throw new NotImplementedException();
-        }
+            var a = new Automaton();
+            var states = new State[s.Length + 1];
+            states[0] = a.Initial;
+            for (int i = 0; i < s.Length; i++)
+            {
+                states[i + 1] = new State();
+            }
 
+            State f = states[s.Length];
+            f.Accept = true;
+            f.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, f));
+            for (int i = 0; i < s.Length; i++)
+            {
+                var done = new HashSet<char?>();
+                char c = s[i];
+                states[i].Transitions.Add(new Transition(c, states[i + 1]));
+                done.Add(c);
+                for (int j = i; j >= 1; j--)
+                {
+                    char d = s[j - 1];
+                    if (!done.Contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
+                    {
+                        states[i].Transitions.Add(new Transition(d, states[j]));
+                        done.Add(d);
+                    }
+                }
+
+                var da = new char[done.Count];
+                int h = 0;
+                foreach (char w in done)
+                {
+                    da[h++] = w;
+                }
+
+                Array.Sort(da);
+                int from = Char.MinValue;
+                int k = 0;
+                while (from <= Char.MaxValue)
+                {
+                    while (k < da.Length && da[k] == from)
+                    {
+                        k++;
+                        from++;
+                    }
+
+                    if (from <= Char.MaxValue)
+                    {
+                        int to = Char.MaxValue;
+                        if (k < da.Length)
+                        {
+                            to = da[k] - 1;
+                            k++;
+                        }
+
+                        states[i].Transitions.Add(new Transition((char)from, (char)to, states[0]));
+                        from = to + 2;
+                    }
+                }
+            }
+
+            a.IsDeterministic = true;
+            return a;
+        }
     }
 }

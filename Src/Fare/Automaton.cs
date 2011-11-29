@@ -247,6 +247,27 @@ namespace Fare
             return transitions;
         }
 
+        public static Automaton MakeChar(char c)
+        {
+            return BasicAutomata.MakeChar(c);
+        }
+
+        public static Automaton MakeCharSet(string set)
+        {
+            return BasicAutomata.MakeCharSet(set);
+        }
+
+        public static Automaton MakeString(string s)
+        {
+            return BasicAutomata.MakeString(s);
+        }
+
+        public static Automaton Minimize(Automaton a)
+        {
+            a.Minimize();
+            return a;
+        }
+
         /// <summary>
         /// Sets or resets allow mutate flag. If this flag is set, then all automata operations
         /// may modify automata given as input; otherwise, operations will always leave input
@@ -425,6 +446,11 @@ namespace Fare
         public Automaton Complement()
         {
             return BasicOperations.Complement(this);
+        }
+
+        public Automaton Concatenate(Automaton a)
+        {
+            return BasicOperations.Concatenate(this, a);
         }
 
         public void Determinize()

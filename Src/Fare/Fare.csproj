@@ -40,6 +40,7 @@
     <Compile Include="Automaton.cs" />
     <Compile Include="BasicAutomata.cs" />
     <Compile Include="BasicOperations.cs" />
+    <Compile Include="Datatypes.cs" />
     <Compile Include="IAutomatonProvider.cs" />
     <Compile Include="LinkedListExtensions.cs" />
     <Compile Include="ListEqualityComparer.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="State.cs" />
     <Compile Include="StateEqualityComparer.cs" />
     <Compile Include="StatePair.cs" />
+    <Compile Include="StringUnionOperations.cs" />
     <Compile Include="Transition.cs" />
     <Compile Include="TransitionComparer.cs" />
     <Compile Include="Xeger.cs" />
