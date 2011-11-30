@@ -22,6 +22,7 @@ Design changes
 * Implemented object equality.
 * Many getters and setters have been replaced by .NET properties.
 * Many foreach loops have been converted to LINQ-expressions.
+* There are currently integration tests utilizing xUnit.net data [theories] (http://xunit.codeplex.com/wikipage?title=Comparisons#note4) using the [ClassData] attribute.
 * Notes from porting Java code in .NET can be found [here] (http://www.nikosbaxevanis.com/bonus-bits/2011/11/notes-from-porting-java-code-to-net.html).
 
 <i>Based on version 1.11-8 of dk.brics.automaton released on September 7, 2011. [ChangeLog] (http://www.brics.dk/automaton/ChangeLog)</i>
