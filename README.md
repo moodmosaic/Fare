@@ -3,7 +3,7 @@ Fare - [F]inite [A]utomata and [R]egular [E]xpressions
 
 A library that contains a DFA/NFA (finite-state automata) implementation with Unicode alphabet (UTF16) and support for the standard regular expression operations (concatenation, union, Kleene star) and a number of non-standard ones (intersection, complement, etc.). 
 
-Fare is a .NET port of the well established Java library [dk.brics.automaton](http://www.brics.dk/automaton/) with API as close as possible to the corresponding dk.brics.automaton classes.
+[Fare] (http://www.nikosbaxevanis.com/bonus-bits/2011/11/fare-finite-automata-and-regex-in-net.html) is a .NET port of the well established Java library [dk.brics.automaton](http://www.brics.dk/automaton/) with API as close as possible to the corresponding dk.brics.automaton classes.
 
 Development environment
 -----------------------
