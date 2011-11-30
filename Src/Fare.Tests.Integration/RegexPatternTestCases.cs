@@ -39,6 +39,11 @@ namespace Fare.Tests.Integration
             yield return new object[] { @"(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?" };
             yield return new object[] { @"^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)?((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4})(\:[0-9]+)?(/[^/][a-zA-Z0-9\.\,\?\'\\/\+&amp;%\$#\=~_\-@]*)*$" };
             yield return new object[] { @"^([1-zA-Z0-1@.\s]{1,255})$" };
+            yield return new object[] { "[A-Z][0-9A-Z]{10}" };
+            yield return new object[] { "[A-Z][A-Za-z0-9]{10}" };
+            yield return new object[] { "[A-Z][a-zA-Z0-9]{10}" };
+            yield return new object[] { "[A-Za-z0-9]{11}" };
+            yield return new object[] { "[A-Za-z]{11}" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()
