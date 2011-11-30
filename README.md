@@ -5,8 +5,6 @@ A library that contains a DFA/NFA (finite-state automata) implementation with Un
 
 Fare is a .NET port of the well established Java library [dk.brics.automaton](http://www.brics.dk/automaton/) with API as close as possible to the corresponding dk.brics.automaton classes.
 
-<i>This code is based on version 1.11-8 of dk.brics.automaton released on September 7, 2011. [ChangeLog] (http://www.brics.dk/automaton/ChangeLog)</i>
-
 Development environment
 -----------------------
 
@@ -25,3 +23,5 @@ Design changes
 * Implemented object equality.
 * Many getters and setters have been replaced by .NET properties.
 * Many foreach loops have been converted to LINQ-expressions.
+
+<i>Based on version 1.11-8 of dk.brics.automaton released on September 7, 2011. [ChangeLog] (http://www.brics.dk/automaton/ChangeLog)</i>
