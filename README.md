@@ -1,10 +1,8 @@
 Fare - [F]inite [A]utomata and [R]egular [E]xpressions
 ===================
 
-A library that contains a DFA/NFA (finite-state automata) implementation with Unicode alphabet (UTF16) and support for the standard regular expression operations (concatenation, union, Kleene star) and a number of non-standard ones (intersection, complement, etc.). 
-
 <p>Project <a href="https://github.com/moodmosaic/Fare" target="_blank" title="Fare - [F]inite [A]utomata and [R]egular [E]xpressions">Fare</a> is an effort to bring a <a href="http://en.wikipedia.org/wiki/Deterministic_finite-state_machine" target="_blank" title="Deterministic finite-state machine">DFA</a>/<a href="http://en.wikipedia.org/wiki/Nondeterministic_finite-state_machine" target="_blank" title="Nondeterministic finite-state machine">NFA</a> (finite-state automata) implementation from Java to .NET.&#0160;There are quite a few implementations available in other languages today. This project aims to fill the gap in .NET.</p>
-<p>Fare is a .NET port of the well established Java library <a href="http://www.brics.dk/automaton/" target="_blank" title="dk.brics.automaton">dk.brics.automaton</a> with API as close as possible to the corresponding dk.brics.automaton classes. It also includes a port of <a href="http://code.google.com/p/xeger/" target="_blank" title="A Java library for generating random text from regular expressions.">Xeger</a>&#0160;which is a&#0160;Java library for generating random text from regular expressions. The latter is possible in .NET using the <a href="http://research.microsoft.com/en-us/projects/rex/" target="_blank" title="Rex is a tool that explores .NET regexes and generates members efficiently.">Rex</a> tool.</p>
+<p>Fare is a .NET port of the well established Java library <a href="http://www.brics.dk/automaton/" target="_blank" title="dk.brics.automaton">dk.brics.automaton</a> with API as close as possible to the corresponding dk.brics.automaton classes.</p>
 
 Development environment
 -----------------------
