@@ -3,6 +3,9 @@
  * 
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
+ * http://github.com/moodmosaic/Fare/
+ * Original Java code:
+ * http://www.brics.dk/automaton/
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

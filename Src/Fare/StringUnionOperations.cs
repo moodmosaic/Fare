@@ -1,4 +1,8 @@
 ﻿/**
+* http://github.com/moodmosaic/Fare/
+* Original Java code:
+* http://www.brics.dk/automaton/
+* 
 * Operations for building minimal deterministic automata from sets of strings. 
 * The algorithm requires sorted input data, but is very fast (nearly linear with the input size).
 * 

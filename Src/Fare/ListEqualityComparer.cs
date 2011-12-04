@@ -60,11 +60,9 @@ namespace Fare
         /// <exception cref="T:System.ArgumentNullException">
         /// The type of <paramref name="obj"/> is a reference type and <paramref name="obj"/> is null.
         ///   </exception>
-        /// <remarks>
-        /// http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
-        /// </remarks>
         public int GetHashCode(List<T> obj)
         {
+            // http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
             return obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
         }
 
