@@ -44,6 +44,7 @@ namespace Fare.Tests.Integration
             yield return new object[] { "[A-Z][a-zA-Z0-9]{10}" };
             yield return new object[] { "[A-Za-z0-9]{11}" };
             yield return new object[] { "[A-Za-z]{11}" };
+            yield return new object[] { @"^[a-zA-Z''-'\s]{1,40}$" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()
