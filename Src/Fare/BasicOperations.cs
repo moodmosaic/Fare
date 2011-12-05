@@ -665,7 +665,7 @@ namespace Fare
         /// <returns></returns>
         /// <remarks>
         /// Complexity: linear in the length of the string.
-        /// For full performance, use the <see cref="RunAutomaton"/> class.
+        /// For full performance, use the RunAutomaton class.
         /// </remarks>
         public static bool Run(Automaton a, string s)
         {
