@@ -523,18 +523,22 @@ namespace Fare
                 {
                     minus = true;
                 }
+
                 if (c >= '1' && c <= '9')
                 {
                     break;
                 }
+
                 i++;
             }
+
             var b = new StringBuilder();
             b.Append(value.Substring(i));
             if (b.Length == 0)
             {
                 b.Append("0");
             }
+
             Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
             Automaton ws = Datatypes.WhitespaceAutomaton;
             return Automaton.Minimize(

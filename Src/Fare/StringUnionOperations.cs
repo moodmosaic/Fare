@@ -1,4 +1,4 @@
-﻿/**
+﻿/*
 * http://github.com/moodmosaic/Fare/
 * Original Java code:
 * http://www.brics.dk/automaton/
@@ -83,22 +83,6 @@ namespace Fare
             state.IsFinal = true;
         }
 
-        private State Complete()
-        {
-            if (this.register == null)
-            {
-                throw new InvalidOperationException("register is null");
-            }
-
-            if (this.root.HasChildren)
-            {
-                this.ReplaceOrRegister(this.root);
-            }
-
-            this.register = null;
-            return this.root;
-        }
-
         private static Fare.State Convert(State s, IDictionary<State, Fare.State> visited)
         {
             Fare.State converted = visited[s];
@@ -119,6 +103,22 @@ namespace Fare
             }
 
             return converted;
+        }
+
+        private State Complete()
+        {
+            if (this.register == null)
+            {
+                throw new InvalidOperationException("register is null");
+            }
+
+            if (this.root.HasChildren)
+            {
+                this.ReplaceOrRegister(this.root);
+            }
+
+            this.register = null;
+            return this.root;
         }
 
         private void ReplaceOrRegister(State state)
