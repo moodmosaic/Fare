@@ -66,7 +66,7 @@ namespace Fare
         /// Generates a random String that is guaranteed to match the regular expression passed to the constructor.
         /// </summary>
         /// <returns></returns>
-        public String Generate()
+        public string Generate()
         {
             var builder = new StringBuilder();
             this.Generate(builder, automaton.Initial);
