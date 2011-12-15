@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NotSupportedRegexPatternTestCases.cs" />
     <Compile Include="Xeger\XegerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexPatternTestCases.cs" />
