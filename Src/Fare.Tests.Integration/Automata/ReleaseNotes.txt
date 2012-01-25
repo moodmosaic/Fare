@@ -1,0 +1,19 @@
+
+This is the first release of the Automata toolkit V1 from Microsoft Research.
+
+The release comes with a collection of binaries in the bin directory and two sample directories.
+
+The Main libraries in the bin directory are: 
+  1) Microsoft.Automata.dll
+  2) Microsoft.Automata.Z3.dll
+
+The library (2) depends on Microsoft.Z3.dll that is included in the bin directory.
+All libraries are compiled for the x86 platform and require .Net v4.0.
+
+The two sample directories are 
+  - AutomataSamples, that illustrate use of library (1)
+  - AutomataZ3Samples, that illustrate use of a combination of all the included libraries.
+Both directories have a README file that provides a high-level overview 
+of the included samples and how to run the examples.
+
+
