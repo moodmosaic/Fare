@@ -9,8 +9,11 @@ Development environment
 -----------------------
  * Microsoft Visual Studio 2010
   * .NET Framework 3.5
+  
 * ReSharper 6.0 Build 6.0.2202.688
+
 * StyleCop 4.6.3.0
+
 * AutoFixture 2.4.1
   * xUnit.net data theories
   * xUnit.net 1.8.0.1549
