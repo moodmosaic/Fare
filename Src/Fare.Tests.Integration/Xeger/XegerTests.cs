@@ -7,8 +7,7 @@ using Xunit.Extensions;
 namespace Fare.Tests.Integration.Xeger
 {
     public sealed class XegerTests
-    {
-        [Theory(Skip = "Run test cases for Xeger (Java package through IKVMC) only on demand.")]
+    {        
         [ClassData(typeof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
