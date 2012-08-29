@@ -29,6 +29,8 @@ namespace Fare
     /// </summary>
     public class Xeger
     {
+        private const RegExpSyntaxOptions AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
+
         private readonly Automaton automaton;
         private readonly Random random;
 
@@ -49,7 +51,7 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
-            this.automaton = new RegExp(regex).ToAutomaton();
+            this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
             this.random = random;
         }
 
