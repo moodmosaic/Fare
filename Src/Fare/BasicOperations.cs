@@ -330,7 +330,7 @@ namespace Fare
             // Subset construction.
             var sets = new Dictionary<List<State>, List<State>>(comparer);
             var worklist = new LinkedList<List<State>>();
-            var newstate = new Dictionary<List<State>, State>();
+            var newstate = new Dictionary<List<State>, State>(comparer);
 
             sets.Add(initialset, initialset);
             worklist.AddLast(initialset);
