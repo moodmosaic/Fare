@@ -31,12 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="automaton">
-      <HintPath>Xeger\automaton 1.11-8\automaton.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>Xeger\automaton 1.11-8\IKVM.OpenJDK.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Ploeh.AutoFixture">
       <HintPath>..\packages\AutoFixture.2.4.1\lib\Ploeh.AutoFixture.dll</HintPath>
     </Reference>
@@ -50,9 +44,6 @@
       <HintPath>Rex\Rex 1.0\Rex.exe</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="xeger">
-      <HintPath>Xeger\xeger 1.0\xeger.dll</HintPath>
-    </Reference>
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.1.8.0.1549\lib\xunit.dll</HintPath>
     </Reference>
@@ -62,10 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NotSupportedRegexPatternTestCases.cs" />
-    <Compile Include="Xeger\XegerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexPatternTestCases.cs" />
-    <Compile Include="Rex\RexEngineTests.cs" />
     <Compile Include="XegerTests.cs" />
   </ItemGroup>
   <ItemGroup>
