@@ -49,6 +49,8 @@ namespace Fare.Tests.Integration
             yield return new object[] { @"[A-Za-z]{11}" };
             yield return new object[] { @"a[a-z]" };
             yield return new object[] { @"[1-9][0-9]" };
+            yield return new object[] { @"\d{8}" };
+            yield return new object[] { @"\d{5}(-\d{4})?" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()
