@@ -51,6 +51,7 @@ namespace Fare.Tests.Integration
             yield return new object[] { @"[1-9][0-9]" };
             yield return new object[] { @"\d{8}" };
             yield return new object[] { @"\d{5}(-\d{4})?" };
+            yield return new object[] { @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()
