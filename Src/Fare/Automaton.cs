@@ -70,7 +70,7 @@ namespace Fare
         /// Minimize using Huffman's O(n<sup>2</sup>) algorithm.
         ///   This is the standard text-book algorithm.
         /// </summary>
-        public const int MinimizeHuffman = 0;
+        public const int MinimizeHuffman = 2;
 
         /// <summary>
         /// Minimize using Brzozowski's O(2<sup>n</sup>) algorithm. 
@@ -83,7 +83,7 @@ namespace Fare
         /// Minimize using Hopcroft's O(n log n) algorithm.
         ///   This is regarded as one of the most generally efficient algorithms that exist.
         /// </summary>
-        public const int MinimizeHopcroft = 2;
+        public const int MinimizeHopcroft = 0;
 
         /// <summary>
         /// Selects whether operations may modify the input automata (default: <code>false</code>).
