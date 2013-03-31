@@ -33,6 +33,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Fare
@@ -869,6 +870,11 @@ namespace Fare
 
             if (this.Match('('))
             {
+                if (this.Match('?'))
+                {
+                    this.SkipNonCapturingSubpatternExp();
+                }
+
                 if (this.Match(')'))
                 {
                     return RegExp.MakeString(string.Empty);
@@ -941,6 +947,12 @@ namespace Fare
             }
 
             return RegExp.MakeChar(this.ParseCharExp());
+        }
+
+        private void SkipNonCapturingSubpatternExp()
+        {
+            RegExpMatchingOptions.All().Any(this.Match);
+            this.Match(':');
         }
 
         private char ParseCharExp()
