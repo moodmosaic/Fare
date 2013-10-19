@@ -11,6 +11,10 @@
         <BuildOutput Include="Src\Fare\bin\Release\Fare.dll" />
         <BuildOutput Include="Src\Fare\bin\Release\Fare.XML" />
     </ItemGroup>
+    <ItemGroup>
+    <NuSpecFiles Include="NuGet\*.nuspec" />
+        <NuGetPackageScripts Include="NuGet\*.ps1" />
+    </ItemGroup>
     <PropertyGroup>
         <ReleaseFolder>Release</ReleaseFolder>
     </PropertyGroup>
@@ -43,6 +47,41 @@
     </Target>
     <Target Name="CopyToReleaseFolder" DependsOnTargets="Test">
         <Copy SourceFiles="@(BuildOutput)" DestinationFolder="$(ReleaseFolder)" />
+        <Copy SourceFiles="@(NuGetPackageScripts)" DestinationFolder="$(ReleaseFolder)" />
     </Target>
-    <Target Name="CompleteBuild" DependsOnTargets="CopyToReleaseFolder" />
+     <Target Name="CreateTemporaryNuGetSpecFiles">
+        <PropertyGroup>
+            <NuGetOutputFolder>NuGetPackages</NuGetOutputFolder>
+        </PropertyGroup>
+        <RemoveDir Directories="$(NuGetOutputFolder)" />
+        <Copy SourceFiles="@(NuSpecFiles)" DestinationFolder="$(NuGetOutputFolder)">
+            <Output TaskParameter="CopiedFiles" ItemName="TempNuspecFiles" />
+        </Copy>
+    </Target>
+    <Target Name="NuGetPrepare" DependsOnTargets="CreateTemporaryNuGetSpecFiles;CopyToReleaseFolder" Outputs="%(TempNuspecFiles.Identity)">
+        <PropertyGroup>
+            <TempNuspecFilePath>%(TempNuspecFiles.FullPath)</TempNuspecFilePath>
+            <AssemblyFile>$(ReleaseFolder)\%(TempNuspecFiles.Filename).dll</AssemblyFile>
+        </PropertyGroup>
+        <GetAssemblyIdentity AssemblyFiles="$(AssemblyFile)">
+            <Output TaskParameter="Assemblies" ItemName="AssemblyInfo" />
+        </GetAssemblyIdentity>
+        <PropertyGroup>
+            <Version>%(AssemblyInfo.Version)</Version>
+            <SemanticVersion>$(Version.Substring(0, $(Version.LastIndexOf('.'))))</SemanticVersion>
+        </PropertyGroup>
+        <XmlPoke XmlInputPath="$(TempNuspecFilePath)"
+                 Query="//metadata/version"
+                 Value="$(SemanticVersion)" />
+        <XmlPoke XmlInputPath="$(TempNuspecFilePath)"
+                 Query="//metadata/dependencies/dependency/Fare/@version"
+                 Value="$(SemanticVersion)" />
+    </Target>
+    <Target Name="NuGetPack" DependsOnTargets="NuGetPrepare">
+        <Exec Command="NuGet\NuGet.exe pack %(TempNuspecFiles.FullPath) -BasePath $(ReleaseFolder) -OutputDirectory $(NuGetOutputFolder)" />
+    </Target>
+    <Target Name="CleanTemporaryNuGetSpecFiles" DependsOnTargets="NuGetPack">
+        <Delete Files="@(TempNuspecFiles)" />
+    </Target>
+    <Target Name="CompleteBuild" DependsOnTargets="CopyToReleaseFolder;CleanTemporaryNuGetSpecFiles" />
 </Project>
