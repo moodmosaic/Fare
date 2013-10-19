@@ -25,3 +25,10 @@ Design changes
 * Notes from porting Java code in .NET can be found [here] (http://www.nikosbaxevanis.com/bonus-bits/2011/11/notes-from-porting-java-code-to-net.html).
 
 <i>Based on version 1.11-8 of dk.brics.automaton released on September 7, 2011. [ChangeLog] (http://www.brics.dk/automaton/ChangeLog)</i>
+
+Which projects use Fare?
+--------------
+
+Fare is used in:
+* [AutoFixture](https://github.com/AutoFixture/AutoFixture) for [supporting the RegularExpressionAttribute](http://nikosbaxevanis.com/blog/2011/12/11/regularexpressionattribute-support-in-autofixture/) class.
+* [EntroTester](https://github.com/ymotton/EntroTester) for generating Regular Expressions that match a given input string.
