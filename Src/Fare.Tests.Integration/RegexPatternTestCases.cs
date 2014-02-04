@@ -7,6 +7,7 @@ namespace Fare.Tests.Integration
     {
         public IEnumerator<object[]> GetEnumerator()
         {
+            yield return new object[] { @"(.*)\r\n\r\n" };
             yield return new object[] { "[ab]{4,6}" };
             yield return new object[] { "[ab]{4,6}c" };
             yield return new object[] { "(a|b)*ab" };
