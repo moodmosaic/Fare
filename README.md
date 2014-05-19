@@ -26,6 +26,16 @@ Design changes
 
 <i>Based on version 1.11-8 of dk.brics.automaton released on September 7, 2011. [ChangeLog] (http://www.brics.dk/automaton/ChangeLog)</i>
 
+NuGet package
+--------------
+
+Fare is [available via NuGet](https://www.nuget.org/packages/Fare/).
+
+Versioning
+--------------
+
+Fare reached version 1 without following a particular versioning scheme. From version 1 and above, Fare follows [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html).
+
 Which projects use Fare?
 --------------
 
