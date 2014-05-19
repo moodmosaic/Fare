@@ -8,8 +8,8 @@
     <ProjectGuid>{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fare.Tests.Integration</RootNamespace>
-    <AssemblyName>Fare.Tests.Integration</AssemblyName>
+    <RootNamespace>Fare.IntegrationTests</RootNamespace>
+    <AssemblyName>Fare.IntegrationTests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

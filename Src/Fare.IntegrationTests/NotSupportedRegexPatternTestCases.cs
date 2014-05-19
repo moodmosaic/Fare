@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Fare.Tests.Integration
+namespace Fare.IntegrationTests
 {
     public class NotSupportedRegexPatternTestCases : IEnumerable<object[]>
     {
