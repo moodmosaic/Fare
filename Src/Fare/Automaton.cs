@@ -33,6 +33,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Fare
 {
@@ -842,5 +843,30 @@ namespace Fare
 
             return live;
         }
+
+
+        public String ToDot() {
+ 		    StringBuilder b = new StringBuilder("digraph Automaton {\n");
+ 		    b.Append("  rankdir = TB;\n");
+ 		    HashSet<State> states = GetStates();
+ 		    SetStateNumbers(states);
+ 		    foreach (State s in states) {
+ 			    b.Append("  ").Append(s.Number);
+ 			    if (s.Accept)
+ 				    b.Append(String.Format(" [shape=doublecircle,label=\"{0}\"];\n", s.Label ?? ""));
+ 			    else
+ 				    //b.Append(" [shape=circle,label=\"\"];\n");
+                    b.Append(String.Format(" [label=\"{0}\"];\n", s.Label ?? ""));
+                if (s == initial) {
+ 				    //b.Append(String.Format("  initial [shape=plaintext,label=\"{0}\"];\n", s.Label ?? ""));
+ 				    //b.Append("  initial -> ").Append(s.Number).Append("\n");
+ 			    }
+ 			    foreach (Transition t in s.Transitions) {
+ 				    b.Append("  ").Append(s.Number);
+ 				    t.AppendDot(b);
+ 			    }
+ 		    }
+ 		    return b.Append("}\n").ToString();
+ 	    }
     }
 }
