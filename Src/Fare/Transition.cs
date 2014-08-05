@@ -258,7 +258,7 @@ namespace Fare
             }
         }
 
-        private void AppendDot(StringBuilder sb)
+        public void AppendDot(StringBuilder sb)
         {
             sb.Append(" -> ").Append(this.to.Number).Append(" [label=\"");
             Transition.AppendCharString(this.min, sb);
