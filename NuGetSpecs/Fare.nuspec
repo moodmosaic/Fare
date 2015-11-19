@@ -3,12 +3,15 @@
     <metadata>
         <id>Fare</id>
         <version>1.0.1</version>
-        <title>Fare</title>
+        <title>Fare - Finite Automata and Regular Expressions</title>
         <authors>Nikos Baxevanis</authors>
         <owners>ymotton,moodmosaic</owners>
         <description>.NET port of dk.brics.automaton - Project Fare is an effort to bring a DFA/NFA (finite-state automata) implementation from Java to .NET. There are quite a few implementations available in other languages today. This project aims to fill the gap in .NET.</description>
         <projectUrl>https://github.com/moodmosaic/Fare</projectUrl>
         <language>en-US</language>
+        <summary>.NET port of dk.brics.automaton</summary>
+        <copyright>Copyright 2015</copyright>
+        <tags>Regex Test NFA DFA Automaton</tags>
     </metadata>
     <files>
         <file src="Fare.dll" target="lib\net35" />
