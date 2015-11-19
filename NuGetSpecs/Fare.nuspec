@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Fare</id>
-        <version>2.2</version>
+        <version>1.0.1</version>
         <title>Fare</title>
         <authors>Nikos Baxevanis</authors>
         <owners>ymotton,moodmosaic</owners>
