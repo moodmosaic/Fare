@@ -58,6 +58,7 @@ namespace Fare.IntegrationTests
             yield return new object[] { @"^(?m:[a-z0-9])+$" };
             yield return new object[] { @"^(?n:[a-z0-9])+$" };
             yield return new object[] { @"^(?x:[a-z0-9])+$" };
+            yield return new object[] { "\\S+.*" };
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -353,7 +353,13 @@ namespace Fare
 
                 for (int n = 0; n < points.Length; n++)
                 {
-                    var p = (from qq in s from t in qq.Transitions where t.Min <= points[n] && points[n] <= t.Max select t.To).ToList();
+                    var set = new HashSet<State>();
+                    foreach (State c in s)
+                        foreach (Transition t in c.Transitions)
+                            if (t.Min <= points[n] && points[n] <= t.Max)
+                                set.Add(t.To);
+
+                    var p = set.ToList();
 
                     if (!sets.ContainsKey(p))
                     {
