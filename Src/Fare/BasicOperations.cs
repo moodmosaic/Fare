@@ -54,7 +54,8 @@ namespace Fare
             var back = new Dictionary<State, HashSet<State>>();
             foreach (StatePair p in pairs)
             {
-                HashSet<State> to = forward[p.FirstState];
+                HashSet<State> to;
+                forward.TryGetValue(p.FirstState, out to);
                 if (to == null)
                 {
                     to = new HashSet<State>();
@@ -62,7 +63,8 @@ namespace Fare
                 }
 
                 to.Add(p.SecondState);
-                HashSet<State> from = back[p.SecondState];
+                HashSet<State> from;
+                back.TryGetValue(p.SecondState, out from);
                 if (from == null)
                 {
                     from = new HashSet<State>();
@@ -78,8 +80,10 @@ namespace Fare
             {
                 StatePair p = worklist.RemoveAndReturnFirst();
                 workset.Remove(p);
-                HashSet<State> to = forward[p.SecondState];
-                HashSet<State> from = back[p.FirstState];
+                HashSet<State> to;
+                forward.TryGetValue(p.SecondState, out to);
+                HashSet<State> from;
+                back.TryGetValue(p.FirstState, out from);
                 if (to != null)
                 {
                     foreach (State s in to)

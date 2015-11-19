@@ -74,6 +74,8 @@ namespace Fare
         /// </summary>
         public int Number { get; set; }
 
+        public String Label { get; set; }
+
         /// <summary>
         /// Gets or sets this State Transitions.
         /// </summary>
