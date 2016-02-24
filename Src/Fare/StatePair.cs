@@ -127,9 +127,9 @@ namespace Fare
                 return true;
             }
 
-            return object.Equals(other.S, S)
-                && object.Equals(other.FirstState, this.FirstState)
-                && object.Equals(other.SecondState, this.SecondState);
+            return
+                object.Equals(other.FirstState, this.FirstState) &&
+                object.Equals(other.SecondState, this.SecondState);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Fare
         {
             unchecked
             {
-                int result = (S != null ? S.GetHashCode() : 0);
+                int result = 0;
                 result = (result * 397) ^ (this.FirstState != null ? this.FirstState.GetHashCode() : 0);
                 result = (result * 397) ^ (this.SecondState != null ? this.SecondState.GetHashCode() : 0);
                 return result;
