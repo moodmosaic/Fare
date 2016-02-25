@@ -127,9 +127,8 @@ namespace Fare
                 return true;
             }
 
-            return
-                object.Equals(other.FirstState, this.FirstState) &&
-                object.Equals(other.SecondState, this.SecondState);
+            return object.Equals(other.FirstState, this.FirstState)
+                && object.Equals(other.SecondState, this.SecondState);
         }
 
         /// <summary>
