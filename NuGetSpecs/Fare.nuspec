@@ -10,7 +10,7 @@
         <projectUrl>https://github.com/moodmosaic/Fare</projectUrl>
         <language>en-US</language>
         <summary>.NET port of dk.brics.automaton</summary>
-        <copyright>Copyright 2015</copyright>
+        <copyright>Copyright 2016</copyright>
         <tags>Regex Test NFA DFA Automaton</tags>
     </metadata>
     <files>
