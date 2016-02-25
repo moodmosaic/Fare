@@ -14,13 +14,13 @@ namespace Fare.IntegrationTests
             //
             // Given
             //
-            Automaton automaton1 = new RegExp(pattern1).ToAutomaton();
-            Automaton automaton2 = new RegExp(pattern2).ToAutomaton();
+            var automaton1 = new RegExp(pattern1).ToAutomaton();
+            var automaton2 = new RegExp(pattern2).ToAutomaton();
 
             //
             // When
             //
-            Automaton intersection = automaton1.Intersection(automaton2);
+            var intersection = automaton1.Intersection(automaton2);
 
             //
             // Then
@@ -37,13 +37,13 @@ namespace Fare.IntegrationTests
             //
             // Given
             //
-            Automaton automaton1 = new RegExp(pattern1).ToAutomaton();
-            Automaton automaton2 = new RegExp(pattern2).ToAutomaton();
+            var automaton1 = new RegExp(pattern1).ToAutomaton();
+            var automaton2 = new RegExp(pattern2).ToAutomaton();
 
             //
             // When
             //
-            Automaton intersection = automaton1.Intersection(automaton2);
+            var intersection = automaton1.Intersection(automaton2);
 
             //
             // Then
