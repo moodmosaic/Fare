@@ -176,7 +176,7 @@ namespace Fare
         {
             unchecked
             {
-                int result = 0;
+                var result = 0;
                 result = (result * 397) ^ (this.FirstState != null ? this.FirstState.GetHashCode() : 0);
                 result = (result * 397) ^ (this.SecondState != null ? this.SecondState.GetHashCode() : 0);
                 return result;
