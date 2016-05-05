@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Fare</id>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
         <title>Fare - Finite Automata and Regular Expressions</title>
         <authors>Nikos Baxevanis</authors>
         <owners>ymotton,moodmosaic</owners>
