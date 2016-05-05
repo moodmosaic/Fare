@@ -172,15 +172,15 @@ namespace Fare
         {
             if (other == null)
             {
-                return 0;
+                return 1;
             }
 
             if (other.GetType() != typeof(State))
             {
-                return 0;
+                throw new ArgumentException("Object is not a State");
             }
 
-            return ((State)other).Id - this.Id;
+            return this.CompareTo((State)other);
         }
 
         /// <summary>
