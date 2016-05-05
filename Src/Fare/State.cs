@@ -41,7 +41,7 @@ namespace Fare
     /// <summary>
     /// <tt>Automaton</tt> state.
     /// </summary>
-    public class State : IEquatable<State>, IComparable<State>
+    public class State : IEquatable<State>, IComparable<State>, IComparable
     {
         private readonly int id;
         private static int nextId;
@@ -154,6 +154,33 @@ namespace Fare
                 result = (result * 397) ^ Number;
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Compares the current instance with another object of the same type
+        /// and returns an integer that indicates whether the current instance precedes,
+        /// follows, or occurs in the same position in the sort order as the other object.
+        /// </summary>
+        /// <param name="other">An object to compare with this instance.</param>
+        /// <returns>
+        /// A value that indicates the relative order of the objects being compared.
+        /// The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="other" /> in the sort order.
+        /// Zero This instance occurs in the same position in the sort order as <paramref name="other" />.
+        /// Greater than zero This instance follows <paramref name="other" /> in the sort order.
+        /// </returns>
+        public int CompareTo(object other)
+        {
+            if (other == null)
+            {
+                return 1;
+            }
+
+            if (other.GetType() != typeof(State))
+            {
+                throw new ArgumentException("Object is not a State");
+            }
+
+            return this.CompareTo((State)other);
         }
 
         /// <summary>
