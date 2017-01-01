@@ -4,17 +4,6 @@ Fare - [F]inite [A]utomata and [R]egular [E]xpressions
 <p>Project Fare is an effort to bring a <a href="http://en.wikipedia.org/wiki/Deterministic_finite-state_machine" target="_blank" title="Deterministic finite-state machine">DFA</a>/<a href="http://en.wikipedia.org/wiki/Nondeterministic_finite-state_machine" target="_blank" title="Nondeterministic finite-state machine">NFA</a> (finite-state automata) implementation from Java to .NET.&#0160;There are quite a few implementations available in other languages today. This project aims to fill the gap in .NET.</p>
 <p>Fare is a .NET port of the well established Java library <a href="http://www.brics.dk/automaton/" target="_blank" title="dk.brics.automaton">dk.brics.automaton</a> with API as close as possible to the corresponding dk.brics.automaton classes.</p>
 
-Development environment
------------------------
-
-* Microsoft Visual Studio 2010
-  * .NET Framework 3.5
-* ReSharper 6.0 Build 6.0.2202.688
-* StyleCop 4.6.3.0
-* AutoFixture 2.4.1
-  * xUnit.net data theories
-* xUnit.net 1.8.0.1549
-
 Design changes
 --------------
 
