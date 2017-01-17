@@ -4,6 +4,15 @@ Fare - [F]inite [A]utomata and [R]egular [E]xpressions
 <p>Project Fare is an effort to bring a <a href="http://en.wikipedia.org/wiki/Deterministic_finite-state_machine" target="_blank" title="Deterministic finite-state machine">DFA</a>/<a href="http://en.wikipedia.org/wiki/Nondeterministic_finite-state_machine" target="_blank" title="Nondeterministic finite-state machine">NFA</a> (finite-state automata) implementation from Java to .NET.&#0160;There are quite a few implementations available in other languages today. This project aims to fill the gap in .NET.</p>
 <p>Fare is a .NET port of the well established Java library <a href="http://www.brics.dk/automaton/" target="_blank" title="dk.brics.automaton">dk.brics.automaton</a> with API as close as possible to the corresponding dk.brics.automaton classes.</p>
 
+Is my Regular Expression supported?
+--------------
+
+Probably yes.
+
+Keep in mind though that Project Fare turns Regular Expressions into [Automatons](http://en.wikipedia.org/wiki/Deterministic_finite_automaton) by applying the algorithms of [dk.brics.automaton](http://www.brics.dk/automaton/) and [xeger](https://code.google.com/p/xeger/).
+
+If your Regular Expression isn't supported, it would make sense to debug the C# code but also compare with the results from xeger.
+
 Design changes
 --------------
 
