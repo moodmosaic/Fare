@@ -13,6 +13,8 @@ Keep in mind though that Project Fare turns Regular Expressions into [Automatons
 
 If your Regular Expression isn't supported, it would make sense to debug the C# code but also compare with the results from xeger.
 
+As an alternative, you may use a different pattern or even use a different _engine_ to reverse the Regular Expression into an Automaton. As an example, you can use the [Rex](http://research.microsoft.com/en-us/projects/rex/) engine.
+
 Design changes
 --------------
 
