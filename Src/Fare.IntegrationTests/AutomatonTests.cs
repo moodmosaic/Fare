@@ -19,7 +19,6 @@ namespace Fare.IntegrationTests
             Assert.True(intersection.Run(matchingString));
         }
 
-
         [Theory]
         [InlineData(".*", "ab", "ac")]
         [InlineData("cab.*", "a.*", "abc")]
