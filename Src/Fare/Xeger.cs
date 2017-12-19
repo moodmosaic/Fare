@@ -84,9 +84,8 @@ namespace Fare
         /// <returns>A random number in the given range.</returns>
         private static int GetRandomInt(int min, int max, Random random)
         {
-            int dif = max - min;
-            double number = random.NextDouble();
-            return min + (int)Math.Round(number * dif);
+            int maxForRandom = max - min + 1;
+            return random.Next(maxForRandom) + min;
         }
 
         private void Generate(StringBuilder builder, State state)
