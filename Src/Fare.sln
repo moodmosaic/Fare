@@ -1,31 +1,36 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fare", "Fare\Fare.csproj", "{24033E0E-0304-4F06-94CD-6F6416ECA509}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fare", "Fare\Fare.csproj", "{24033E0E-0304-4F06-94CD-6F6416ECA509}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fare.IntegrationTests", "Fare.IntegrationTests\Fare.IntegrationTests.csproj", "{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fare.IntegrationTests", "Fare.IntegrationTests\Fare.IntegrationTests.csproj", "{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Verify|Any CPU = Verify|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Verify|Any CPU = Verify|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Verify|Any CPU.ActiveCfg = Verify|Any CPU
-		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Verify|Any CPU.Build.0 = Verify|Any CPU
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Verify|Any CPU.ActiveCfg = Verify|Any CPU
+		{24033E0E-0304-4F06-94CD-6F6416ECA509}.Verify|Any CPU.Build.0 = Verify|Any CPU
 		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Verify|Any CPU.ActiveCfg = Verify|Any CPU
-		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Verify|Any CPU.Build.0 = Verify|Any CPU
 		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Verify|Any CPU.ActiveCfg = Verify|Any CPU
+		{20F5CC3B-9D71-472A-BD28-3A4C104A00E4}.Verify|Any CPU.Build.0 = Verify|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A7CCE179-33F8-436F-8CA0-E736F2C69760}
 	EndGlobalSection
 EndGlobal

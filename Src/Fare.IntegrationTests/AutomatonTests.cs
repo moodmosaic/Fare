@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using Xunit.Extensions;
 
 namespace Fare.IntegrationTests
 {
@@ -22,7 +21,7 @@ namespace Fare.IntegrationTests
         [Theory]
         [InlineData(".*", "ab", "ac")]
         [InlineData("cab.*", "a.*", "abc")]
-        public void StringDoesntMatchBothRegexAutomaton(string pattern1, string pattern2, string matchingString)
+        public void StringDoesNotMatchBothRegexAutomaton(string pattern1, string pattern2, string matchingString)
         {
             var automaton1 = new RegExp(pattern1).ToAutomaton();
             var automaton2 = new RegExp(pattern2).ToAutomaton();
