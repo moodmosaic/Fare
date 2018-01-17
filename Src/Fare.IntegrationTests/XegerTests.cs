@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Rex;
 using Xunit;
 
 namespace Fare.IntegrationTests
@@ -23,7 +22,8 @@ namespace Fare.IntegrationTests
         public void GeneratedTextIsCorrectWithRexEngine(string pattern)
         {
             const int repeatCount = 3;
-            var settings = new Rex.RexSettings(pattern) { k = 1, encoding = CharacterEncoding.ASCII };
+            var settings = new Rex.RexSettings(pattern) { k = 1 };
+            settings.seed = 102;
 
             var result = Enumerable.Repeat(0, repeatCount).Select(_ => Rex.RexEngine.GenerateMembers(settings).Single()).ToArray();
 

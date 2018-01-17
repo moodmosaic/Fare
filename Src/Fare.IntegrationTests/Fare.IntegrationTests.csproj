@@ -5,6 +5,7 @@
     <TargetFrameworks>net452</TargetFrameworks>
     <AssemblyTitle>Fare.IntegrationTests</AssemblyTitle>
     <AssemblyName>Fare.IntegrationTests</AssemblyName>
+    <PlatformTarget>x86</PlatformTarget>
 
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
