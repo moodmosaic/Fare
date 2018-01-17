@@ -14,14 +14,11 @@
 
   <Choose>
     <When Condition="$(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp'))">
-      <PropertyGroup>
-        <!-- <DefineConstants>$(DefineConstants);SYSTEM_GLOBALIZATION_CULTUREINFO_CULTURESETTERS</DefineConstants> -->
-      </PropertyGroup>
+      <PropertyGroup />
     </When>
     <Otherwise>
       <PropertyGroup>
         <_IsFullFramework>true</_IsFullFramework>
-        <!-- <DefineConstants>$(DefineConstants);SYSTEM_NET_MAIL;SYSTEM_RUNTIME_SERIALIZATION;SERIALIZABLE_MEMBERINFO;SYSTEM_THREADING_THREAD_CULTURESETTERS;SYSTEM_TYPE_FULL</DefineConstants> -->
       </PropertyGroup>
     </Otherwise>
   </Choose>

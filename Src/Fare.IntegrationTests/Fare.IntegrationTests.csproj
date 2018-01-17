@@ -2,10 +2,9 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
     <AssemblyTitle>Fare.IntegrationTests</AssemblyTitle>
     <AssemblyName>Fare.IntegrationTests</AssemblyName>
-    <PlatformTarget>x86</PlatformTarget>
 
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -17,9 +16,15 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)'=='net452' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>$(DefineConstants);REX_AVAILABLE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Fare\Fare.csproj" />
-    <Reference Include="Rex">
+
+    <Reference Include="Rex" Condition=" '$(TargetFramework)'=='net452' ">
       <HintPath>..\..\References\Rex.exe</HintPath>
     </Reference>
 

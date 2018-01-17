@@ -18,6 +18,7 @@ namespace Fare.IntegrationTests
             Assert.All(result, regex => Assert.Matches(pattern, regex));
         }
 
+#if REX_AVAILABLE
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrectWithRexEngine(string pattern)
         {
@@ -29,6 +30,7 @@ namespace Fare.IntegrationTests
 
             Assert.All(result, regex => Assert.Matches(pattern, regex));
         }
+#endif
 
         public static TheoryData<string> RegexPatternTestCases => new TheoryData<string>
         {
