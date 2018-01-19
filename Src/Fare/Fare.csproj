@@ -1,76 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common.props" />
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{24033E0E-0304-4F06-94CD-6F6416ECA509}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fare</RootNamespace>
+    <TargetFrameworks>net35;netstandard1.1</TargetFrameworks>
+    <AssemblyTitle>Fare</AssemblyTitle>
     <AssemblyName>Fare</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <Copyright>Copyright © Nikos Baxevanis 2016</Copyright>
+
+    <CodeAnalysisCulture>en-US</CodeAnalysisCulture>
+    <CodeAnalysisRuleSet>Fare.ruleset</CodeAnalysisRuleSet>
+
+    <!-- NuGet options -->
+    <PackageId>Fare</PackageId>
+    <Title>Fare - Finite Automata and Regular Expressions</Title>
+    <Description>.NET port of dk.brics.automaton - Project Fare is an effort to bring a DFA/NFA (finite-state automata) implementation from Java to .NET. There are quite a few implementations available in other languages today. This project aims to fill the gap in .NET.</Description>
+
+    <Authors>Nikos Baxevanis</Authors>
+    <PackageProjectUrl>https://github.com/moodmosaic/Fare</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/moodmosaic/Fare/blob/master/LICENCE</PackageLicenseUrl>
+    <PackageTags>Regex Test NFA DFA Automaton</PackageTags>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Verify|AnyCPU'">
-    <OutputPath>bin\Verify\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Fare.XML</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Automaton.cs" />
-    <Compile Include="BasicAutomata.cs" />
-    <Compile Include="BasicOperations.cs" />
-    <Compile Include="Datatypes.cs" />
-    <Compile Include="IAutomatonProvider.cs" />
-    <Compile Include="LinkedListExtensions.cs" />
-    <Compile Include="ListEqualityComparer.cs" />
-    <Compile Include="MinimizationOperations.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegExp.cs" />
-    <Compile Include="RegExpMatchingOptions.cs" />
-    <Compile Include="RegExpSyntaxOptions.cs" />
-    <Compile Include="SpecialOperations.cs" />
-    <Compile Include="State.cs" />
-    <Compile Include="StateEqualityComparer.cs" />
-    <Compile Include="StatePair.cs" />
-    <Compile Include="StringUnionOperations.cs" />
-    <Compile Include="Transition.cs" />
-    <Compile Include="TransitionComparer.cs" />
-    <Compile Include="Xeger.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
