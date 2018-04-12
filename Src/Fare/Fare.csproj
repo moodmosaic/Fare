@@ -6,8 +6,7 @@
     <AssemblyTitle>Fare</AssemblyTitle>
     <AssemblyName>Fare</AssemblyName>
     <Copyright>Copyright © Nikos Baxevanis 2016</Copyright>
-    <Version>2.0</Version>
-
+    
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../Fare.snk</AssemblyOriginatorKeyFile>
 
