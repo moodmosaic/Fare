@@ -123,6 +123,7 @@ namespace Fare.IntegrationTests
             @"\\abc\\d",
             @"\w+1\w{4}",
             @"\W+1\w?2\W{4}"
+            @"^[^$]$"
         };
     }
 }

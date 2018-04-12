@@ -51,6 +51,8 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
+
+            regex = RemoveStartEndMarkers(regex);
             this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
             this.random = random;
         }
@@ -72,7 +74,7 @@ namespace Fare
         {
             var builder = new StringBuilder();
             this.Generate(builder, automaton.Initial);
-            return builder.ToString().TrimStart('^').TrimEnd('$');
+            return builder.ToString();
         }
 
         /// <summary>
@@ -119,6 +121,21 @@ namespace Fare
         {
             var c = (char)Xeger.GetRandomInt(transition.Min, transition.Max, random);
             builder.Append(c);
+        }
+
+        private string RemoveStartEndMarkers(string regExp)
+        {
+            if (regExp.StartsWith("^"))
+            {
+                regExp = regExp.Substring(1);
+            }
+
+            if (regExp.EndsWith("$"))
+            {
+                regExp = regExp.Substring(0, regExp.Length - 1);
+            }
+
+            return regExp;
         }
     }
 }
