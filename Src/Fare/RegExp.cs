@@ -83,7 +83,7 @@ namespace Fare
         /// <param name = "syntaxFlags">Boolean 'or' of optional syntax constructs to be enabled.</param>
         public RegExp(string s, RegExpSyntaxOptions syntaxFlags)
         {
-            this.b = RegExp.ReplaceShorthandCharacterClasses(s);
+            this.b = s;
             this.flags = syntaxFlags;
             RegExp e;
             if (s.Length == 0)
@@ -345,6 +345,11 @@ namespace Fare
             return r;
         }
 
+        private static RegExp MakeAnyPrintableASCIIChar()
+        {
+            return MakeCharRange(' ', '~');
+        }
+
         private static RegExp MakeCharRange(char from, char to)
         {
             var r = new RegExp();
@@ -392,11 +397,6 @@ namespace Fare
             }
 
             return RegExp.MakeString(sb.ToString());
-        }
-
-        private static string ReplaceShorthandCharacterClasses(string s)
-        {
-            return s.Replace("\\d", "[0-9]");
         }
 
         private Automaton ToAutomatonAllowMutate(
@@ -816,7 +816,7 @@ namespace Fare
                 RegExp e = this.ParseCharClasses();
                 if (negate)
                 {
-                    e = RegExp.MakeIntersection(RegExp.MakeAnyChar(), RegExp.MakeComplement(e));
+                    e = ExcludeChars(e, MakeAnyChar());
                 }
 
                 if (!this.Match(']'))
@@ -941,6 +941,41 @@ namespace Fare
                 }
             }
 
+            if (this.Match('\\'))
+            {
+                // Escaped '\' character.
+                if (this.Match('\\'))
+                {
+                    return MakeChar('\\');
+                }
+
+                bool inclusion;
+
+                // Digits.
+                if ((inclusion = this.Match('d')) || this.Match('D'))
+                {
+                    RegExp digitChars = MakeCharRange('0', '9');
+                    return inclusion ? digitChars : ExcludeChars(digitChars, MakeAnyPrintableASCIIChar());
+                }
+
+                // Whitespace chars only.
+                if ((inclusion = this.Match('s')) || this.Match('S'))
+                {
+                    // Do not add line breaks, as usually RegExp is single line.
+                    RegExp whitespaceChars = MakeUnion(MakeChar(' '), MakeChar('\t'));
+                    return inclusion ? whitespaceChars : ExcludeChars(whitespaceChars, MakeAnyPrintableASCIIChar());
+                }
+
+                // Word character. Range is [A-Za-z0-9_]
+                if ((inclusion = this.Match('w')) || this.Match('W'))
+                {
+                    var ranges = new[] { MakeCharRange('A', 'Z'), MakeCharRange('a', 'z'), MakeCharRange('0', '9') };
+                    RegExp wordChars = ranges.Aggregate(MakeChar('_'), MakeUnion);
+                    
+                    return inclusion ? wordChars : ExcludeChars(wordChars, MakeAnyPrintableASCIIChar());
+                }
+            }
+            
             return RegExp.MakeChar(this.ParseCharExp());
         }
 
@@ -981,6 +1016,11 @@ namespace Fare
             }
 
             return RegExp.MakeChar(@char);
+        }
+
+        private static RegExp ExcludeChars(RegExp exclusion, RegExp allChars)
+        {
+            return MakeIntersection(allChars, MakeComplement(exclusion));
         }
 
         private enum Kind
