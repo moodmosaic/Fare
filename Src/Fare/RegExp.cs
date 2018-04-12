@@ -816,7 +816,7 @@ namespace Fare
                 RegExp e = this.ParseCharClasses();
                 if (negate)
                 {
-                    e = ExcludeChars(e, MakeAnyChar());
+                    e = ExcludeChars(e, MakeAnyPrintableASCIIChar());
                 }
 
                 if (!this.Match(']'))
@@ -834,7 +834,7 @@ namespace Fare
         {
             if (this.Match('.'))
             {
-                return RegExp.MakeAnyChar();
+                return MakeAnyPrintableASCIIChar();
             }
 
             if (this.Check(RegExpSyntaxOptions.Empty) && this.Match('#'))
