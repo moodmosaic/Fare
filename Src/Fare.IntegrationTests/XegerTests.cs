@@ -119,7 +119,7 @@ namespace Fare.IntegrationTests
             @"^\s1\s+2\s3\s?4\s*$",
             @"(\s123)+",
             @"\Sabc\S{3}111",
-            @"^\S\S",
+            @"^\S\S  (\S)+$",
             @"\\abc\\d",
             @"\w+1\w{4}",
             @"\W+1\w?2\W{4}",
