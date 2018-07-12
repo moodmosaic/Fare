@@ -20,7 +20,7 @@
 
     <Authors>Nikos Baxevanis</Authors>
     <PackageProjectUrl>https://github.com/moodmosaic/Fare</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/moodmosaic/Fare/blob/master/LICENCE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/moodmosaic/Fare/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>Regex Test NFA DFA Automaton</PackageTags>
   </PropertyGroup>
 </Project>
