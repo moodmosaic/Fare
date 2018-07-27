@@ -79,47 +79,26 @@ let buildVersion = match getBuildParamOrDefault "BuildVersion" "git" with
                                       infoVersion = getBuildParamOrDefault "BuildInfoVersion" assemblyVer
                                       nugetVersion = getBuildParamOrDefault "BuildNugetVersion" assemblyVer
                                       source = None }
+                                      
+let runDotNet command configuration properties =
+    let stringProps = properties
+                      @ [ "AssemblyVersion", buildVersion.assemblyVersion
+                          "FileVersion", buildVersion.fileVersion
+                          "InformationalVersion", buildVersion.infoVersion
+                          "PackageVersion", buildVersion.nugetVersion ]
+                      |> Seq.map(fun (name, value) -> sprintf "/p:%s=%s" name value )
+                      |> String.concat " "
+                      
+    DotNetCli.RunCommand id
+                         (sprintf "%s %s --configuration %s %s" command solutionToBuild configuration stringProps)
 
-let runMsBuild target configuration properties =
-    let verbosity = match getBuildParam "BuildVerbosity" |> toLower with
-                    | "quiet" | "q"         -> Quiet
-                    | "minimal" | "m"       -> Minimal
-                    | "normal" | "n"        -> Normal
-                    | "detailed" | "d"      -> Detailed
-                    | "diagnostic" | "diag" -> Diagnostic
-                    | _ -> Minimal
+Target "Verify" (fun _ -> runDotNet "build" configuration [])
+Target "Build" (fun _ -> runDotNet "build" configuration [])
 
-    let configProperty = match configuration with
-                         | Some c -> [ "Configuration", c ]
-                         | _ -> []
-
-    let properties = configProperty @ properties
-                     @ [ "AssemblyVersion", buildVersion.assemblyVersion
-                         "FileVersion", buildVersion.fileVersion
-                         "InformationalVersion", buildVersion.infoVersion
-                         "PackageVersion", buildVersion.nugetVersion ]
-
-    solutionToBuild
-    |> build (fun p -> { p with MaxCpuCount = Some None
-                                Verbosity = Some verbosity
-                                Targets = [ target ]
-                                Properties = properties })
-
-let rebuild configuration = runMsBuild "Rebuild" (Some configuration) []
-
-Target "RestoreNuGetPackages" (fun _ -> runMsBuild "Restore" None [])
-
-Target "VerifyOnly" (fun _ -> rebuild "Verify")
-
-Target "BuildOnly" (fun _ -> rebuild configuration)
-Target "TestOnly" (fun _ ->
+Target "Test" (fun _ ->
     DotNetCli.RunCommand (fun p -> { p with WorkingDir = testProjectDir })
-                         (sprintf "xunit --configuration %s --no-build -x86" configuration)
+                         (sprintf "test --configuration %s" configuration)
 )
-
-Target "Verify" DoNothing
-Target "Build"  DoNothing
-Target "Test"   DoNothing
 
 Target "CleanNuGetPackages" (fun _ ->
     CleanDir nuGetOutputFolder
@@ -127,11 +106,9 @@ Target "CleanNuGetPackages" (fun _ ->
 
 Target "NuGetPack" (fun _ ->
     // Pack projects using MSBuild.
-    runMsBuild "Pack" (Some configuration) [ "IncludeSource", "true"
-                                             "IncludeSymbols", "true"
-                                             "PackageOutputPath", FullName nuGetOutputFolder
-                                             "NoBuild", "true" ]
-
+    runDotNet "pack" configuration [ "IncludeSource", "true"
+                                     "IncludeSymbols", "true"
+                                     "PackageOutputPath", FullName nuGetOutputFolder ]
 )
 
 let publishPackagesWithSymbols packageFeed symbolFeed accessKey =
@@ -159,18 +136,8 @@ Target "PublishNuGetPublic" (fun _ ->
 
 Target "CompleteBuild"   DoNothing
 
-"RestoreNuGetPackages" ==> "Verify"
-"VerifyOnly"           ==> "Verify"
-
-"Verify"    ==> "Build"
-"BuildOnly" ==> "Build"
-
-"BuildOnly" ==> "TestOnly"
-
-"Build"    ==> "Test"
-"TestOnly" ==> "Test"
-
 "CleanNuGetPackages" ==> "NuGetPack"
+"Verify"             ==> "NuGetPack"
 "Test"               ==> "NuGetPack"
 
 "NuGetPack" ==> "CompleteBuild"
