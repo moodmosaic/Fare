@@ -40,5 +40,7 @@ Which projects use Fare?
 --------------
 
 Fare is used in:
+* [RandomDataGenerator.Net](https://github.com/StefH/RandomDataGenerator)
+* [WireMock.Net](https://github.com/WireMock-Net/WireMock.Net)
 * [AutoFixture](https://github.com/AutoFixture/AutoFixture) for [supporting the RegularExpressionAttribute](http://nikosbaxevanis.com/blog/2011/12/11/regularexpressionattribute-support-in-autofixture/) class.
 * [EntroTester](https://github.com/ymotton/EntroTester) for generating Regular Expressions that match a given input string.
