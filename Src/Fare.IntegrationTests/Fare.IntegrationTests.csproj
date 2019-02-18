@@ -12,7 +12,7 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>Empty.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fare\Fare.csproj" />
-    <ProjectReference Include="..\FareOld\FareOld.csproj" />
 
     <Reference Include="Rex" Condition=" '$(TargetFramework)'=='net452' ">
       <HintPath>..\..\References\Rex.exe</HintPath>
