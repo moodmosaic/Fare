@@ -109,7 +109,7 @@ namespace Fare
         /// <inheritdoc />
         public bool Equals(StatePair other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
             {
                 return false;
             }
@@ -126,7 +126,7 @@ namespace Fare
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }

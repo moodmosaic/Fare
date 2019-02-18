@@ -4,13 +4,17 @@ using System.Linq;
 
 namespace Fare
 {
-    internal sealed class ListEqualityComparer<T>  : IEqualityComparer<List<T>>, IEquatable<ListEqualityComparer<T>>
+    internal sealed class ListEqualityComparer<T> : IEqualityComparer<List<T>>, IEquatable<ListEqualityComparer<T>>
     {
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -22,8 +26,12 @@ namespace Fare
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -32,7 +40,8 @@ namespace Fare
             return !Equals(left, right);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public bool Equals(List<T> x, List<T> y)
         {
             if (x.Count != y.Count)
@@ -43,23 +52,26 @@ namespace Fare
             return x.SequenceEqual(y);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public int GetHashCode(List<T> obj)
         {
             // http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
             return obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public bool Equals(ListEqualityComparer<T> other)
         {
-            return !ReferenceEquals(null, other);
+            return !(other is null);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }
@@ -77,7 +89,8 @@ namespace Fare
             return Equals((ListEqualityComparer<T>)obj);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override int GetHashCode()
         {
             return base.GetHashCode();
