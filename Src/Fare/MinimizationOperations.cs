@@ -49,11 +49,11 @@ namespace Fare
             {
                 switch (Automaton.Minimization)
                 {
-                    case Automaton._MinimizeHuffman:
+                    case Automaton.MinimizeHuffman:
                         MinimizeHuffman(a);
                         break;
 
-                    case Automaton._MinimizeBrzozowski:
+                    case Automaton.MinimizeBrzozowski:
                         MinimizeBrzozowski(a);
                         break;
 

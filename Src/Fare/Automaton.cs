@@ -57,20 +57,20 @@ namespace Fare
         /// <summary>
         /// Minimize using Huffman's O(n <sup>2</sup>) algorithm. This is the standard text-book algorithm.
         /// </summary>
-        public const int _MinimizeHuffman = 0;
+        public const int MinimizeHuffman = 0;
 
         /// <summary>
         /// Minimize using Brzozowski's O(2 <sup>n</sup>) algorithm. This algorithm uses the
         /// reverse-determinize-reverse-determinize trick, which has a bad worst-case behavior but
         /// often works very well in practice even better than Hopcroft's!).
         /// </summary>
-        public const int _MinimizeBrzozowski = 1;
+        public const int MinimizeBrzozowski = 1;
 
         /// <summary>
         /// Minimize using Hopcroft's O(n log n) algorithm. This is regarded as one of the most
         /// generally efficient algorithms that exist.
         /// </summary>
-        public const int _MinimizeHopcroft = 2;
+        public const int MinimizeHopcroft = 2;
 
         /// <summary>
         /// Selects whether operations may modify the input automata (default:
@@ -115,7 +115,7 @@ namespace Fare
         /// </code>
         /// ).
         /// </summary>
-        public static int Minimization => _MinimizeHopcroft;
+        public static int Minimization => MinimizeHopcroft;
 
         /// <summary>
         /// Gets or sets a value indicating whether operations may modify the input automata (default:
