@@ -16,7 +16,7 @@ namespace Fare
         /// </returns>
         public static bool operator ==(ListEqualityComparer<T> left, ListEqualityComparer<T> right)
         {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Fare
         /// </returns>
         public static bool operator !=(ListEqualityComparer<T> left, ListEqualityComparer<T> right)
         {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         /// <inheritdoc />
@@ -53,18 +53,18 @@ namespace Fare
         /// <inheritdoc />
         public bool Equals(ListEqualityComparer<T> other)
         {
-            return !object.ReferenceEquals(null, other);
+            return !ReferenceEquals(null, other);
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }

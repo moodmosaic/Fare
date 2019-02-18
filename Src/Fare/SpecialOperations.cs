@@ -52,23 +52,23 @@ namespace Fare
         {
             // Reverse all edges.
             var m = new Dictionary<State, HashSet<Transition>>();
-            HashSet<State> states = a.GetStates();
-            HashSet<State> accept = a.GetAcceptStates();
-            foreach (State r in states)
+            var states = a.GetStates();
+            var accept = a.GetAcceptStates();
+            foreach (var r in states)
             {
                 m.Add(r, new HashSet<Transition>());
                 r.Accept = false;
             }
 
-            foreach (State r in states)
+            foreach (var r in states)
             {
-                foreach (Transition t in r.Transitions)
+                foreach (var t in r.Transitions)
                 {
                     m[t.To].Add(new Transition(t.Min, t.Max, r));
                 }
             }
 
-            foreach (State r in states)
+            foreach (var r in states)
             {
                 r.Transitions = m[r].ToList();
             }
@@ -76,7 +76,7 @@ namespace Fare
             // Make new initial+final states.
             a.Initial.Accept = true;
             a.Initial = new State();
-            foreach (State r in accept)
+            foreach (var r in accept)
             {
                 a.Initial.AddEpsilon(r); // Ensures that all initial states are reachable.
             }

@@ -45,7 +45,7 @@ namespace Fare
         /// <returns>A new (deterministic) automaton that accepts any single character.</returns>
         public static Automaton MakeAnyChar()
         {
-            return BasicAutomata.MakeCharRange(char.MinValue, char.MaxValue);
+            return MakeCharRange(char.MinValue, char.MaxValue);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Fare
         {
             if (min == max)
             {
-                return BasicAutomata.MakeChar(min);
+                return MakeChar(min);
             }
 
             var a = new Automaton();
@@ -153,16 +153,16 @@ namespace Fare
         public static Automaton MakeInterval(int min, int max, int digits)
         {
             var a = new Automaton();
-            string x = Convert.ToString(min);
-            string y = Convert.ToString(max);
+            var x = Convert.ToString(min);
+            var y = Convert.ToString(max);
             if (min > max || (digits > 0 && y.Length > digits))
             {
                 throw new ArgumentException();
             }
 
-            int d = digits > 0 ? digits : y.Length;
+            var d = digits > 0 ? digits : y.Length;
             var bx = new StringBuilder();
-            for (int i = x.Length; i < d; i++)
+            for (var i = x.Length; i < d; i++)
             {
                 bx.Append('0');
             }
@@ -170,7 +170,7 @@ namespace Fare
             bx.Append(x);
             x = bx.ToString();
             var by = new StringBuilder();
-            for (int i = y.Length; i < d; i++)
+            for (var i = y.Length; i < d; i++)
             {
                 by.Append('0');
             }
@@ -178,10 +178,10 @@ namespace Fare
             by.Append(y);
             y = by.ToString();
             ICollection<State> initials = new List<State>();
-            a.Initial = BasicAutomata.Between(x, y, 0, initials, digits <= 0);
+            a.Initial = Between(x, y, 0, initials, digits <= 0);
             if (digits <= 0)
             {
-                List<StatePair> pairs = (from p in initials
+                var pairs = (from p in initials
                                          where a.Initial != p
                                          select new StatePair(a.Initial, p)).ToList();
                 a.AddEpsilons(pairs);
@@ -255,7 +255,7 @@ namespace Fare
                     initials.Add(s);
                 }
 
-                char c = x[n];
+                var c = x[n];
                 s.AddTransition(new Transition(c, AtLeast(x, n + 1, initials, zeros && c == '0')));
                 if (c < '9')
                 {
@@ -283,7 +283,7 @@ namespace Fare
             }
             else
             {
-                char c = x[n];
+                var c = x[n];
                 s.AddTransition(new Transition(c, AtMost(x, (char)n + 1)));
                 if (c > '0')
                 {
@@ -320,8 +320,8 @@ namespace Fare
                     initials.Add(s);
                 }
 
-                char cx = x[n];
-                char cy = y[n];
+                var cx = x[n];
+                var cy = y[n];
                 if (cx == cy)
                 {
                     s.AddTransition(new Transition(cx, Between(x, y, n + 1, initials, zeros && cx == '0')));
@@ -329,11 +329,11 @@ namespace Fare
                 else
                 {
                     // cx < cy
-                    s.AddTransition(new Transition(cx, BasicAutomata.AtLeast(x, n + 1, initials, zeros && cx == '0')));
-                    s.AddTransition(new Transition(cy, BasicAutomata.AtMost(y, n + 1)));
+                    s.AddTransition(new Transition(cx, AtLeast(x, n + 1, initials, zeros && cx == '0')));
+                    s.AddTransition(new Transition(cy, AtMost(y, n + 1)));
                     if (cx + 1 < cy)
                     {
-                        s.AddTransition(new Transition((char)(cx + 1), (char)(cy - 1), BasicAutomata.AnyOfRightLength(x, n + 1)));
+                        s.AddTransition(new Transition((char)(cx + 1), (char)(cy - 1), AnyOfRightLength(x, n + 1)));
                     }
                 }
             }
@@ -360,7 +360,7 @@ namespace Fare
             a.Initial = s1;
             s2.Accept = true;
 
-            foreach (char t in set)
+            foreach (var t in set)
             {
                 s1.Transitions.Add(new Transition(t, s2));
             }
@@ -402,7 +402,7 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeMaxInteger(String n)
         {
-            int i = 0;
+            var i = 0;
             while (i < n.Length && n[i] == '0')
             {
                 i++;
@@ -425,7 +425,7 @@ namespace Fare
             b.Append('(');
             if (i < n.Length)
             {
-                char c = n[i];
+                var c = n[i];
                 if (c != '0')
                 {
                     b.Append("[0-" + (char)(c - 1) + "][0-9]{" + (n.Length - i - 1) + "}|");
@@ -446,7 +446,7 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeMinInteger(String n) 
         {
-            int i = 0;
+            var i = 0;
             while (i + 1 < n.Length && n[i] == '0')
             {
                 i++;
@@ -464,7 +464,7 @@ namespace Fare
             b.Append('(');
             if (i < n.Length)
             {
-                char c = n[i];
+                var c = n[i];
                 if (c != '9')
                 {
                     b.Append("[" + (char)(c + 1) + "-9][0-9]{" + (n.Length - i - 1) + "}|");
@@ -514,11 +514,11 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeIntegerValue(String value) 
         {
-            bool minus = false;
-            int i = 0;
+            var minus = false;
+            var i = 0;
             while (i < value.Length)
             {
-                char c = value[i];
+                var c = value[i];
                 if (c == '-')
                 {
                     minus = true;
@@ -539,8 +539,8 @@ namespace Fare
                 b.Append("0");
             }
 
-            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
-            Automaton ws = Datatypes.WhitespaceAutomaton;
+            var s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
+            var ws = Datatypes.WhitespaceAutomaton;
             return Automaton.Minimize(
                 ws.Concatenate(
                     s.Concatenate(Automaton.MakeChar('0').Repeat())
@@ -556,11 +556,11 @@ namespace Fare
         /// <returns></returns>
         public static Automaton MakeDecimalValue(String value) 
         {
-            bool minus = false;
-            int i = 0;
+            var minus = false;
+            var i = 0;
             while (i < value.Length)
             {
-                char c = value[i];
+                var c = value[i];
                 if (c == '-')
                 {
                     minus = true;
@@ -576,7 +576,7 @@ namespace Fare
 
             var b1 = new StringBuilder();
             var b2 = new StringBuilder();
-            int p = value.IndexOf('.', i);
+            var p = value.IndexOf('.', i);
             if (p == -1)
             {
                 b1.Append(value.Substring(i));
@@ -587,7 +587,7 @@ namespace Fare
                 i = value.Length - 1;
                 while (i > p)
                 {
-                    char c = value[i];
+                    var c = value[i];
                     if (c >= '1' && c <= '9')
                     {
                         break;
@@ -604,7 +604,7 @@ namespace Fare
                 b1.Append("0");
             }
 
-            Automaton s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
+            var s = minus ? Automaton.MakeChar('-') : Automaton.MakeChar('+').Optional();
             Automaton d;
             if (b2.Length == 0)
             {
@@ -618,7 +618,7 @@ namespace Fare
                                      .Repeat());
             }
 
-            Automaton ws = Datatypes.WhitespaceAutomaton;
+            var ws = Datatypes.WhitespaceAutomaton;
             return Automaton.Minimize(
                 ws.Concatenate(
                     s.Concatenate(Automaton.MakeChar('0').Repeat())
@@ -637,23 +637,23 @@ namespace Fare
             var a = new Automaton();
             var states = new State[s.Length + 1];
             states[0] = a.Initial;
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
                 states[i + 1] = new State();
             }
 
-            State f = states[s.Length];
+            var f = states[s.Length];
             f.Accept = true;
             f.Transitions.Add(new Transition(Char.MinValue, Char.MaxValue, f));
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
                 var done = new HashSet<char?>();
-                char c = s[i];
+                var c = s[i];
                 states[i].Transitions.Add(new Transition(c, states[i + 1]));
                 done.Add(c);
-                for (int j = i; j >= 1; j--)
+                for (var j = i; j >= 1; j--)
                 {
-                    char d = s[j - 1];
+                    var d = s[j - 1];
                     if (!done.Contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
                     {
                         states[i].Transitions.Add(new Transition(d, states[j]));
@@ -662,7 +662,7 @@ namespace Fare
                 }
 
                 var da = new char[done.Count];
-                int h = 0;
+                var h = 0;
                 foreach (char w in done)
                 {
                     da[h++] = w;
@@ -670,7 +670,7 @@ namespace Fare
 
                 Array.Sort(da);
                 int from = Char.MinValue;
-                int k = 0;
+                var k = 0;
                 while (from <= Char.MaxValue)
                 {
                     while (k < da.Length && da[k] == from)

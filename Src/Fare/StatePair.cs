@@ -109,29 +109,29 @@ namespace Fare
         /// <inheritdoc />
         public bool Equals(StatePair other)
         {
-            if (object.ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
 
-            return object.Equals(other.FirstState, this.FirstState)
-                && object.Equals(other.SecondState, this.SecondState);
+            return Equals(other.FirstState, this.FirstState)
+                && Equals(other.SecondState, this.SecondState);
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }

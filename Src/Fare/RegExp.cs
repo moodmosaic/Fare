@@ -88,7 +88,7 @@ namespace Fare
             RegExp e;
             if (s.Length == 0)
             {
-                e = RegExp.MakeString(string.Empty);
+                e = MakeString(string.Empty);
             }
             else
             {
@@ -190,7 +190,7 @@ namespace Fare
         /// <returns>The previous value of the flag.</returns>
         public bool SetAllowMutate(bool flag)
         {
-            bool @bool = allowMutation;
+            var @bool = allowMutation;
             allowMutation = flag;
             return @bool;
         }
@@ -235,7 +235,7 @@ namespace Fare
             if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
                 && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
             {
-                return RegExp.MakeString(exp1, exp2);
+                return MakeString(exp1, exp2);
             }
 
             var r = new RegExp();
@@ -245,13 +245,13 @@ namespace Fare
                 && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
             {
                 r.exp1 = exp1.exp1;
-                r.exp2 = RegExp.MakeString(exp1.exp2, exp2);
+                r.exp2 = MakeString(exp1.exp2, exp2);
             }
             else if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
                      && exp2.kind == Kind.RegexpConcatenation
                      && (exp2.exp1.kind == Kind.RegexpChar || exp2.exp1.kind == Kind.RegexpString))
             {
-                r.exp1 = RegExp.MakeString(exp1, exp2.exp1);
+                r.exp1 = MakeString(exp1, exp2.exp1);
                 r.exp2 = exp2.exp2;
             }
             else
@@ -396,7 +396,7 @@ namespace Fare
                 sb.Append(exp2.c);
             }
 
-            return RegExp.MakeString(sb.ToString());
+            return MakeString(sb.ToString());
         }
 
         private Automaton ToAutomatonAllowMutate(
@@ -404,13 +404,13 @@ namespace Fare
             IAutomatonProvider automatonProvider,
             bool minimize)
         {
-            bool @bool = false;
+            var @bool = false;
             if (allowMutation)
             {
                 @bool = this.SetAllowMutate(true); // This is not thead safe.
             }
 
-            Automaton a = this.ToAutomaton(automata, automatonProvider, minimize);
+            var a = this.ToAutomaton(automata, automatonProvider, minimize);
             if (allowMutation)
             {
                 this.SetAllowMutate(@bool);
@@ -607,12 +607,12 @@ namespace Fare
                     sb.Append("<").Append(s).Append(">");
                     break;
                 case Kind.RegexpInterval:
-                    string s1 = Convert.ToDecimal(min).ToString();
-                    string s2 = Convert.ToDecimal(max).ToString();
+                    var s1 = Convert.ToDecimal(min).ToString();
+                    var s2 = Convert.ToDecimal(max).ToString();
                     sb.Append("<");
                     if (digits > 0)
                     {
-                        for (int i = s1.Length; i < digits; i++)
+                        for (var i = s1.Length; i < digits; i++)
                         {
                             sb.Append('0');
                         }
@@ -621,7 +621,7 @@ namespace Fare
                     sb.Append(s1).Append("-");
                     if (digits > 0)
                     {
-                        for (int i = s2.Length; i < digits; i++)
+                        for (var i = s2.Length; i < digits; i++)
                         {
                             sb.Append('0');
                         }
@@ -659,10 +659,10 @@ namespace Fare
 
         private RegExp ParseUnionExp()
         {
-            RegExp e = this.ParseInterExp();
+            var e = this.ParseInterExp();
             if (this.Match('|'))
             {
-                e = RegExp.MakeUnion(e, this.ParseUnionExp());
+                e = MakeUnion(e, this.ParseUnionExp());
             }
 
             return e;
@@ -686,10 +686,10 @@ namespace Fare
 
         private RegExp ParseInterExp()
         {
-            RegExp e = this.ParseConcatExp();
+            var e = this.ParseConcatExp();
             if (this.Check(RegExpSyntaxOptions.Intersection) && this.Match('&'))
             {
-                e = RegExp.MakeIntersection(e, this.ParseInterExp());
+                e = MakeIntersection(e, this.ParseInterExp());
             }
 
             return e;
@@ -702,10 +702,10 @@ namespace Fare
 
         private RegExp ParseConcatExp()
         {
-            RegExp e = this.ParseRepeatExp();
+            var e = this.ParseRepeatExp();
             if (this.More() && !this.Peek(")|") && (!this.Check(RegExpSyntaxOptions.Intersection) || !this.Peek("&")))
             {
-                e = RegExp.MakeConcatenation(e, this.ParseConcatExp());
+                e = MakeConcatenation(e, this.ParseConcatExp());
             }
 
             return e;
@@ -723,24 +723,24 @@ namespace Fare
 
         private RegExp ParseRepeatExp()
         {
-            RegExp e = this.ParseComplExp();
+            var e = this.ParseComplExp();
             while (this.Peek("?*+{"))
             {
                 if (this.Match('?'))
                 {
-                    e = RegExp.MakeOptional(e);
+                    e = MakeOptional(e);
                 }
                 else if (this.Match('*'))
                 {
-                    e = RegExp.MakeRepeat(e);
+                    e = MakeRepeat(e);
                 }
                 else if (this.Match('+'))
                 {
-                    e = RegExp.MakeRepeat(e, 1);
+                    e = MakeRepeat(e, 1);
                 }
                 else if (this.Match('{'))
                 {
-                    int start = pos;
+                    var start = pos;
                     while (this.Peek("0123456789"))
                     {
                         this.Next();
@@ -751,8 +751,8 @@ namespace Fare
                         throw new ArgumentException("integer expected at position " + pos);
                     }
 
-                    int n = int.Parse(b.Substring(start, pos - start));
-                    int m = -1;
+                    var n = int.Parse(b.Substring(start, pos - start));
+                    var m = -1;
                     if (this.Match(','))
                     {
                         start = pos;
@@ -776,7 +776,7 @@ namespace Fare
                         throw new ArgumentException("expected '}' at position " + pos);
                     }
 
-                    e = m == -1 ? RegExp.MakeRepeat(e, n) : RegExp.MakeRepeat(e, n, m);
+                    e = m == -1 ? MakeRepeat(e, n) : MakeRepeat(e, n, m);
                 }
             }
 
@@ -797,7 +797,7 @@ namespace Fare
         {
             if (this.Check(RegExpSyntaxOptions.Complement) && this.Match('~'))
             {
-                return RegExp.MakeComplement(this.ParseComplExp());
+                return MakeComplement(this.ParseComplExp());
             }
 
             return this.ParseCharClassExp();
@@ -807,13 +807,13 @@ namespace Fare
         {
             if (this.Match('['))
             {
-                bool negate = false;
+                var negate = false;
                 if (this.Match('^'))
                 {
                     negate = true;
                 }
 
-                RegExp e = this.ParseCharClasses();
+                var e = this.ParseCharClasses();
                 if (negate)
                 {
                     e = ExcludeChars(e, MakeAnyPrintableASCIIChar());
@@ -839,17 +839,17 @@ namespace Fare
 
             if (this.Check(RegExpSyntaxOptions.Empty) && this.Match('#'))
             {
-                return RegExp.MakeEmpty();
+                return MakeEmpty();
             }
 
             if (this.Check(RegExpSyntaxOptions.Anystring) && this.Match('@'))
             {
-                return RegExp.MakeAnyString();
+                return MakeAnyString();
             }
 
             if (this.Match('"'))
             {
-                int start = pos;
+                var start = pos;
                 while (this.More() && !this.Peek("\""))
                 {
                     this.Next();
@@ -860,7 +860,7 @@ namespace Fare
                     throw new ArgumentException("expected '\"' at position " + pos);
                 }
 
-                return RegExp.MakeString(b.Substring(start, ((pos - 1) - start)));
+                return MakeString(b.Substring(start, ((pos - 1) - start)));
             }
 
             if (this.Match('('))
@@ -872,10 +872,10 @@ namespace Fare
 
                 if (this.Match(')'))
                 {
-                    return RegExp.MakeString(string.Empty);
+                    return MakeString(string.Empty);
                 }
 
-                RegExp e = this.ParseUnionExp();
+                var e = this.ParseUnionExp();
                 if (!this.Match(')'))
                 {
                     throw new ArgumentException("expected ')' at position " + pos);
@@ -886,7 +886,7 @@ namespace Fare
 
             if ((this.Check(RegExpSyntaxOptions.Automaton) || this.Check(RegExpSyntaxOptions.Interval)) && this.Match('<'))
             {
-                int start = pos;
+                var start = pos;
                 while (this.More() && !this.Peek(">"))
                 {
                     this.Next();
@@ -897,8 +897,8 @@ namespace Fare
                     throw new ArgumentException("expected '>' at position " + pos);
                 }
 
-                string str = b.Substring(start, ((pos - 1) - start));
-                int i = str.IndexOf('-');
+                var str = b.Substring(start, ((pos - 1) - start));
+                var i = str.IndexOf('-');
                 if (i == -1)
                 {
                     if (!this.Check(RegExpSyntaxOptions.Automaton))
@@ -906,7 +906,7 @@ namespace Fare
                         throw new ArgumentException("interval syntax error at position " + (pos - 1));
                     }
 
-                    return RegExp.MakeAutomaton(str);
+                    return MakeAutomaton(str);
                 }
 
                 if (!this.Check(RegExpSyntaxOptions.Interval))
@@ -921,19 +921,19 @@ namespace Fare
                         throw new FormatException();
                     }
 
-                    string smin = str.Substring(0, i - 0);
-                    string smax = str.Substring(i + 1, (str.Length - (i + 1)));
-                    int imin = int.Parse(smin);
-                    int imax = int.Parse(smax);
-                    int numdigits = smin.Length == smax.Length ? smin.Length : 0;
+                    var smin = str.Substring(0, i - 0);
+                    var smax = str.Substring(i + 1, (str.Length - (i + 1)));
+                    var imin = int.Parse(smin);
+                    var imax = int.Parse(smax);
+                    var numdigits = smin.Length == smax.Length ? smin.Length : 0;
                     if (imin > imax)
                     {
-                        int t = imin;
+                        var t = imin;
                         imin = imax;
                         imax = t;
                     }
 
-                    return RegExp.MakeInterval(imin, imax, numdigits);
+                    return MakeInterval(imin, imax, numdigits);
                 }
                 catch (FormatException)
                 {
@@ -954,7 +954,7 @@ namespace Fare
                 // Digits.
                 if ((inclusion = this.Match('d')) || this.Match('D'))
                 {
-                    RegExp digitChars = MakeCharRange('0', '9');
+                    var digitChars = MakeCharRange('0', '9');
                     return inclusion ? digitChars : ExcludeChars(digitChars, MakeAnyPrintableASCIIChar());
                 }
 
@@ -962,7 +962,7 @@ namespace Fare
                 if ((inclusion = this.Match('s')) || this.Match('S'))
                 {
                     // Do not add line breaks, as usually RegExp is single line.
-                    RegExp whitespaceChars = MakeUnion(MakeChar(' '), MakeChar('\t'));
+                    var whitespaceChars = MakeUnion(MakeChar(' '), MakeChar('\t'));
                     return inclusion ? whitespaceChars : ExcludeChars(whitespaceChars, MakeAnyPrintableASCIIChar());
                 }
 
@@ -970,13 +970,13 @@ namespace Fare
                 if ((inclusion = this.Match('w')) || this.Match('W'))
                 {
                     var ranges = new[] { MakeCharRange('A', 'Z'), MakeCharRange('a', 'z'), MakeCharRange('0', '9') };
-                    RegExp wordChars = ranges.Aggregate(MakeChar('_'), MakeUnion);
+                    var wordChars = ranges.Aggregate(MakeChar('_'), MakeUnion);
                     
                     return inclusion ? wordChars : ExcludeChars(wordChars, MakeAnyPrintableASCIIChar());
                 }
             }
             
-            return RegExp.MakeChar(this.ParseCharExp());
+            return MakeChar(this.ParseCharExp());
         }
 
         private void SkipNonCapturingSubpatternExp()
@@ -993,10 +993,10 @@ namespace Fare
 
         private RegExp ParseCharClasses()
         {
-            RegExp e = this.ParseCharClass();
+            var e = this.ParseCharClass();
             while (this.More() && !this.Peek("]"))
             {
-                e = RegExp.MakeUnion(e, this.ParseCharClass());
+                e = MakeUnion(e, this.ParseCharClass());
             }
 
             return e;
@@ -1004,18 +1004,18 @@ namespace Fare
 
         private RegExp ParseCharClass()
         {
-            char @char = this.ParseCharExp();
+            var @char = this.ParseCharExp();
             if (this.Match('-'))
             {
                 if (this.Peek("]"))
                 {
-                    return RegExp.MakeUnion(RegExp.MakeChar(@char), RegExp.MakeChar('-'));
+                    return MakeUnion(MakeChar(@char), MakeChar('-'));
                 }
 
-                return RegExp.MakeCharRange(@char, this.ParseCharExp());
+                return MakeCharRange(@char, this.ParseCharExp());
             }
 
-            return RegExp.MakeChar(@char);
+            return MakeChar(@char);
         }
 
         private static RegExp ExcludeChars(RegExp exclusion, RegExp allChars)

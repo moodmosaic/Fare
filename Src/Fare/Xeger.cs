@@ -84,6 +84,12 @@ namespace Fare
             return builder.ToString();
         }
 
+        private static int GetRandomInt(int min, int max, IRandom random)
+        {
+            var maxForRandom = max - min + 1;
+            return random.NextInt32(0, maxForRandom) + min;
+        }
+
         private void Generate(StringBuilder builder, State state)
         {
             var transitions = state.GetSortedTransitions(true);
@@ -97,8 +103,8 @@ namespace Fare
                 return;
             }
 
-            int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            int option = random.NextInt32(0, nroptions);
+            var nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
+            var option = GetRandomInt(0, nroptions, random);
             if (state.Accept && option == 0)
             {
                 // 0 is considered stop.
@@ -106,14 +112,14 @@ namespace Fare
             }
 
             // Moving on to next transition.
-            Transition transition = transitions[option - (state.Accept ? 1 : 0)];
+            var transition = transitions[option - (state.Accept ? 1 : 0)];
             this.AppendChoice(builder, transition);
             Generate(builder, transition.To);
         }
 
         private void AppendChoice(StringBuilder builder, Transition transition)
         {
-            var c = (char)random.NextInt32(transition.Min, transition.Max);
+            var c = (char)GetRandomInt(transition.Min, transition.Max, random);
             builder.Append(c);
         }
 

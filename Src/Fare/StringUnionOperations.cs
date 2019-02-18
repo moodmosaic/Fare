@@ -41,7 +41,7 @@ namespace Fare
                 builder.Add(chs);
             }
 
-            return StringUnionOperations.Convert(builder.Complete(), new Dictionary<State, Fare.State>());
+            return Convert(builder.Complete(), new Dictionary<State, Fare.State>());
         }
 
         public void Add(char[] current)
@@ -55,10 +55,10 @@ namespace Fare
             Debug.Assert(this.SetPrevious(current));
 
             // Descend in the automaton (find matching prefix). 
-            int pos = 0;
-            int max = current.Length;
+            var pos = 0;
+            var max = current.Length;
             State next;
-            State state = root;
+            var state = root;
             while (pos < max && (next = state.GetLastChild(current[pos])) != null)
             {
                 state = next;
@@ -70,12 +70,12 @@ namespace Fare
                 this.ReplaceOrRegister(state);
             }
 
-            StringUnionOperations.AddSuffix(state, current, pos);
+            AddSuffix(state, current, pos);
         }
 
         private static void AddSuffix(State state, char[] current, int fromIndex)
         {
-            for (int i = fromIndex; i < current.Length; i++)
+            for (var i = fromIndex; i < current.Length; i++)
             {
                 state = state.NewState(current[i]);
             }
@@ -85,7 +85,7 @@ namespace Fare
 
         private static Fare.State Convert(State s, IDictionary<State, Fare.State> visited)
         {
-            Fare.State converted = visited[s];
+            var converted = visited[s];
             if (converted != null)
             {
                 return converted;
@@ -95,11 +95,11 @@ namespace Fare
             converted.Accept = s.IsFinal;
 
             visited.Add(s, converted);
-            int i = 0;
-            char[] labels = s.TransitionLabels;
-            foreach (State target in s.States)
+            var i = 0;
+            var labels = s.TransitionLabels;
+            foreach (var target in s.States)
             {
-                converted.AddTransition(new Transition(labels[i++], StringUnionOperations.Convert(target, visited)));
+                converted.AddTransition(new Transition(labels[i++], Convert(target, visited)));
             }
 
             return converted;
@@ -123,14 +123,14 @@ namespace Fare
 
         private void ReplaceOrRegister(State state)
         {
-            State child = state.LastChild;
+            var child = state.LastChild;
 
             if (child.HasChildren)
             {
                 this.ReplaceOrRegister(child);
             }
 
-            State registered = this.register[child];
+            var registered = this.register[child];
             if (registered != null)
             {
                 state.ReplaceLastChild(registered);
@@ -158,14 +158,14 @@ namespace Fare
         {
             public int Compare(char[] s1, char[] s2)
             {
-                int lens1 = s1.Length;
-                int lens2 = s2.Length;
-                int max = Math.Min(lens1, lens2);
+                var lens1 = s1.Length;
+                var lens2 = s2.Length;
+                var max = Math.Min(lens1, lens2);
 
-                for (int i = 0; i < max; i++)
+                for (var i = 0; i < max; i++)
                 {
-                    char c1 = s1[i];
-                    char c2 = s2[i];
+                    var c1 = s1[i];
+                    var c2 = s2[i];
                     if (c1 != c2)
                     {
                         return c1 - c2;
@@ -224,13 +224,13 @@ namespace Fare
                 }
 
                 return this.isFinal == other.isFinal
-                    && State.ReferenceEquals(states, other.states)
-                    && object.Equals(labels, other.labels);
+                    && ReferenceEquals(states, other.states)
+                    && Equals(labels, other.labels);
             }
 
             public override int GetHashCode()
             {
-                int hash = this.isFinal ? 1 : 0;
+                var hash = this.isFinal ? 1 : 0;
                 hash ^= (hash * 31) + this.labels.Length;
                 hash = this.labels.Aggregate(hash, (current, c) => current ^ (current * 31) + c);
 
@@ -256,7 +256,7 @@ namespace Fare
 
             public State GetLastChild(char label)
             {
-                int index = this.labels.Length - 1;
+                var index = this.labels.Length - 1;
                 State s = null;
                 if (index >= 0 && this.labels[index] == label)
                 {
@@ -299,7 +299,7 @@ namespace Fare
 
             private State GetState(char label)
             {
-                int index = Array.BinarySearch(this.labels, label);
+                var index = Array.BinarySearch(this.labels, label);
                 return index >= 0 ? states[index] : null;
             }
         }

@@ -48,13 +48,13 @@ namespace Fare
                 switch (Automaton.Minimization)
                 {
                     case Automaton.MinimizeHuffman:
-                        MinimizationOperations.MinimizeHuffman(a);
+                        MinimizeHuffman(a);
                         break;
                     case Automaton.MinimizeBrzozowski:
-                        MinimizationOperations.MinimizeBrzozowski(a);
+                        MinimizeBrzozowski(a);
                         break;
                     default:
-                        MinimizationOperations.MinimizeHopcroft(a);
+                        MinimizeHopcroft(a);
                         break;
                 }
             }
@@ -80,10 +80,10 @@ namespace Fare
         public static void MinimizeHopcroft(Automaton a)
         {
             a.Determinize();
-            IList<Transition> tr = a.Initial.Transitions;
+            var tr = a.Initial.Transitions;
             if (tr.Count == 1)
             {
-                Transition t = tr[0];
+                var t = tr[0];
                 if (t.To == a.Initial && t.Min == char.MinValue && t.Max == char.MaxValue)
                 {
                     return;
@@ -93,20 +93,20 @@ namespace Fare
             a.Totalize();
 
             // Make arrays for numbered states and effective alphabet.
-            HashSet<State> ss = a.GetStates();
+            var ss = a.GetStates();
             var states = new State[ss.Count];
-            int number = 0;
-            foreach (State q in ss)
+            var number = 0;
+            foreach (var q in ss)
             {
                 states[number] = q;
                 q.Number = number++;
             }
 
-            char[] sigma = a.GetStartPoints();
+            var sigma = a.GetStartPoints();
 
             // Initialize data structures.
             var reverse = new List<List<LinkedList<State>>>();
-            foreach (State s in states)
+            foreach (var s in states)
             {
                 var v = new List<LinkedList<State>>();
                 Initialize(ref v, sigma.Length);
@@ -131,11 +131,11 @@ namespace Fare
             var splitblock = new List<List<State>>();
             Initialize(ref splitblock, states.Length);
 
-            for (int q = 0; q < states.Length; q++)
+            for (var q = 0; q < states.Length; q++)
             {
                 splitblock[q] = new List<State>();
                 partition[q] = new LinkedList<State>();
-                for (int x = 0; x < sigma.Length; x++)
+                for (var x = 0; x < sigma.Length; x++)
                 {
                     reverse[q][x] = new LinkedList<State>();
                     active[q, x] = new StateList();
@@ -143,27 +143,27 @@ namespace Fare
             }
 
             // Find initial partition and reverse edges.
-            foreach (State qq in states)
+            foreach (var qq in states)
             {
-                int j = qq.Accept ? 0 : 1;
+                var j = qq.Accept ? 0 : 1;
 
                 partition[j].AddLast(qq);
                 block[qq.Number] = j;
-                for (int x = 0; x < sigma.Length; x++)
+                for (var x = 0; x < sigma.Length; x++)
                 {
-                    char y = sigma[x];
-                    State p = qq.Step(y);
+                    var y = sigma[x];
+                    var p = qq.Step(y);
                     reverse[p.Number][x].AddLast(qq);
                     reverseNonempty[p.Number, x] = true;
                 }
             }
 
             // Initialize active sets.
-            for (int j = 0; j <= 1; j++)
+            for (var j = 0; j <= 1; j++)
             {
-                for (int x = 0; x < sigma.Length; x++)
+                for (var x = 0; x < sigma.Length; x++)
                 {
-                    foreach (State qq in partition[j])
+                    foreach (var qq in partition[j])
                     {
                         if (reverseNonempty[qq.Number, x])
                         {
@@ -174,34 +174,34 @@ namespace Fare
             }
 
             // Initialize pending.
-            for (int x = 0; x < sigma.Length; x++)
+            for (var x = 0; x < sigma.Length; x++)
             {
-                int a0 = active[0, x].Size;
-                int a1 = active[1, x].Size;
-                int j = a0 <= a1 ? 0 : 1;
+                var a0 = active[0, x].Size;
+                var a1 = active[1, x].Size;
+                var j = a0 <= a1 ? 0 : 1;
                 pending.AddLast(new IntPair(j, x));
                 pending2[x, j] = true;
             }
 
             // Process pending until fixed point.
-            int k = 2;
+            var k = 2;
             while (pending.Count > 0)
             {
-                IntPair ip = pending.RemoveAndReturnFirst();
-                int p = ip.N1;
-                int x = ip.N2;
+                var ip = pending.RemoveAndReturnFirst();
+                var p = ip.N1;
+                var x = ip.N2;
                 pending2[x, p] = false;
 
                 // Find states that need to be split off their blocks.
-                for (StateListNode m = active[p, x].First; m != null; m = m.Next)
+                for (var m = active[p, x].First; m != null; m = m.Next)
                 {
-                    foreach (State s in reverse[m.State.Number][x])
+                    foreach (var s in reverse[m.State.Number][x])
                     {
                         if (!split2[s.Number])
                         {
                             split2[s.Number] = true;
                             split.Add(s);
-                            int j = block[s.Number];
+                            var j = block[s.Number];
                             splitblock[j].Add(s);
                             if (!refine2[j])
                             {
@@ -213,20 +213,20 @@ namespace Fare
                 }
 
                 // Refine blocks.
-                foreach (int j in refine)
+                foreach (var j in refine)
                 {
                     if (splitblock[j].Count < partition[j].Count)
                     {
-                        LinkedList<State> b1 = partition[j];
-                        LinkedList<State> b2 = partition[k];
-                        foreach (State s in splitblock[j])
+                        var b1 = partition[j];
+                        var b2 = partition[k];
+                        foreach (var s in splitblock[j])
                         {
                             b1.Remove(s);
                             b2.AddLast(s);
                             block[s.Number] = k;
-                            for (int c = 0; c < sigma.Length; c++)
+                            for (var c = 0; c < sigma.Length; c++)
                             {
-                                StateListNode sn = active2[s.Number, c];
+                                var sn = active2[s.Number, c];
                                 if (sn != null && sn.StateList == active[j, c])
                                 {
                                     sn.Remove();
@@ -236,10 +236,10 @@ namespace Fare
                         }
 
                         // Update pending.
-                        for (int c = 0; c < sigma.Length; c++)
+                        for (var c = 0; c < sigma.Length; c++)
                         {
-                            int aj = active[j, c].Size;
-                            int ak = active[k, c].Size;
+                            var aj = active[j, c].Size;
+                            var ak = active[k, c].Size;
                             if (!pending2[c, j] && 0 < aj && aj <= ak)
                             {
                                 pending2[c, j] = true;
@@ -255,7 +255,7 @@ namespace Fare
                         k++;
                     }
 
-                    foreach (State s in splitblock[j])
+                    foreach (var s in splitblock[j])
                     {
                         split2[s.Number] = false;
                     }
@@ -270,11 +270,11 @@ namespace Fare
 
             // Make a new state for each equivalence class, set initial state.
             var newstates = new State[k];
-            for (int n = 0; n < newstates.Length; n++)
+            for (var n = 0; n < newstates.Length; n++)
             {
                 var s = new State();
                 newstates[n] = s;
-                foreach (State q in partition[n])
+                foreach (var q in partition[n])
                 {
                     if (q == a.Initial)
                     {
@@ -288,10 +288,10 @@ namespace Fare
             }
 
             // Build transitions and set acceptance.
-            foreach (State s in newstates)
+            foreach (var s in newstates)
             {
                 s.Accept = states[s.Number].Accept;
-                foreach (Transition t in states[s.Number].Transitions)
+                foreach (var t in states[s.Number].Transitions)
                 {
                     s.Transitions.Add(new Transition(t.Min, t.Max, newstates[t.To.Number]));
                 }
@@ -308,13 +308,13 @@ namespace Fare
         {
             a.Determinize();
             a.Totalize();
-            HashSet<State> ss = a.GetStates();
+            var ss = a.GetStates();
             var transitions = new Transition[ss.Count][];
-            State[] states = ss.ToArray();
+            var states = ss.ToArray();
 
             var mark = new List<List<bool>>();
             var triggers = new List<List<HashSet<IntPair>>>();
-            foreach (State t in states)
+            foreach (var t in states)
             {
                 var v = new List<HashSet<IntPair>>();
                 Initialize(ref v, states.Length);
@@ -322,11 +322,11 @@ namespace Fare
             }
 
             // Initialize marks based on acceptance status and find transition arrays.
-            for (int n1 = 0; n1 < states.Length; n1++)
+            for (var n1 = 0; n1 < states.Length; n1++)
             {
                 states[n1].Number = n1;
                 transitions[n1] = states[n1].GetSortedTransitions(false).ToArray();
-                for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                for (var n2 = n1 + 1; n2 < states.Length; n2++)
                 {
                     if (states[n1].Accept != states[n2].Accept)
                     {
@@ -336,37 +336,37 @@ namespace Fare
             }
 
             // For all pairs, see if states agree.
-            for (int n1 = 0; n1 < states.Length; n1++)
+            for (var n1 = 0; n1 < states.Length; n1++)
             {
-                for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                for (var n2 = n1 + 1; n2 < states.Length; n2++)
                 {
                     if (!mark[n1][n2])
                     {
-                        if (MinimizationOperations.StatesAgree(transitions, mark, n1, n2))
+                        if (StatesAgree(transitions, mark, n1, n2))
                         {
-                            MinimizationOperations.AddTriggers(transitions, triggers, n1, n2);
+                            AddTriggers(transitions, triggers, n1, n2);
                         }
                         else
                         {
-                            MinimizationOperations.MarkPair(mark, triggers, n1, n2);
+                            MarkPair(mark, triggers, n1, n2);
                         }
                     }
                 }
             }
 
             // Assign equivalence class numbers to states.
-            int numclasses = 0;
-            foreach (State t in states)
+            var numclasses = 0;
+            foreach (var t in states)
             {
                 t.Number = -1;
             }
 
-            for (int n1 = 0; n1 < states.Length; n1++)
+            for (var n1 = 0; n1 < states.Length; n1++)
             {
                 if (states[n1].Number == -1)
                 {
                     states[n1].Number = numclasses;
-                    for (int n2 = n1 + 1; n2 < states.Length; n2++)
+                    for (var n2 = n1 + 1; n2 < states.Length; n2++)
                     {
                         if (!mark[n1][n2])
                         {
@@ -380,13 +380,13 @@ namespace Fare
 
             // Make a new state for each equivalence class.
             var newstates = new State[numclasses];
-            for (int n = 0; n < numclasses; n++)
+            for (var n = 0; n < numclasses; n++)
             {
                 newstates[n] = new State();
             }
 
             // Select a class representative for each class and find the new initial state.
-            for (int n = 0; n < states.Length; n++)
+            for (var n = 0; n < states.Length; n++)
             {
                 newstates[states[n].Number].Number = n;
                 if (states[n] == a.Initial)
@@ -396,11 +396,11 @@ namespace Fare
             }
 
             // Build transitions and set acceptance.
-            for (int n = 0; n < numclasses; n++)
+            for (var n = 0; n < numclasses; n++)
             {
-                State s = newstates[n];
+                var s = newstates[n];
                 s.Accept = states[s.Number].Accept;
-                foreach (Transition t in states[s.Number].Transitions)
+                foreach (var t in states[s.Number].Transitions)
                 {
                     s.Transitions.Add(new Transition(t.Min, t.Max, newstates[t.To.Number]));
                 }
@@ -411,7 +411,7 @@ namespace Fare
 
         private static void Initialize<T>(ref List<T> list, int size)
         {
-            for (int i = 0; i < size; i++)
+            for (var i = 0; i < size; i++)
             {
                 list.Add(default(T));
             }
@@ -419,8 +419,8 @@ namespace Fare
 
         private static void AddTriggers(Transition[][] transitions, IList<List<HashSet<IntPair>>> triggers, int n1, int n2)
         {
-            Transition[] t1 = transitions[n1];
-            Transition[] t2 = transitions[n2];
+            var t1 = transitions[n1];
+            var t2 = transitions[n2];
             for (int k1 = 0, k2 = 0; k1 < t1.Length && k2 < t2.Length;)
             {
                 if (t1[k1].Max < t2[k2].Min)
@@ -435,11 +435,11 @@ namespace Fare
                 {
                     if (t1[k1].To != t2[k2].To)
                     {
-                        int m1 = t1[k1].To.Number;
-                        int m2 = t2[k2].To.Number;
+                        var m1 = t1[k1].To.Number;
+                        var m2 = t2[k2].To.Number;
                         if (m1 > m2)
                         {
-                            int t = m1;
+                            var t = m1;
                             m1 = m2;
                             m2 = t;
                         }
@@ -469,13 +469,13 @@ namespace Fare
             mark[n1][n2] = true;
             if (triggers[n1][n2] != null)
             {
-                foreach (IntPair p in triggers[n1][n2])
+                foreach (var p in triggers[n1][n2])
                 {
-                    int m1 = p.N1;
-                    int m2 = p.N2;
+                    var m1 = p.N1;
+                    var m2 = p.N2;
                     if (m1 > m2)
                     {
-                        int t = m1;
+                        var t = m1;
                         m1 = m2;
                         m2 = t;
                     }
@@ -490,8 +490,8 @@ namespace Fare
 
         private static bool StatesAgree(Transition[][] transitions, List<List<bool>> mark, int n1, int n2)
         {
-            Transition[] t1 = transitions[n1];
-            Transition[] t2 = transitions[n2];
+            var t1 = transitions[n1];
+            var t2 = transitions[n2];
             for (int k1 = 0, k2 = 0; k1 < t1.Length && k2 < t2.Length;)
             {
                 if (t1[k1].Max < t2[k2].Min)
@@ -504,11 +504,11 @@ namespace Fare
                 }
                 else
                 {
-                    int m1 = t1[k1].To.Number;
-                    int m2 = t2[k2].To.Number;
+                    var m1 = t1[k1].To.Number;
+                    var m2 = t2[k2].To.Number;
                     if (m1 > m2)
                     {
-                        int t = m1;
+                        var t = m1;
                         m1 = m2;
                         m2 = t;
                     }

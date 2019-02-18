@@ -6,7 +6,7 @@ namespace Fare
     {
         public static T RemoveAndReturnFirst<T>(this LinkedList<T> linkedList)
         {
-            T first = linkedList.First.Value;
+            var first = linkedList.First.Value;
             linkedList.RemoveFirst();
             return first;
         }

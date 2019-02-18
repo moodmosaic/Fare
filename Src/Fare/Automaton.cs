@@ -126,7 +126,7 @@ namespace Fare
         /// </summary>
         public static int Minimization
         {
-            get { return Automaton.MinimizeHopcroft; }
+            get { return MinimizeHopcroft; }
         }
 
         /// <summary>
@@ -240,9 +240,9 @@ namespace Fare
 
         public static Transition[][] GetSortedTransitions(HashSet<State> states)
         {
-            Automaton.SetStateNumbers(states);
+            SetStateNumbers(states);
             var transitions = new Transition[states.Count][];
-            foreach (State s in states)
+            foreach (var s in states)
             {
                 transitions[s.Number] = s.GetSortedTransitions(false).ToArray();
             }
@@ -282,7 +282,7 @@ namespace Fare
         /// <returns>The previous value of the flag.</returns>
         public static bool SetAllowMutate(bool flag)
         {
-            bool b = allowMutation;
+            var b = allowMutation;
             allowMutation = flag;
             return b;
         }
@@ -304,8 +304,8 @@ namespace Fare
         /// <param name="states">The states.</param>
         public static void SetStateNumbers(IEnumerable<State> states)
         {
-            int number = 0;
-            foreach (State s in states)
+            var number = 0;
+            foreach (var s in states)
             {
                 s.Number = number++;
             }
@@ -357,10 +357,10 @@ namespace Fare
             var a = (Automaton)this.MemberwiseClone();
             if (!this.IsSingleton)
             {
-                HashSet<State> states = this.GetStates();
+                var states = this.GetStates();
                 var d = states.ToDictionary(s => s, s => new State());
 
-                foreach (State s in states)
+                foreach (var s in states)
                 {
                     State p;
                     if (!d.TryGetValue(s, out p))
@@ -374,7 +374,7 @@ namespace Fare
                         a.Initial = p;
                     }
 
-                    foreach (Transition t in s.Transitions)
+                    foreach (var t in s.Transitions)
                     {
                         State to;
                         d.TryGetValue(t.To, out to);
@@ -394,7 +394,7 @@ namespace Fare
         /// </returns>
         public Automaton CloneExpanded()
         {
-            Automaton a = this.Clone();
+            var a = this.Clone();
             a.ExpandSingleton();
             return a;
         }
@@ -415,7 +415,7 @@ namespace Fare
         /// </returns>
         public Automaton CloneExpandedIfRequired()
         {
-            if (Automaton.AllowMutation)
+            if (AllowMutation)
             {
                 this.ExpandSingleton();
                 return this;
@@ -465,7 +465,7 @@ namespace Fare
             {
                 var p = new State();
                 initial = p;
-                foreach (char t in this.Singleton)
+                foreach (var t in this.Singleton)
                 {
                     var q = new State();
                     p.Transitions.Add(new Transition(t, q));
@@ -497,13 +497,13 @@ namespace Fare
 
             while (worklist.Count > 0)
             {
-                State s = worklist.RemoveAndReturnFirst();
+                var s = worklist.RemoveAndReturnFirst();
                 if (s.Accept)
                 {
                     accepts.Add(s);
                 }
 
-                foreach (Transition t in s.Transitions)
+                foreach (var t in s.Transitions)
                 {
                     // TODO: Java code does not check for null states.
                     if (t.To == null)
@@ -539,10 +539,10 @@ namespace Fare
         public char[] GetStartPoints()
         {
             var pointSet = new HashSet<char>();
-            foreach (State s in this.GetStates())
+            foreach (var s in this.GetStates())
             {
                 pointSet.Add(char.MinValue);
-                foreach (Transition t in s.Transitions)
+                foreach (var t in s.Transitions)
                 {
                     pointSet.Add(t.Min);
                     if (t.Max < char.MaxValue)
@@ -553,8 +553,8 @@ namespace Fare
             }
 
             var points = new char[pointSet.Count];
-            int n = 0;
-            foreach (char m in pointSet)
+            var n = 0;
+            foreach (var m in pointSet)
             {
                 points[n++] = m;
             }
@@ -588,17 +588,17 @@ namespace Fare
             visited.Add(this.Initial);
             while (worklist.Count > 0)
             {
-                State s = worklist.RemoveAndReturnFirst();
+                var s = worklist.RemoveAndReturnFirst();
                 if (s == null)
                 {
                     continue;
                 }
 
-                HashSet<Transition> tr = this.IsDebug
+                var tr = this.IsDebug
                     ? new HashSet<Transition>(s.GetSortedTransitions(false))
                     : new HashSet<Transition>(s.Transitions);
 
-                foreach (Transition t in tr)
+                foreach (var t in tr)
                 {
                     if (!visited.Contains(t.To))
                     {
@@ -659,15 +659,15 @@ namespace Fare
                 return;
             }
 
-            HashSet<State> states = this.GetStates();
-            Automaton.SetStateNumbers(states);
-            foreach (State s in states)
+            var states = this.GetStates();
+            SetStateNumbers(states);
+            foreach (var s in states)
             {
-                IList<Transition> st = s.GetSortedTransitions(true);
+                var st = s.GetSortedTransitions(true);
                 s.ResetTransitions();
                 State p = null;
                 int min = -1, max = -1;
-                foreach (Transition t in st)
+                foreach (var t in st)
                 {
                     if (p == t.To)
                     {
@@ -726,11 +726,11 @@ namespace Fare
             // TODO: Java code does not check for null states.
             var states = new HashSet<State>(this.GetStates().Where(state => state != null));
             var live = this.GetLiveStates(states);
-            foreach (State s in states)
+            foreach (var s in states)
             {
                 var st = s.Transitions;
                 s.ResetTransitions();
-                foreach (Transition t in st)
+                foreach (var t in st)
                 {
                     // TODO: Java code does not check for null states.
                     if (t.To == null)
@@ -776,10 +776,10 @@ namespace Fare
             var s = new State();
             s.Transitions.Add(new Transition(char.MinValue, char.MaxValue, s));
 
-            foreach (State p in this.GetStates())
+            foreach (var p in this.GetStates())
             {
                 int maxi = char.MinValue;
-                foreach (Transition t in p.GetSortedTransitions(false))
+                foreach (var t in p.GetSortedTransitions(false))
                 {
                     if (t.Min > maxi)
                     {
@@ -803,9 +803,9 @@ namespace Fare
         {
             var dictionary = states.ToDictionary(s => s, s => new HashSet<State>());
 
-            foreach (State s in states)
+            foreach (var s in states)
             {
-                foreach (Transition t in s.Transitions)
+                foreach (var t in s.Transitions)
                 {
                     // TODO: Java code does not check for null states.
                     if (t.To == null)
@@ -823,8 +823,8 @@ namespace Fare
             var worklist = new LinkedList<State>(live);
             while (worklist.Count > 0)
             {
-                State s = worklist.RemoveAndReturnFirst();
-                foreach (State p in dictionary[s])
+                var s = worklist.RemoveAndReturnFirst();
+                foreach (var p in dictionary[s])
                 {
                     if (!live.Contains(p))
                     {

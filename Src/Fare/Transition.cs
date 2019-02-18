@@ -71,7 +71,7 @@ namespace Fare
         {
             if (max < min)
             {
-                char t = max;
+                var t = max;
                 max = min;
                 min = t;
             }
@@ -135,11 +135,11 @@ namespace Fare
         public override string ToString()
         {
             var sb = new StringBuilder();
-            Transition.AppendCharString(min, sb);
+            AppendCharString(min, sb);
             if (min != max)
             {
                 sb.Append("-");
-                Transition.AppendCharString(max, sb);
+                AppendCharString(max, sb);
             }
 
             sb.Append(" -> ").Append(to.Number);
@@ -149,12 +149,12 @@ namespace Fare
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
@@ -172,7 +172,7 @@ namespace Fare
         {
             unchecked
             {
-                int result = min.GetHashCode();
+                var result = min.GetHashCode();
                 result = (result*397) ^ max.GetHashCode();
                 result = (result*397) ^ (to != null ? to.GetHashCode() : 0);
                 return result;
@@ -182,19 +182,19 @@ namespace Fare
         /// <inheritdoc />
         public bool Equals(Transition other)
         {
-            if (object.ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
 
             return other.min == min
                    && other.max == max
-                   && object.Equals(other.to, to);
+                   && Equals(other.to, to);
         }
 
         private static void AppendCharString(char c, StringBuilder sb)
@@ -206,7 +206,7 @@ namespace Fare
             else
             {
                 sb.Append("\\u");
-                string s = ((int)c).ToString("x");
+                var s = ((int)c).ToString("x");
                 if (c < 0x10)
                 {
                     sb.Append("000").Append(s);
@@ -229,11 +229,11 @@ namespace Fare
         private void AppendDot(StringBuilder sb)
         {
             sb.Append(" -> ").Append(this.to.Number).Append(" [label=\"");
-            Transition.AppendCharString(this.min, sb);
+            AppendCharString(this.min, sb);
             if (this.min != this.max)
             {
                 sb.Append("-");
-                Transition.AppendCharString(this.max, sb);
+                AppendCharString(this.max, sb);
             }
 
             sb.Append("\"]\n");

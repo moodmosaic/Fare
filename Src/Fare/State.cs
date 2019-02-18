@@ -108,12 +108,12 @@ namespace Fare
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
@@ -131,7 +131,7 @@ namespace Fare
         {
             unchecked
             {
-                int result = id;
+                var result = id;
                 result = (result * 397) ^ Accept.GetHashCode();
                 result = (result * 397) ^ Number;
                 return result;
@@ -158,12 +158,12 @@ namespace Fare
         /// <inheritdoc />
         public bool Equals(State other)
         {
-            if (object.ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
@@ -186,7 +186,7 @@ namespace Fare
             sb.Append("state ").Append(this.Number);
             sb.Append(this.Accept ? " [accept]" : " [reject]");
             sb.Append(":\n");
-            foreach (Transition t in this.Transitions)
+            foreach (var t in this.Transitions)
             {
                 sb.Append("  ").Append(t.ToString()).Append("\n");
             }
@@ -244,7 +244,7 @@ namespace Fare
         /// </returns>
         public IList<Transition> GetSortedTransitions(bool toFirst)
         {
-            Transition[] e = this.Transitions.ToArray();
+            var e = this.Transitions.ToArray();
             Array.Sort(e, new TransitionComparer(toFirst));
             return e.ToList();
         }
@@ -256,7 +256,7 @@ namespace Fare
                 this.Accept = true;
             }
 
-            foreach (Transition t in to.Transitions)
+            foreach (var t in to.Transitions)
             {
                 this.Transitions.Add(t);
             }
