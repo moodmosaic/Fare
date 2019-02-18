@@ -7,20 +7,6 @@ namespace Fare
     internal sealed class ListEqualityComparer<T> : IEqualityComparer<List<T>>, IEquatable<ListEqualityComparer<T>>
     {
         /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        /// <param name="left">
-        /// The left.
-        /// </param>
-        /// <param name="right">
-        /// The right.
-        /// </param>
-        /// <returns>
-        /// The result of the operator.
-        /// </returns>
-        public static bool operator ==(ListEqualityComparer<T> left, ListEqualityComparer<T> right) => Equals(left, right);
-
-        /// <summary>
         /// Implements the operator !=.
         /// </summary>
         /// <param name="left">
@@ -34,6 +20,20 @@ namespace Fare
         /// </returns>
         public static bool operator !=(ListEqualityComparer<T> left, ListEqualityComparer<T> right) => !Equals(left, right);
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(ListEqualityComparer<T> left, ListEqualityComparer<T> right) => Equals(left, right);
+
         /// <inheritdoc/>
         ///
         public bool Equals(List<T> x, List<T> y)
@@ -45,12 +45,6 @@ namespace Fare
 
             return x.SequenceEqual(y);
         }
-
-        /// <inheritdoc/>
-        ///
-        public int GetHashCode(List<T> obj) =>
-            // http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
-            obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
 
         /// <inheritdoc/>
         ///
@@ -77,6 +71,12 @@ namespace Fare
 
             return Equals((ListEqualityComparer<T>)obj);
         }
+
+        /// <inheritdoc/>
+        ///
+        public int GetHashCode(List<T> obj) =>
+            // http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
+            obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
 
         /// <inheritdoc/>
         ///
