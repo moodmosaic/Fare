@@ -1,4 +1,6 @@
-﻿/*
+﻿#pragma warning disable CA1801 // Review unused parameters
+#pragma warning disable IDE0060 // Remove unused parameter
+/*
  * dk.brics.automaton
  *
  * Copyright (c) 2001-2011 Anders Moeller
@@ -406,3 +408,6 @@ namespace Fare
         public static Automaton ReplaceWhitespace(Automaton a) => throw new NotImplementedException();
     }
 }
+
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore CA1801 // Review unused parameters
