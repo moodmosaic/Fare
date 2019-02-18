@@ -85,6 +85,21 @@ namespace Fare
             return random.NextInt32(0, maxForRandom) + min;
         }
 
+        private static string RemoveStartEndMarkers(string regExp)
+        {
+            if (regExp.StartsWith("^"))
+            {
+                regExp = regExp.Substring(1);
+            }
+
+            if (regExp.EndsWith("$"))
+            {
+                regExp = regExp[0..^1];
+            }
+
+            return regExp;
+        }
+
         private void AppendChoice(StringBuilder builder, Transition transition)
         {
             var c = (char)GetRandomInt(transition.Min, transition.Max, _Random);
@@ -116,21 +131,6 @@ namespace Fare
             var transition = transitions[option - (state.Accept ? 1 : 0)];
             AppendChoice(builder, transition);
             Generate(builder, transition.To);
-        }
-
-        private static string RemoveStartEndMarkers(string regExp)
-        {
-            if (regExp.StartsWith("^"))
-            {
-                regExp = regExp.Substring(1);
-            }
-
-            if (regExp.EndsWith("$"))
-            {
-                regExp = regExp[0..^1];
-            }
-
-            return regExp;
         }
     }
 }
