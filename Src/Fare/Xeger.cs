@@ -29,10 +29,10 @@ namespace Fare
     /// </summary>
     public class Xeger
     {
-        private const RegExpSyntaxOptions AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
+        private const RegExpSyntaxOptions _AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
 
-        private readonly Automaton automaton;
-        private readonly IRandom random;
+        private readonly Automaton _Automaton;
+        private readonly IRandom _Random;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
@@ -47,17 +47,12 @@ namespace Fare
         {
             if (string.IsNullOrEmpty(regex))
             {
-                throw new ArgumentNullException("regex");
-            }
-
-            if (random == null)
-            {
-                throw new ArgumentNullException("random");
+                throw new ArgumentNullException(nameof(regex));
             }
 
             regex = RemoveStartEndMarkers(regex);
-            this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
-            this.random = random;
+            this._Automaton = new RegExp(regex, _AllExceptAnyString).ToAutomaton();
+            this._Random = random ?? throw new ArgumentNullException(nameof(random));
         }
 
         /// <summary>
@@ -80,7 +75,7 @@ namespace Fare
         public string Generate()
         {
             var builder = new StringBuilder();
-            this.Generate(builder, automaton.Initial);
+            this.Generate(builder, _Automaton.Initial);
             return builder.ToString();
         }
 
@@ -88,6 +83,12 @@ namespace Fare
         {
             var maxForRandom = max - min + 1;
             return random.NextInt32(0, maxForRandom) + min;
+        }
+
+        private void AppendChoice(StringBuilder builder, Transition transition)
+        {
+            var c = (char)GetRandomInt(transition.Min, transition.Max, _Random);
+            builder.Append(c);
         }
 
         private void Generate(StringBuilder builder, State state)
@@ -104,7 +105,7 @@ namespace Fare
             }
 
             var nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            var option = GetRandomInt(0, nroptions, random);
+            var option = GetRandomInt(0, nroptions, _Random);
             if (state.Accept && option == 0)
             {
                 // 0 is considered stop.
@@ -115,12 +116,6 @@ namespace Fare
             var transition = transitions[option - (state.Accept ? 1 : 0)];
             this.AppendChoice(builder, transition);
             Generate(builder, transition.To);
-        }
-
-        private void AppendChoice(StringBuilder builder, Transition transition)
-        {
-            var c = (char)GetRandomInt(transition.Min, transition.Max, random);
-            builder.Append(c);
         }
 
         private string RemoveStartEndMarkers(string regExp)

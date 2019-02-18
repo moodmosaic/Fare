@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -36,7 +36,7 @@ using System.Text;
 namespace Fare
 {
     ///<summary>
-    ///  <tt>Automaton</tt> transition. 
+    ///  <tt>Automaton</tt> transition.
     ///  <p>
     ///    A transition, which belongs to a source state, consists of a Unicode character interval
     ///    and a destination state.
@@ -44,29 +44,39 @@ namespace Fare
     ///</summary>
     public class Transition : IEquatable<Transition>
     {
-        private readonly char max;
-        private readonly char min;
-        private readonly State to;
+        private readonly char _Max;
+        private readonly char _Min;
+        private readonly State _To;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Transition"/> class.
-        /// (Constructs a new singleton interval transition).
+        /// Initializes a new instance of the <see cref="Transition"/> class. (Constructs a new
+        /// singleton interval transition).
         /// </summary>
-        /// <param name="c">The transition character.</param>
-        /// <param name="to">The destination state.</param>
+        /// <param name="c">
+        /// The transition character.
+        /// </param>
+        /// <param name="to">
+        /// The destination state.
+        /// </param>
         public Transition(char c, State to)
         {
-            this.min = this.max = c;
-            this.to = to;
+            this._Min = this._Max = c;
+            this._To = to;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Transition"/> class.
-        /// (Both end points are included in the interval).
+        /// Initializes a new instance of the <see cref="Transition"/> class. (Both end points are
+        /// included in the interval).
         /// </summary>
-        /// <param name="min">The transition interval minimum.</param>
-        /// <param name="max">The transition interval maximum.</param>
-        /// <param name="to">The destination state.</param>
+        /// <param name="min">
+        /// The transition interval minimum.
+        /// </param>
+        /// <param name="max">
+        /// The transition interval maximum.
+        /// </param>
+        /// <param name="to">
+        /// The destination state.
+        /// </param>
         public Transition(char min, char max, State to)
         {
             if (max < min)
@@ -76,9 +86,9 @@ namespace Fare
                 min = t;
             }
 
-            this.min = min;
-            this.max = max;
-            this.to = to;
+            this._Min = min;
+            this._Max = max;
+            this._To = to;
         }
 
         /// <summary>
@@ -86,7 +96,7 @@ namespace Fare
         /// </summary>
         public char Min
         {
-            get { return this.min; }
+            get { return this._Min; }
         }
 
         /// <summary>
@@ -94,7 +104,7 @@ namespace Fare
         /// </summary>
         public char Max
         {
-            get { return this.max; }
+            get { return this._Max; }
         }
 
         /// <summary>
@@ -102,14 +112,18 @@ namespace Fare
         /// </summary>
         public State To
         {
-            get { return this.to; }
+            get { return this._To; }
         }
 
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -121,8 +135,12 @@ namespace Fare
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -131,22 +149,24 @@ namespace Fare
             return !Equals(left, right);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override string ToString()
         {
             var sb = new StringBuilder();
-            AppendCharString(min, sb);
-            if (min != max)
+            AppendCharString(_Min, sb);
+            if (_Min != _Max)
             {
                 sb.Append("-");
-                AppendCharString(max, sb);
+                AppendCharString(_Max, sb);
             }
 
-            sb.Append(" -> ").Append(to.Number);
+            sb.Append(" -> ").Append(_To.Number);
             return sb.ToString();
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -167,19 +187,21 @@ namespace Fare
             return this.Equals((Transition)obj);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override int GetHashCode()
         {
             unchecked
             {
-                var result = min.GetHashCode();
-                result = (result*397) ^ max.GetHashCode();
-                result = (result*397) ^ (to != null ? to.GetHashCode() : 0);
+                var result = _Min.GetHashCode();
+                result = (result * 397) ^ _Max.GetHashCode();
+                result = (result * 397) ^ (_To != null ? _To.GetHashCode() : 0);
                 return result;
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public bool Equals(Transition other)
         {
             if (ReferenceEquals(null, other))
@@ -192,9 +214,9 @@ namespace Fare
                 return true;
             }
 
-            return other.min == min
-                   && other.max == max
-                   && Equals(other.to, to);
+            return other._Min == _Min
+                   && other._Max == _Max
+                   && Equals(other._To, _To);
         }
 
         private static void AppendCharString(char c, StringBuilder sb)
@@ -228,12 +250,12 @@ namespace Fare
 
         private void AppendDot(StringBuilder sb)
         {
-            sb.Append(" -> ").Append(this.to.Number).Append(" [label=\"");
-            AppendCharString(this.min, sb);
-            if (this.min != this.max)
+            sb.Append(" -> ").Append(this._To.Number).Append(" [label=\"");
+            AppendCharString(this._Min, sb);
+            if (this._Min != this._Max)
             {
                 sb.Append("-");
-                AppendCharString(this.max, sb);
+                AppendCharString(this._Max, sb);
             }
 
             sb.Append("\"]\n");

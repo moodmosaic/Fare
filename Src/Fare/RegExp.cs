@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -43,48 +43,54 @@ namespace Fare
     /// </summary>
     public class RegExp
     {
-        private readonly string b;
-        private readonly RegExpSyntaxOptions flags;
+        private readonly string _B;
+        private readonly RegExpSyntaxOptions _Flags;
 
-        private static bool allowMutation;
+        private static bool _AllowMutation;
 
-        private char c;
-        private int digits;
-        private RegExp exp1;
-        private RegExp exp2;
-        private char from;
-        private Kind kind;
-        private int max;
-        private int min;
-        private int pos;
-        private string s;
-        private char to;
+        private char _C;
+        private int _Digits;
+        private RegExp _Exp1;
+        private RegExp _Exp2;
+        private char _From;
+        private Kind _Kind;
+        private int _Max;
+        private int _Min;
+        private int _Pos;
+        private string _S;
+        private char _To;
 
         /// <summary>
-        ///   Prevents a default instance of the <see cref = "RegExp" /> class from being created.
+        /// Prevents a default instance of the <see cref="RegExp"/> class from being created.
         /// </summary>
         private RegExp()
         {
         }
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref = "RegExp" /> class from a string.
+        /// Initializes a new instance of the <see cref="RegExp"/> class from a string.
         /// </summary>
-        /// <param name = "s">A string with the regular expression.</param>
+        /// <param name="s">
+        /// A string with the regular expression.
+        /// </param>
         public RegExp(string s)
             : this(s, RegExpSyntaxOptions.All)
         {
         }
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref = "RegExp" /> class from a string.
+        /// Initializes a new instance of the <see cref="RegExp"/> class from a string.
         /// </summary>
-        /// <param name = "s">A string with the regular expression.</param>
-        /// <param name = "syntaxFlags">Boolean 'or' of optional syntax constructs to be enabled.</param>
+        /// <param name="s">
+        /// A string with the regular expression.
+        /// </param>
+        /// <param name="syntaxFlags">
+        /// Boolean 'or' of optional syntax constructs to be enabled.
+        /// </param>
         public RegExp(string s, RegExpSyntaxOptions syntaxFlags)
         {
-            this.b = s;
-            this.flags = syntaxFlags;
+            this._B = s;
+            this._Flags = syntaxFlags;
             RegExp e;
             if (s.Length == 0)
             {
@@ -93,109 +99,181 @@ namespace Fare
             else
             {
                 e = this.ParseUnionExp();
-                if (this.pos < b.Length)
+                if (this._Pos < _B.Length)
                 {
-                    throw new ArgumentException("end-of-string expected at position " + this.pos);
+                    throw new ArgumentException("end-of-string expected at position " + this._Pos);
                 }
             }
 
-            this.kind = e.kind;
-            this.exp1 = e.exp1;
-            this.exp2 = e.exp2;
-            this.s = e.s;
-            this.c = e.c;
-            this.min = e.min;
-            this.max = e.max;
-            this.digits = e.digits;
-            this.from = e.from;
-            this.to = e.to;
-            this.b = null;
+            this._Kind = e._Kind;
+            this._Exp1 = e._Exp1;
+            this._Exp2 = e._Exp2;
+            this._S = e._S;
+            this._C = e._C;
+            this._Min = e._Min;
+            this._Max = e._Max;
+            this._Digits = e._Digits;
+            this._From = e._From;
+            this._To = e._To;
+            this._B = null;
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   Same as <code>toAutomaton(null)</code> (empty automaton map).
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . Same as
+        /// <code>
+        /// toAutomaton(null)
+        /// </code>
+        /// (empty automaton map).
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton()
         {
             return this.ToAutomatonAllowMutate(null, null, true);
         }
 
         /// <summary>
-        /// Constructs new <code>Automaton</code> from this <code>RegExp</code>.
-        /// Same as <code>toAutomaton(null,minimize)</code> (empty automaton map).
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . Same as
+        /// <code>
+        /// toAutomaton(null,minimize)
+        /// </code>
+        /// (empty automaton map).
         /// </summary>
-        /// <param name="minimize">if set to <c>true</c> [minimize].</param>
-        /// <returns></returns>
+        /// <param name="minimize">
+        /// if set to <c>true</c> [minimize].
+        /// </param>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton(bool minimize)
         {
             return this.ToAutomatonAllowMutate(null, null, minimize);
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   The constructed automaton is minimal and deterministic and has no 
-        ///   transitions to dead states.
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . The constructed automaton is minimal and deterministic and has no transitions to dead states.
         /// </summary>
-        /// <param name = "automatonProvider">The provider of automata for named identifiers.</param>
-        /// <returns></returns>
+        /// <param name="automatonProvider">
+        /// The provider of automata for named identifiers.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton(IAutomatonProvider automatonProvider)
         {
             return this.ToAutomatonAllowMutate(null, automatonProvider, true);
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   The constructed automaton has no transitions to dead states.
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . The constructed automaton has no transitions to dead states.
         /// </summary>
-        /// <param name = "automatonProvider">The provider of automata for named identifiers.</param>
-        /// <param name = "minimize">if set to <c>true</c> the automaton is minimized and determinized.</param>
-        /// <returns></returns>
+        /// <param name="automatonProvider">
+        /// The provider of automata for named identifiers.
+        /// </param>
+        /// <param name="minimize">
+        /// if set to <c>true</c> the automaton is minimized and determinized.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton(IAutomatonProvider automatonProvider, bool minimize)
         {
             return this.ToAutomatonAllowMutate(null, automatonProvider, minimize);
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   The constructed automaton is minimal and deterministic and has no 
-        ///   transitions to dead states.
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . The constructed automaton is minimal and deterministic and has no transitions to dead states.
         /// </summary>
-        /// <param name = "automata">The a map from automaton identifiers to automata.</param>
-        /// <returns></returns>
+        /// <param name="automata">
+        /// The a map from automaton identifiers to automata.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton(IDictionary<string, Automaton> automata)
         {
             return this.ToAutomatonAllowMutate(automata, null, true);
         }
 
         /// <summary>
-        ///   Constructs new <code>Automaton</code> from this <code>RegExp</code>. 
-        ///   The constructed automaton has no transitions to dead states.
+        /// Constructs new
+        /// <code>
+        /// Automaton
+        /// </code>
+        /// from this
+        /// <code>
+        /// RegExp
+        /// </code>
+        /// . The constructed automaton has no transitions to dead states.
         /// </summary>
-        /// <param name = "automata">The map from automaton identifiers to automata.</param>
-        /// <param name = "minimize">if set to <c>true</c> the automaton is minimized and determinized.</param>
-        /// <returns></returns>
+        /// <param name="automata">
+        /// The map from automaton identifiers to automata.
+        /// </param>
+        /// <param name="minimize">
+        /// if set to <c>true</c> the automaton is minimized and determinized.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public Automaton ToAutomaton(IDictionary<string, Automaton> automata, bool minimize)
         {
             return this.ToAutomatonAllowMutate(automata, null, minimize);
         }
 
         /// <summary>
-        ///   Sets or resets allow mutate flag.
-        ///   If this flag is set, then automata construction uses mutable automata,
-        ///   which is slightly faster but not thread safe.
+        /// Sets or resets allow mutate flag. If this flag is set, then automata construction uses
+        /// mutable automata, which is slightly faster but not thread safe.
         /// </summary>
-        /// <param name = "flag">if set to <c>true</c> the flag is set.</param>
-        /// <returns>The previous value of the flag.</returns>
+        /// <param name="flag">
+        /// if set to <c>true</c> the flag is set.
+        /// </param>
+        /// <returns>
+        /// The previous value of the flag.
+        /// </returns>
         public bool SetAllowMutate(bool flag)
         {
-            var @bool = allowMutation;
-            allowMutation = flag;
+            var @bool = _AllowMutation;
+            _AllowMutation = flag;
             return @bool;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override string ToString()
         {
             return this.ToStringBuilder(new StringBuilder()).ToString();
@@ -204,7 +282,9 @@ namespace Fare
         /// <summary>
         /// Returns the set of automaton identifiers that occur in this regular expression.
         /// </summary>
-        /// <returns>The set of automaton identifiers that occur in this regular expression.</returns>
+        /// <returns>
+        /// The set of automaton identifiers that occur in this regular expression.
+        /// </returns>
         public HashSet<string> GetIdentifiers()
         {
             var set = new HashSet<string>();
@@ -215,49 +295,49 @@ namespace Fare
         private static RegExp MakeUnion(RegExp exp1, RegExp exp2)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpUnion;
-            r.exp1 = exp1;
-            r.exp2 = exp2;
+            r._Kind = Kind.RegexpUnion;
+            r._Exp1 = exp1;
+            r._Exp2 = exp2;
             return r;
         }
 
         private static RegExp MakeIntersection(RegExp exp1, RegExp exp2)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpIntersection;
-            r.exp1 = exp1;
-            r.exp2 = exp2;
+            r._Kind = Kind.RegexpIntersection;
+            r._Exp1 = exp1;
+            r._Exp2 = exp2;
             return r;
         }
 
         private static RegExp MakeConcatenation(RegExp exp1, RegExp exp2)
         {
-            if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
-                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
+            if ((exp1._Kind == Kind.RegexpChar || exp1._Kind == Kind.RegexpString)
+                && (exp2._Kind == Kind.RegexpChar || exp2._Kind == Kind.RegexpString))
             {
                 return MakeString(exp1, exp2);
             }
 
             var r = new RegExp();
-            r.kind = Kind.RegexpConcatenation;
-            if (exp1.kind == Kind.RegexpConcatenation
-                && (exp1.exp2.kind == Kind.RegexpChar || exp1.exp2.kind == Kind.RegexpString)
-                && (exp2.kind == Kind.RegexpChar || exp2.kind == Kind.RegexpString))
+            r._Kind = Kind.RegexpConcatenation;
+            if (exp1._Kind == Kind.RegexpConcatenation
+                && (exp1._Exp2._Kind == Kind.RegexpChar || exp1._Exp2._Kind == Kind.RegexpString)
+                && (exp2._Kind == Kind.RegexpChar || exp2._Kind == Kind.RegexpString))
             {
-                r.exp1 = exp1.exp1;
-                r.exp2 = MakeString(exp1.exp2, exp2);
+                r._Exp1 = exp1._Exp1;
+                r._Exp2 = MakeString(exp1._Exp2, exp2);
             }
-            else if ((exp1.kind == Kind.RegexpChar || exp1.kind == Kind.RegexpString)
-                     && exp2.kind == Kind.RegexpConcatenation
-                     && (exp2.exp1.kind == Kind.RegexpChar || exp2.exp1.kind == Kind.RegexpString))
+            else if ((exp1._Kind == Kind.RegexpChar || exp1._Kind == Kind.RegexpString)
+                     && exp2._Kind == Kind.RegexpConcatenation
+                     && (exp2._Exp1._Kind == Kind.RegexpChar || exp2._Exp1._Kind == Kind.RegexpString))
             {
-                r.exp1 = MakeString(exp1, exp2.exp1);
-                r.exp2 = exp2.exp2;
+                r._Exp1 = MakeString(exp1, exp2._Exp1);
+                r._Exp2 = exp2._Exp2;
             }
             else
             {
-                r.exp1 = exp1;
-                r.exp2 = exp2;
+                r._Exp1 = exp1;
+                r._Exp2 = exp2;
             }
 
             return r;
@@ -266,82 +346,82 @@ namespace Fare
         private static RegExp MakeRepeat(RegExp exp)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpRepeat;
-            r.exp1 = exp;
+            r._Kind = Kind.RegexpRepeat;
+            r._Exp1 = exp;
             return r;
         }
 
         private static RegExp MakeRepeat(RegExp exp, int min)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpRepeatMin;
-            r.exp1 = exp;
-            r.min = min;
+            r._Kind = Kind.RegexpRepeatMin;
+            r._Exp1 = exp;
+            r._Min = min;
             return r;
         }
 
         private static RegExp MakeRepeat(RegExp exp, int min, int max)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpRepeatMinMax;
-            r.exp1 = exp;
-            r.min = min;
-            r.max = max;
+            r._Kind = Kind.RegexpRepeatMinMax;
+            r._Exp1 = exp;
+            r._Min = min;
+            r._Max = max;
             return r;
         }
 
         private static RegExp MakeOptional(RegExp exp)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpOptional;
-            r.exp1 = exp;
+            r._Kind = Kind.RegexpOptional;
+            r._Exp1 = exp;
             return r;
         }
 
         private static RegExp MakeChar(char @char)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpChar;
-            r.c = @char;
+            r._Kind = Kind.RegexpChar;
+            r._C = @char;
             return r;
         }
 
         private static RegExp MakeInterval(int min, int max, int digits)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpInterval;
-            r.min = min;
-            r.max = max;
-            r.digits = digits;
+            r._Kind = Kind.RegexpInterval;
+            r._Min = min;
+            r._Max = max;
+            r._Digits = digits;
             return r;
         }
 
         private static RegExp MakeAutomaton(string s)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpAutomaton;
-            r.s = s;
+            r._Kind = Kind.RegexpAutomaton;
+            r._S = s;
             return r;
         }
 
         private static RegExp MakeAnyString()
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpAnyString;
+            r._Kind = Kind.RegexpAnyString;
             return r;
         }
 
         private static RegExp MakeEmpty()
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpEmpty;
+            r._Kind = Kind.RegexpEmpty;
             return r;
         }
 
         private static RegExp MakeAnyChar()
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpAnyChar;
+            r._Kind = Kind.RegexpAnyChar;
             return r;
         }
 
@@ -353,47 +433,47 @@ namespace Fare
         private static RegExp MakeCharRange(char from, char to)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpCharRange;
-            r.from = from;
-            r.to = to;
+            r._Kind = Kind.RegexpCharRange;
+            r._From = from;
+            r._To = to;
             return r;
         }
 
         private static RegExp MakeComplement(RegExp exp)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpComplement;
-            r.exp1 = exp;
+            r._Kind = Kind.RegexpComplement;
+            r._Exp1 = exp;
             return r;
         }
 
         private static RegExp MakeString(string @string)
         {
             var r = new RegExp();
-            r.kind = Kind.RegexpString;
-            r.s = @string;
+            r._Kind = Kind.RegexpString;
+            r._S = @string;
             return r;
         }
 
         private static RegExp MakeString(RegExp exp1, RegExp exp2)
         {
             var sb = new StringBuilder();
-            if (exp1.kind == Kind.RegexpString)
+            if (exp1._Kind == Kind.RegexpString)
             {
-                sb.Append(exp1.s);
+                sb.Append(exp1._S);
             }
             else
             {
-                sb.Append(exp1.c);
+                sb.Append(exp1._C);
             }
 
-            if (exp2.kind == Kind.RegexpString)
+            if (exp2._Kind == Kind.RegexpString)
             {
-                sb.Append(exp2.s);
+                sb.Append(exp2._S);
             }
             else
             {
-                sb.Append(exp2.c);
+                sb.Append(exp2._C);
             }
 
             return MakeString(sb.ToString());
@@ -405,13 +485,13 @@ namespace Fare
             bool minimize)
         {
             var @bool = false;
-            if (allowMutation)
+            if (_AllowMutation)
             {
                 @bool = this.SetAllowMutate(true); // This is not thead safe.
             }
 
             var a = this.ToAutomaton(automata, automatonProvider, minimize);
-            if (allowMutation)
+            if (_AllowMutation)
             {
                 this.SetAllowMutate(@bool);
             }
@@ -426,77 +506,91 @@ namespace Fare
         {
             IList<Automaton> list;
             Automaton a = null;
-            switch (kind)
+            switch (_Kind)
             {
                 case Kind.RegexpUnion:
                     list = new List<Automaton>();
-                    this.FindLeaves(exp1, Kind.RegexpUnion, list, automata, automatonProvider, minimize);
-                    this.FindLeaves(exp2, Kind.RegexpUnion, list, automata, automatonProvider, minimize);
+                    this.FindLeaves(_Exp1, Kind.RegexpUnion, list, automata, automatonProvider, minimize);
+                    this.FindLeaves(_Exp2, Kind.RegexpUnion, list, automata, automatonProvider, minimize);
                     a = BasicOperations.Union(list);
                     a.Minimize();
                     break;
+
                 case Kind.RegexpConcatenation:
                     list = new List<Automaton>();
-                    this.FindLeaves(exp1, Kind.RegexpConcatenation, list, automata, automatonProvider, minimize);
-                    this.FindLeaves(exp2, Kind.RegexpConcatenation, list, automata, automatonProvider, minimize);
+                    this.FindLeaves(_Exp1, Kind.RegexpConcatenation, list, automata, automatonProvider, minimize);
+                    this.FindLeaves(_Exp2, Kind.RegexpConcatenation, list, automata, automatonProvider, minimize);
                     a = BasicOperations.Concatenate(list);
                     a.Minimize();
                     break;
+
                 case Kind.RegexpIntersection:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize)
-                        .Intersection(exp2.ToAutomaton(automata, automatonProvider, minimize));
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize)
+                        .Intersection(_Exp2.ToAutomaton(automata, automatonProvider, minimize));
                     a.Minimize();
                     break;
+
                 case Kind.RegexpOptional:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize).Optional();
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize).Optional();
                     a.Minimize();
                     break;
+
                 case Kind.RegexpRepeat:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat();
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat();
                     a.Minimize();
                     break;
+
                 case Kind.RegexpRepeatMin:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat(min);
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat(_Min);
                     a.Minimize();
                     break;
+
                 case Kind.RegexpRepeatMinMax:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat(min, max);
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize).Repeat(_Min, _Max);
                     a.Minimize();
                     break;
+
                 case Kind.RegexpComplement:
-                    a = exp1.ToAutomaton(automata, automatonProvider, minimize).Complement();
+                    a = _Exp1.ToAutomaton(automata, automatonProvider, minimize).Complement();
                     a.Minimize();
                     break;
+
                 case Kind.RegexpChar:
-                    a = BasicAutomata.MakeChar(c);
+                    a = BasicAutomata.MakeChar(_C);
                     break;
+
                 case Kind.RegexpCharRange:
-                    a = BasicAutomata.MakeCharRange(from, to);
+                    a = BasicAutomata.MakeCharRange(_From, _To);
                     break;
+
                 case Kind.RegexpAnyChar:
                     a = BasicAutomata.MakeAnyChar();
                     break;
+
                 case Kind.RegexpEmpty:
                     a = BasicAutomata.MakeEmpty();
                     break;
+
                 case Kind.RegexpString:
-                    a = BasicAutomata.MakeString(s);
+                    a = BasicAutomata.MakeString(_S);
                     break;
+
                 case Kind.RegexpAnyString:
                     a = BasicAutomata.MakeAnyString();
                     break;
+
                 case Kind.RegexpAutomaton:
                     Automaton aa = null;
                     if (automata != null)
                     {
-                        automata.TryGetValue(s, out aa);
+                        automata.TryGetValue(_S, out aa);
                     }
 
                     if (aa == null && automatonProvider != null)
                     {
                         try
                         {
-                            aa = automatonProvider.GetAutomaton(s);
+                            aa = automatonProvider.GetAutomaton(_S);
                         }
                         catch (IOException e)
                         {
@@ -506,13 +600,14 @@ namespace Fare
 
                     if (aa == null)
                     {
-                        throw new ArgumentException("'" + s + "' not found");
+                        throw new ArgumentException("'" + _S + "' not found");
                     }
 
                     a = aa.Clone(); // Always clone here (ignore allowMutate).
                     break;
+
                 case Kind.RegexpInterval:
-                    a = BasicAutomata.MakeInterval(min, max, digits);
+                    a = BasicAutomata.MakeInterval(_Min, _Max, _Digits);
                     break;
             }
 
@@ -523,14 +618,14 @@ namespace Fare
             RegExp exp,
             Kind regExpKind,
             IList<Automaton> list,
-            IDictionary<String, Automaton> automata,
+            IDictionary<string, Automaton> automata,
             IAutomatonProvider automatonProvider,
             bool minimize)
         {
-            if (exp.kind == regExpKind)
+            if (exp._Kind == regExpKind)
             {
-                this.FindLeaves(exp.exp1, regExpKind, list, automata, automatonProvider, minimize);
-                this.FindLeaves(exp.exp2, regExpKind, list, automata, automatonProvider, minimize);
+                this.FindLeaves(exp._Exp1, regExpKind, list, automata, automatonProvider, minimize);
+                this.FindLeaves(exp._Exp2, regExpKind, list, automata, automatonProvider, minimize);
             }
             else
             {
@@ -540,88 +635,103 @@ namespace Fare
 
         private StringBuilder ToStringBuilder(StringBuilder sb)
         {
-            switch (kind)
+            switch (_Kind)
             {
                 case Kind.RegexpUnion:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
                     sb.Append("|");
-                    exp2.ToStringBuilder(sb);
+                    _Exp2.ToStringBuilder(sb);
                     sb.Append(")");
                     break;
+
                 case Kind.RegexpConcatenation:
-                    exp1.ToStringBuilder(sb);
-                    exp2.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
+                    _Exp2.ToStringBuilder(sb);
                     break;
+
                 case Kind.RegexpIntersection:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
                     sb.Append("&");
-                    exp2.ToStringBuilder(sb);
+                    _Exp2.ToStringBuilder(sb);
                     sb.Append(")");
                     break;
+
                 case Kind.RegexpOptional:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
                     sb.Append(")?");
                     break;
+
                 case Kind.RegexpRepeat:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
                     sb.Append(")*");
                     break;
+
                 case Kind.RegexpRepeatMin:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
-                    sb.Append("){").Append(min).Append(",}");
+                    _Exp1.ToStringBuilder(sb);
+                    sb.Append("){").Append(_Min).Append(",}");
                     break;
+
                 case Kind.RegexpRepeatMinMax:
                     sb.Append("(");
-                    exp1.ToStringBuilder(sb);
-                    sb.Append("){").Append(min).Append(",").Append(max).Append("}");
+                    _Exp1.ToStringBuilder(sb);
+                    sb.Append("){").Append(_Min).Append(",").Append(_Max).Append("}");
                     break;
+
                 case Kind.RegexpComplement:
                     sb.Append("~(");
-                    exp1.ToStringBuilder(sb);
+                    _Exp1.ToStringBuilder(sb);
                     sb.Append(")");
                     break;
+
                 case Kind.RegexpChar:
-                    sb.Append("\\").Append(c);
+                    sb.Append("\\").Append(_C);
                     break;
+
                 case Kind.RegexpCharRange:
-                    sb.Append("[\\").Append(from).Append("-\\").Append(to).Append("]");
+                    sb.Append("[\\").Append(_From).Append("-\\").Append(_To).Append("]");
                     break;
+
                 case Kind.RegexpAnyChar:
                     sb.Append(".");
                     break;
+
                 case Kind.RegexpEmpty:
                     sb.Append("#");
                     break;
+
                 case Kind.RegexpString:
-                    sb.Append("\"").Append(s).Append("\"");
+                    sb.Append("\"").Append(_S).Append("\"");
                     break;
+
                 case Kind.RegexpAnyString:
                     sb.Append("@");
                     break;
+
                 case Kind.RegexpAutomaton:
-                    sb.Append("<").Append(s).Append(">");
+                    sb.Append("<").Append(_S).Append(">");
                     break;
+
                 case Kind.RegexpInterval:
-                    var s1 = Convert.ToDecimal(min).ToString();
-                    var s2 = Convert.ToDecimal(max).ToString();
+                    var s1 = Convert.ToDecimal(_Min).ToString();
+                    var s2 = Convert.ToDecimal(_Max).ToString();
                     sb.Append("<");
-                    if (digits > 0)
+                    if (_Digits > 0)
                     {
-                        for (var i = s1.Length; i < digits; i++)
+                        for (var i = s1.Length; i < _Digits; i++)
                         {
                             sb.Append('0');
                         }
                     }
 
                     sb.Append(s1).Append("-");
-                    if (digits > 0)
+                    if (_Digits > 0)
                     {
-                        for (var i = s2.Length; i < digits; i++)
+                        for (var i = s2.Length; i < _Digits; i++)
                         {
                             sb.Append('0');
                         }
@@ -636,23 +746,25 @@ namespace Fare
 
         private void GetIdentifiers(HashSet<string> set)
         {
-            switch (kind)
+            switch (_Kind)
             {
                 case Kind.RegexpUnion:
                 case Kind.RegexpConcatenation:
                 case Kind.RegexpIntersection:
-                    exp1.GetIdentifiers(set);
-                    exp2.GetIdentifiers(set);
+                    _Exp1.GetIdentifiers(set);
+                    _Exp2.GetIdentifiers(set);
                     break;
+
                 case Kind.RegexpOptional:
                 case Kind.RegexpRepeat:
                 case Kind.RegexpRepeatMin:
                 case Kind.RegexpRepeatMinMax:
                 case Kind.RegexpComplement:
-                    exp1.GetIdentifiers(set);
+                    _Exp1.GetIdentifiers(set);
                     break;
+
                 case Kind.RegexpAutomaton:
-                    set.Add(s);
+                    set.Add(_S);
                     break;
             }
         }
@@ -670,14 +782,14 @@ namespace Fare
 
         private bool Match(char @char)
         {
-            if (pos >= b.Length)
+            if (_Pos >= _B.Length)
             {
                 return false;
             }
 
-            if (b[pos] == @char)
+            if (_B[_Pos] == @char)
             {
-                pos++;
+                _Pos++;
                 return true;
             }
 
@@ -697,7 +809,7 @@ namespace Fare
 
         private bool Check(RegExpSyntaxOptions flag)
         {
-            return (flags & flag) != 0;
+            return (_Flags & flag) != 0;
         }
 
         private RegExp ParseConcatExp()
@@ -713,12 +825,12 @@ namespace Fare
 
         private bool More()
         {
-            return pos < b.Length;
+            return _Pos < _B.Length;
         }
 
         private bool Peek(string @string)
         {
-            return this.More() && @string.IndexOf(b[pos]) != -1;
+            return this.More() && @string.IndexOf(_B[_Pos]) != -1;
         }
 
         private RegExp ParseRepeatExp()
@@ -740,30 +852,30 @@ namespace Fare
                 }
                 else if (this.Match('{'))
                 {
-                    var start = pos;
+                    var start = _Pos;
                     while (this.Peek("0123456789"))
                     {
                         this.Next();
                     }
 
-                    if (start == pos)
+                    if (start == _Pos)
                     {
-                        throw new ArgumentException("integer expected at position " + pos);
+                        throw new ArgumentException("integer expected at position " + _Pos);
                     }
 
-                    var n = int.Parse(b.Substring(start, pos - start));
+                    var n = int.Parse(_B.Substring(start, _Pos - start));
                     var m = -1;
                     if (this.Match(','))
                     {
-                        start = pos;
+                        start = _Pos;
                         while (this.Peek("0123456789"))
                         {
                             this.Next();
                         }
 
-                        if (start != pos)
+                        if (start != _Pos)
                         {
-                            m = int.Parse(b.Substring(start, pos - start));
+                            m = int.Parse(_B.Substring(start, _Pos - start));
                         }
                     }
                     else
@@ -773,7 +885,7 @@ namespace Fare
 
                     if (!this.Match('}'))
                     {
-                        throw new ArgumentException("expected '}' at position " + pos);
+                        throw new ArgumentException("expected '}' at position " + _Pos);
                     }
 
                     e = m == -1 ? MakeRepeat(e, n) : MakeRepeat(e, n, m);
@@ -790,7 +902,7 @@ namespace Fare
                 throw new InvalidOperationException("unexpected end-of-string");
             }
 
-            return b[pos++];
+            return _B[_Pos++];
         }
 
         private RegExp ParseComplExp()
@@ -821,7 +933,7 @@ namespace Fare
 
                 if (!this.Match(']'))
                 {
-                    throw new ArgumentException("expected ']' at position " + pos);
+                    throw new ArgumentException("expected ']' at position " + _Pos);
                 }
 
                 return e;
@@ -849,7 +961,7 @@ namespace Fare
 
             if (this.Match('"'))
             {
-                var start = pos;
+                var start = _Pos;
                 while (this.More() && !this.Peek("\""))
                 {
                     this.Next();
@@ -857,10 +969,10 @@ namespace Fare
 
                 if (!this.Match('"'))
                 {
-                    throw new ArgumentException("expected '\"' at position " + pos);
+                    throw new ArgumentException("expected '\"' at position " + _Pos);
                 }
 
-                return MakeString(b.Substring(start, ((pos - 1) - start)));
+                return MakeString(_B.Substring(start, ((_Pos - 1) - start)));
             }
 
             if (this.Match('('))
@@ -878,7 +990,7 @@ namespace Fare
                 var e = this.ParseUnionExp();
                 if (!this.Match(')'))
                 {
-                    throw new ArgumentException("expected ')' at position " + pos);
+                    throw new ArgumentException("expected ')' at position " + _Pos);
                 }
 
                 return e;
@@ -886,7 +998,7 @@ namespace Fare
 
             if ((this.Check(RegExpSyntaxOptions.Automaton) || this.Check(RegExpSyntaxOptions.Interval)) && this.Match('<'))
             {
-                var start = pos;
+                var start = _Pos;
                 while (this.More() && !this.Peek(">"))
                 {
                     this.Next();
@@ -894,16 +1006,16 @@ namespace Fare
 
                 if (!this.Match('>'))
                 {
-                    throw new ArgumentException("expected '>' at position " + pos);
+                    throw new ArgumentException("expected '>' at position " + _Pos);
                 }
 
-                var str = b.Substring(start, ((pos - 1) - start));
+                var str = _B.Substring(start, ((_Pos - 1) - start));
                 var i = str.IndexOf('-');
                 if (i == -1)
                 {
                     if (!this.Check(RegExpSyntaxOptions.Automaton))
                     {
-                        throw new ArgumentException("interval syntax error at position " + (pos - 1));
+                        throw new ArgumentException("interval syntax error at position " + (_Pos - 1));
                     }
 
                     return MakeAutomaton(str);
@@ -911,7 +1023,7 @@ namespace Fare
 
                 if (!this.Check(RegExpSyntaxOptions.Interval))
                 {
-                    throw new ArgumentException("illegal identifier at position " + (pos - 1));
+                    throw new ArgumentException("illegal identifier at position " + (_Pos - 1));
                 }
 
                 try
@@ -937,7 +1049,7 @@ namespace Fare
                 }
                 catch (FormatException)
                 {
-                    throw new ArgumentException("interval syntax error at position " + (pos - 1));
+                    throw new ArgumentException("interval syntax error at position " + (_Pos - 1));
                 }
             }
 
@@ -971,11 +1083,11 @@ namespace Fare
                 {
                     var ranges = new[] { MakeCharRange('A', 'Z'), MakeCharRange('a', 'z'), MakeCharRange('0', '9') };
                     var wordChars = ranges.Aggregate(MakeChar('_'), MakeUnion);
-                    
+
                     return inclusion ? wordChars : ExcludeChars(wordChars, MakeAnyPrintableASCIIChar());
                 }
             }
-            
+
             return MakeChar(this.ParseCharExp());
         }
 

@@ -340,8 +340,7 @@ namespace Fare
             while (worklist.Count > 0)
             {
                 var s = worklist.RemoveAndReturnFirst();
-                State r;
-                newstate.TryGetValue(s, out r);
+                newstate.TryGetValue(s, out var r);
                 foreach (var q in s)
                 {
                     if (q.Accept)
@@ -368,8 +367,7 @@ namespace Fare
                         newstate.Add(p, new State());
                     }
 
-                    State q;
-                    newstate.TryGetValue(p, out q);
+                    newstate.TryGetValue(p, out var q);
                     var min = points[n];
                     char max;
                     if (n + 1 < points.Length)
@@ -484,8 +482,7 @@ namespace Fare
                         if (t2[n2].Max >= t1[n1].Min)
                         {
                             var q = new StatePair(t1[n1].To, t2[n2].To);
-                            StatePair r;
-                            newstates.TryGetValue(q, out r);
+                            newstates.TryGetValue(q, out var r);
                             if (r == null)
                             {
                                 q.S = new State();

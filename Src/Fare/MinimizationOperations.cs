@@ -1,12 +1,12 @@
 /*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -40,7 +40,9 @@ namespace Fare
         /// <summary>
         /// Minimizes (and determinizes if not already deterministic) the given automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         public static void Minimize(Automaton a)
         {
             if (!a.IsSingleton)
@@ -50,9 +52,11 @@ namespace Fare
                     case Automaton.MinimizeHuffman:
                         MinimizeHuffman(a);
                         break;
+
                     case Automaton.MinimizeBrzozowski:
                         MinimizeBrzozowski(a);
                         break;
+
                     default:
                         MinimizeHopcroft(a);
                         break;
@@ -65,7 +69,9 @@ namespace Fare
         /// <summary>
         /// Minimizes the given automaton using Brzozowski's algorithm.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         public static void MinimizeBrzozowski(Automaton a)
         {
             if (a.IsSingleton)
@@ -303,7 +309,9 @@ namespace Fare
         /// <summary>
         /// Minimizes the given automaton using Huffman's algorithm.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         public static void MinimizeHuffman(Automaton a)
         {
             a.Determinize();
@@ -532,33 +540,27 @@ namespace Fare
             return true;
         }
 
-        #region Nested type: IntPair
-
         private sealed class IntPair
         {
-            private readonly int n1;
-            private readonly int n2;
+            private readonly int _N1;
+            private readonly int _N2;
 
             public IntPair(int n1, int n2)
             {
-                this.n1 = n1;
-                this.n2 = n2;
+                this._N1 = n1;
+                this._N2 = n2;
             }
 
             public int N1
             {
-                get { return n1; }
+                get { return _N1; }
             }
 
             public int N2
             {
-                get { return n2; }
+                get { return _N2; }
             }
         }
-
-        #endregion
-
-        #region Nested type: StateList
 
         private sealed class StateList
         {
@@ -573,10 +575,6 @@ namespace Fare
                 return new StateListNode(q, this);
             }
         }
-
-        #endregion
-
-        #region Nested type: StateListNode
 
         private sealed class StateListNode
         {
@@ -626,7 +624,5 @@ namespace Fare
                 }
             }
         }
-
-        #endregion
     }
 }

@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -39,26 +39,14 @@ namespace Fare
     /// <summary>
     /// Finite-state automaton with regular expression operations.
     /// <p>
-    /// Class invariants:
-    /// <ul>
-    /// <li>
-    /// An automaton is either represented explicitly (with State and Transition} objects)
-    /// or with a singleton string (see Singleton property ExpandSingleton() method) in case the
-    /// automaton is known to accept exactly one string. (Implicitly, all states and transitions of
-    /// an automaton are reachable from its initial state.)
-    /// </li>
-    /// <li>
-    /// Automata are always reduced (see method Rreduce()) and have no transitions to dead states
-    /// (see RemoveDeadTransitions() method).
-    /// </li>
-    /// <li>
-    /// If an automaton is non deterministic, then IsDeterministic property returns false (but the
-    /// converse is not required).
-    /// </li>
-    /// <li>
-    /// Automata provided as input to operations are generally assumed to be disjoint.
-    /// </li>
-    /// </ul>
+    /// Class invariants: <ul><li> An automaton is either represented explicitly (with State and
+    /// Transition} objects) or with a singleton string (see Singleton property ExpandSingleton()
+    /// method) in case the automaton is known to accept exactly one string. (Implicitly, all states
+    /// and transitions of an automaton are reachable from its initial state.) </li><li> Automata are
+    /// always reduced (see method Rreduce()) and have no transitions to dead states (see
+    /// RemoveDeadTransitions() method). </li><li> If an automaton is non deterministic, then
+    /// IsDeterministic property returns false (but the converse is not required). </li><li> Automata
+    /// provided as input to operations are generally assumed to be disjoint. </li></ul>
     /// </p>
     /// If the states or transitions are manipulated manually, the RestoreInvariant() method and
     /// SetDeterministic(bool) methods should be used afterwards to restore representation invariants
@@ -67,26 +55,29 @@ namespace Fare
     public class Automaton
     {
         /// <summary>
-        /// Minimize using Huffman's O(n<sup>2</sup>) algorithm.
-        ///   This is the standard text-book algorithm.
+        /// Minimize using Huffman's O(n <sup>2</sup>) algorithm. This is the standard text-book algorithm.
         /// </summary>
         public const int MinimizeHuffman = 0;
 
         /// <summary>
-        /// Minimize using Brzozowski's O(2<sup>n</sup>) algorithm. 
-        ///   This algorithm uses the reverse-determinize-reverse-determinize trick, which has a bad
-        ///   worst-case behavior but often works very well in practice even better than Hopcroft's!).
+        /// Minimize using Brzozowski's O(2 <sup>n</sup>) algorithm. This algorithm uses the
+        /// reverse-determinize-reverse-determinize trick, which has a bad worst-case behavior but
+        /// often works very well in practice even better than Hopcroft's!).
         /// </summary>
         public const int MinimizeBrzozowski = 1;
 
         /// <summary>
-        /// Minimize using Hopcroft's O(n log n) algorithm.
-        ///   This is regarded as one of the most generally efficient algorithms that exist.
+        /// Minimize using Hopcroft's O(n log n) algorithm. This is regarded as one of the most
+        /// generally efficient algorithms that exist.
         /// </summary>
         public const int MinimizeHopcroft = 2;
 
         /// <summary>
-        /// Selects whether operations may modify the input automata (default: <code>false</code>).
+        /// Selects whether operations may modify the input automata (default:
+        /// <code>
+        /// false
+        /// </code>
+        /// ).
         /// </summary>
         private static bool allowMutation;
 
@@ -106,9 +97,9 @@ namespace Fare
         private State initial;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Automaton"/> class that accepts the empty 
-        ///   language. Using this constructor, automata can be constructed manually from 
-        ///   <see cref="State"/> and <see cref="Transition"/> objects.
+        /// Initializes a new instance of the <see cref="Automaton"/> class that accepts the empty
+        /// language. Using this constructor, automata can be constructed manually from <see
+        /// cref="State"/> and <see cref="Transition"/> objects.
         /// </summary>
         public Automaton()
         {
@@ -118,7 +109,7 @@ namespace Fare
         }
 
         /// <summary>
-        /// Gets the minimization algorithm (default: 
+        /// Gets the minimization algorithm (default:
         /// <code>
         /// MINIMIZE_HOPCROFT
         /// </code>
@@ -131,7 +122,7 @@ namespace Fare
 
         /// <summary>
         /// Gets or sets a value indicating whether operations may modify the input automata (default:
-        ///   <code>
+        /// <code>
         /// false
         /// </code>
         /// ).
@@ -143,11 +134,11 @@ namespace Fare
 
         /// <summary>
         /// Gets or sets a value indicating whether this automaton is definitely deterministic (i.e.,
-        ///   there are no choices for any run, but a run may crash).
+        /// there are no choices for any run, but a run may crash).
         /// </summary>
         /// <value>
-        /// <c>true</c> then this automaton is definitely deterministic (i.e., there are no 
-        ///   choices for any run, but a run may crash)., <c>false</c>.
+        /// <c>true</c> then this automaton is definitely deterministic (i.e., there are no choices
+        /// for any run, but a run may crash)., <c>false</c>.
         /// </value>
         public bool IsDeterministic { get; set; }
 
@@ -173,11 +164,13 @@ namespace Fare
         }
 
         /// <summary>
-        /// Gets or sets the singleton string for this automaton. An automaton that accepts exactly one
-        ///  string <i>may</i> be represented in singleton mode. In that case, this method may be 
+        /// Gets or sets the singleton string for this automaton. An automaton that accepts exactly
+        /// one string <i>may</i> be represented in singleton mode. In that case, this method may be
         /// used to obtain the string.
         /// </summary>
-        /// <value>The singleton string, null if this automaton is not in singleton mode.</value>
+        /// <value>
+        /// The singleton string, null if this automaton is not in singleton mode.
+        /// </value>
         public string Singleton { get; set; }
 
         /// <summary>
@@ -222,8 +215,8 @@ namespace Fare
         }
 
         /// <summary>
-        /// Gets the number of transitions in this automaton. This number is counted
-        ///   as the total number of edges, where one edge may be a character interval.
+        /// Gets the number of transitions in this automaton. This number is counted as the total
+        /// number of edges, where one edge may be a character interval.
         /// </summary>
         public int NumberOfTransitions
         {
@@ -272,14 +265,17 @@ namespace Fare
         }
 
         /// <summary>
-        /// Sets or resets allow mutate flag. If this flag is set, then all automata operations
-        /// may modify automata given as input; otherwise, operations will always leave input
-        /// automata languages unmodified. By default, the flag is not set.
+        /// Sets or resets allow mutate flag. If this flag is set, then all automata operations may
+        /// modify automata given as input; otherwise, operations will always leave input automata
+        /// languages unmodified. By default, the flag is not set.
         /// </summary>
-        /// <param name="flag">if set to <c>true</c> then all automata operations may modify 
-        /// automata given as input; otherwise, operations will always leave input automata 
-        /// languages unmodified..</param>
-        /// <returns>The previous value of the flag.</returns>
+        /// <param name="flag">
+        /// if set to <c>true</c> then all automata operations may modify automata given as input;
+        /// otherwise, operations will always leave input automata languages unmodified..
+        /// </param>
+        /// <returns>
+        /// The previous value of the flag.
+        /// </returns>
         public static bool SetAllowMutate(bool flag)
         {
             var b = allowMutation;
@@ -288,11 +284,13 @@ namespace Fare
         }
 
         /// <summary>
-        /// Sets or resets minimize always flag. If this flag is set, then {@link #minimize()} 
-        /// will automatically be invoked after all operations that otherwise may produce 
-        /// non-minimal automata. By default, the flag is not set.
+        /// Sets or resets minimize always flag. If this flag is set, then {@link #minimize()} will
+        /// automatically be invoked after all operations that otherwise may produce non-minimal
+        /// automata. By default, the flag is not set.
         /// </summary>
-        /// <param name="flag">The flag if true, the flag is set.</param>
+        /// <param name="flag">
+        /// The flag if true, the flag is set.
+        /// </param>
         public static void SetMinimizeAlways(bool flag)
         {
             minimizeAlways = flag;
@@ -301,7 +299,9 @@ namespace Fare
         /// <summary>
         /// Assigns consecutive numbers to the given states.
         /// </summary>
-        /// <param name="states">The states.</param>
+        /// <param name="states">
+        /// The states.
+        /// </param>
         public static void SetStateNumbers(IEnumerable<State> states)
         {
             var number = 0;
@@ -311,7 +311,8 @@ namespace Fare
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override int GetHashCode()
         {
             if (this.hashCode == 0)
@@ -362,8 +363,7 @@ namespace Fare
 
                 foreach (var s in states)
                 {
-                    State p;
-                    if (!d.TryGetValue(s, out p))
+                    if (!d.TryGetValue(s, out var p))
                     {
                         continue;
                     }
@@ -376,8 +376,7 @@ namespace Fare
 
                     foreach (var t in s.Transitions)
                     {
-                        State to;
-                        d.TryGetValue(t.To, out to);
+                        d.TryGetValue(t.To, out var to);
                         p.Transitions.Add(new Transition(t.Min, t.Max, to));
                     }
                 }
@@ -400,14 +399,14 @@ namespace Fare
         }
 
         /// <summary>
-        /// A clone of this automaton unless 
+        /// A clone of this automaton unless
         /// <code>
         /// allowMutation
         /// </code>
         /// is set, expands if singleton.
         /// </summary>
         /// <returns>
-        /// Returns a clone of this automaton unless 
+        /// Returns a clone of this automaton unless
         /// <code>
         /// allowMutation
         /// </code>
@@ -425,11 +424,19 @@ namespace Fare
         }
 
         /// <summary>
-        /// Returns a clone of this automaton, or this automaton itself if <code>allow_mutation</code>
+        /// Returns a clone of this automaton, or this automaton itself if
+        /// <code>
+        /// allow_mutation
+        /// </code>
         /// flag is set.
         /// </summary>
-        /// <returns>A clone of this automaton, or this automaton itself if <code>allow_mutation</code>
-        /// flag is set.</returns>
+        /// <returns>
+        /// A clone of this automaton, or this automaton itself if
+        /// <code>
+        /// allow_mutation
+        /// </code>
+        /// flag is set.
+        /// </returns>
         public Automaton CloneIfRequired()
         {
             if (allowMutation)
@@ -456,8 +463,8 @@ namespace Fare
         }
 
         /// <summary>
-        /// Expands singleton representation to normal representation.
-        /// Does nothing if not in singleton representation.
+        /// Expands singleton representation to normal representation. Does nothing if not in
+        /// singleton representation.
         /// </summary>
         public void ExpandSingleton()
         {
@@ -481,7 +488,9 @@ namespace Fare
         /// <summary>
         /// The set of reachable accept states.
         /// </summary>
-        /// <returns>Returns the set of reachable accept states.</returns>
+        /// <returns>
+        /// Returns the set of reachable accept states.
+        /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is not executing immediately nor returns the same value each time it is invoked.")]
         public HashSet<State> GetAcceptStates()
         {
@@ -525,7 +534,8 @@ namespace Fare
         /// <summary>
         /// Returns the set of live states. A state is "live" if an accept state is reachable from it.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// </returns>
         public HashSet<State> GetLiveStates()
         {
             this.ExpandSingleton();
@@ -535,7 +545,9 @@ namespace Fare
         /// <summary>
         /// The sorted array of all interval start points.
         /// </summary>
-        /// <returns>Returns sorted array of all interval start points.</returns>
+        /// <returns>
+        /// Returns sorted array of all interval start points.
+        /// </returns>
         public char[] GetStartPoints()
         {
             var pointSet = new HashSet<char>();
@@ -635,8 +647,7 @@ namespace Fare
         }
 
         /// <summary>
-        /// Recomputes the hash code.
-        ///   The automaton must be minimal when this operation is performed.
+        /// Recomputes the hash code. The automaton must be minimal when this operation is performed.
         /// </summary>
         public void RecomputeHashCode()
         {
@@ -648,9 +659,8 @@ namespace Fare
         }
 
         /// <summary>
-        /// Reduces this automaton.
-        /// An automaton is "reduced" by combining overlapping and adjacent edge intervals with same 
-        /// destination.
+        /// Reduces this automaton. An automaton is "reduced" by combining overlapping and adjacent
+        /// edge intervals with same destination.
         /// </summary>
         public void Reduce()
         {
@@ -712,8 +722,8 @@ namespace Fare
         }
 
         /// <summary>
-        /// Removes transitions to dead states and calls Reduce() and ClearHashCode().
-        /// (A state is "dead" if no accept state is reachable from it).
+        /// Removes transitions to dead states and calls Reduce() and ClearHashCode(). (A state is
+        /// "dead" if no accept state is reachable from it).
         /// </summary>
         public void RemoveDeadTransitions()
         {
