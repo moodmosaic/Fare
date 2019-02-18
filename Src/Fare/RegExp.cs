@@ -135,10 +135,7 @@ namespace Fare
         /// </summary>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton()
-        {
-            return ToAutomatonAllowMutate(null, null, true);
-        }
+        public Automaton ToAutomaton() => ToAutomatonAllowMutate(null, null, true);
 
         /// <summary>
         /// Constructs new
@@ -160,10 +157,7 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton(bool minimize)
-        {
-            return ToAutomatonAllowMutate(null, null, minimize);
-        }
+        public Automaton ToAutomaton(bool minimize) => ToAutomatonAllowMutate(null, null, minimize);
 
         /// <summary>
         /// Constructs new
@@ -181,10 +175,7 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton(IAutomatonProvider automatonProvider)
-        {
-            return ToAutomatonAllowMutate(null, automatonProvider, true);
-        }
+        public Automaton ToAutomaton(IAutomatonProvider automatonProvider) => ToAutomatonAllowMutate(null, automatonProvider, true);
 
         /// <summary>
         /// Constructs new
@@ -205,10 +196,7 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton(IAutomatonProvider automatonProvider, bool minimize)
-        {
-            return ToAutomatonAllowMutate(null, automatonProvider, minimize);
-        }
+        public Automaton ToAutomaton(IAutomatonProvider automatonProvider, bool minimize) => ToAutomatonAllowMutate(null, automatonProvider, minimize);
 
         /// <summary>
         /// Constructs new
@@ -226,10 +214,7 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton(IDictionary<string, Automaton> automata)
-        {
-            return ToAutomatonAllowMutate(automata, null, true);
-        }
+        public Automaton ToAutomaton(IDictionary<string, Automaton> automata) => ToAutomatonAllowMutate(automata, null, true);
 
         /// <summary>
         /// Constructs new
@@ -250,10 +235,7 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public Automaton ToAutomaton(IDictionary<string, Automaton> automata, bool minimize)
-        {
-            return ToAutomatonAllowMutate(automata, null, minimize);
-        }
+        public Automaton ToAutomaton(IDictionary<string, Automaton> automata, bool minimize) => ToAutomatonAllowMutate(automata, null, minimize);
 
         /// <summary>
         /// Sets or resets allow mutate flag. If this flag is set, then automata construction uses
@@ -274,10 +256,7 @@ namespace Fare
 
         /// <inheritdoc/>
         ///
-        public override string ToString()
-        {
-            return ToStringBuilder(new StringBuilder()).ToString();
-        }
+        public override string ToString() => ToStringBuilder(new StringBuilder()).ToString();
 
         /// <summary>
         /// Returns the set of automaton identifiers that occur in this regular expression.
@@ -451,10 +430,7 @@ namespace Fare
             return r;
         }
 
-        private static RegExp MakeAnyPrintableASCIIChar()
-        {
-            return MakeCharRange(' ', '~');
-        }
+        private static RegExp MakeAnyPrintableASCIIChar() => MakeCharRange(' ', '~');
 
         private static RegExp MakeCharRange(char from, char to)
         {
@@ -839,10 +815,7 @@ namespace Fare
             return e;
         }
 
-        private bool Check(RegExpSyntaxOptions flag)
-        {
-            return (_Flags & flag) != 0;
-        }
+        private bool Check(RegExpSyntaxOptions flag) => (_Flags & flag) != 0;
 
         private RegExp ParseConcatExp()
         {
@@ -855,15 +828,9 @@ namespace Fare
             return e;
         }
 
-        private bool More()
-        {
-            return _Pos < _B.Length;
-        }
+        private bool More() => _Pos < _B.Length;
 
-        private bool Peek(string @string)
-        {
-            return More() && @string.IndexOf(_B[_Pos]) != -1;
-        }
+        private bool Peek(string @string) => More() && @string.IndexOf(_B[_Pos]) != -1;
 
         private RegExp ParseRepeatExp()
         {
@@ -1162,10 +1129,7 @@ namespace Fare
             return MakeChar(@char);
         }
 
-        private static RegExp ExcludeChars(RegExp exclusion, RegExp allChars)
-        {
-            return MakeIntersection(allChars, MakeComplement(exclusion));
-        }
+        private static RegExp ExcludeChars(RegExp exclusion, RegExp allChars) => MakeIntersection(allChars, MakeComplement(exclusion));
 
         private enum Kind
         {

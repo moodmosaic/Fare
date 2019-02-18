@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -41,18 +41,22 @@ namespace Fare
         /// <summary>
         /// Initializes a new instance of the <see cref="TransitionComparer"/> class.
         /// </summary>
-        /// <param name="toFirst">if set to <c>true</c> [to first].</param>
-        public TransitionComparer(bool toFirst)
-        {
-            this.toFirst = toFirst;
-        }
+        /// <param name="toFirst">
+        /// if set to <c>true</c> [to first].
+        /// </param>
+        public TransitionComparer(bool toFirst) => this.toFirst = toFirst;
 
         /// <summary>
         /// Compares by (min, reverse max, to) or (to, min, reverse max).
         /// </summary>
-        /// <param name="t1">The first Transition.</param>
-        /// <param name="t2">The second Transition.</param>
-        /// <returns></returns>
+        /// <param name="t1">
+        /// The first Transition.
+        /// </param>
+        /// <param name="t2">
+        /// The second Transition.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public int Compare(Transition t1, Transition t2)
         {
             if (toFirst)

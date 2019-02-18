@@ -551,15 +551,9 @@ namespace Fare
                 _N2 = n2;
             }
 
-            public int N1
-            {
-                get { return _N1; }
-            }
+            public int N1 => _N1;
 
-            public int N2
-            {
-                get { return _N2; }
-            }
+            public int N2 => _N2;
         }
 
         private sealed class StateList
@@ -570,10 +564,7 @@ namespace Fare
 
             public StateListNode Last { get; set; }
 
-            public StateListNode Add(State q)
-            {
-                return new StateListNode(q, this);
-            }
+            public StateListNode Add(State q) => new StateListNode(q, this);
         }
 
         private sealed class StateListNode

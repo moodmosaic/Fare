@@ -45,10 +45,7 @@ namespace Fare
         /// <returns>
         /// A new (deterministic) automaton that accepts any single character.
         /// </returns>
-        public static Automaton MakeAnyChar()
-        {
-            return MakeCharRange(char.MinValue, char.MaxValue);
-        }
+        public static Automaton MakeAnyChar() => MakeCharRange(char.MinValue, char.MaxValue);
 
         /// <summary>
         /// Returns a new (deterministic) automaton that accepts all strings.
@@ -560,13 +557,9 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public static Automaton MakeTotalDigits(int i)
-        {
-            return
-               Automaton.Minimize(
+        public static Automaton MakeTotalDigits(int i) => Automaton.Minimize(
                     new RegExp("[ \t\n\r]*[-+]?0*([0-9]{0," + i + "}|((([0-9]\\.*){0," + i + "})&@\\.@)0*)[ \t\n\r]*")
                        .ToAutomaton());
-        }
 
         /// <summary>
         /// Constructs automaton that accept strings representing decimal numbers that can be written
@@ -577,13 +570,9 @@ namespace Fare
         /// </param>
         /// <returns>
         /// </returns>
-        public static Automaton MakeFractionDigits(int i)
-        {
-            return
-                Automaton.Minimize(
+        public static Automaton MakeFractionDigits(int i) => Automaton.Minimize(
                     new RegExp("[ \t\n\r]*[-+]?[0-9]+(\\.[0-9]{0," + i + "}0*)?[ \t\n\r]*")
                         .ToAutomaton());
-        }
 
         /// <summary>
         /// Constructs automaton that accept strings representing the given integer. Surrounding

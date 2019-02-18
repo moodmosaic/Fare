@@ -115,10 +115,7 @@ namespace Fare
         /// </code>
         /// ).
         /// </summary>
-        public static int Minimization
-        {
-            get { return _MinimizeHopcroft; }
-        }
+        public static int Minimization => _MinimizeHopcroft;
 
         /// <summary>
         /// Gets or sets a value indicating whether operations may modify the input automata (default:
@@ -179,10 +176,7 @@ namespace Fare
         /// <value>
         /// <c>true</c> if this instance is singleton; otherwise, <c>false</c>.
         /// </value>
-        public bool IsSingleton
-        {
-            get { return Singleton != null; }
-        }
+        public bool IsSingleton => Singleton != null;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is debug.
@@ -243,20 +237,11 @@ namespace Fare
             return transitions;
         }
 
-        public static Automaton MakeChar(char c)
-        {
-            return BasicAutomata.MakeChar(c);
-        }
+        public static Automaton MakeChar(char c) => BasicAutomata.MakeChar(c);
 
-        public static Automaton MakeCharSet(string set)
-        {
-            return BasicAutomata.MakeCharSet(set);
-        }
+        public static Automaton MakeCharSet(string set) => BasicAutomata.MakeCharSet(set);
 
-        public static Automaton MakeString(string s)
-        {
-            return BasicAutomata.MakeString(s);
-        }
+        public static Automaton MakeString(string s) => BasicAutomata.MakeString(s);
 
         public static Automaton Minimize(Automaton a)
         {
@@ -291,10 +276,7 @@ namespace Fare
         /// <param name="flag">
         /// The flag if true, the flag is set.
         /// </param>
-        public static void SetMinimizeAlways(bool flag)
-        {
-            _MinimizeAlways = flag;
-        }
+        public static void SetMinimizeAlways(bool flag) => _MinimizeAlways = flag;
 
         /// <summary>
         /// Assigns consecutive numbers to the given states.
@@ -323,10 +305,7 @@ namespace Fare
             return _HashCode;
         }
 
-        public void AddEpsilons(ICollection<StatePair> pairs)
-        {
-            BasicOperations.AddEpsilons(this, pairs);
-        }
+        public void AddEpsilons(ICollection<StatePair> pairs) => BasicOperations.AddEpsilons(this, pairs);
 
         /// <summary>
         /// The check minimize always.
@@ -342,10 +321,7 @@ namespace Fare
         /// <summary>
         /// The clear hash code.
         /// </summary>
-        public void ClearHashCode()
-        {
-            _HashCode = 0;
-        }
+        public void ClearHashCode() => _HashCode = 0;
 
         /// <summary>
         /// Creates a shallow copy of the current Automaton.
@@ -447,20 +423,11 @@ namespace Fare
             return Clone();
         }
 
-        public Automaton Complement()
-        {
-            return BasicOperations.Complement(this);
-        }
+        public Automaton Complement() => BasicOperations.Complement(this);
 
-        public Automaton Concatenate(Automaton a)
-        {
-            return BasicOperations.Concatenate(this, a);
-        }
+        public Automaton Concatenate(Automaton a) => BasicOperations.Concatenate(this, a);
 
-        public void Determinize()
-        {
-            BasicOperations.Determinize(this);
-        }
+        public void Determinize() => BasicOperations.Determinize(this);
 
         /// <summary>
         /// Expands singleton representation to normal representation. Does nothing if not in
@@ -623,28 +590,16 @@ namespace Fare
             return visited;
         }
 
-        public Automaton Intersection(Automaton a)
-        {
-            return BasicOperations.Intersection(this, a);
-        }
+        public Automaton Intersection(Automaton a) => BasicOperations.Intersection(this, a);
 
-        public bool IsEmptyString()
-        {
-            return BasicOperations.IsEmptyString(this);
-        }
+        public bool IsEmptyString() => BasicOperations.IsEmptyString(this);
 
         /// <summary>
         /// The minimize.
         /// </summary>
-        public void Minimize()
-        {
-            MinimizationOperations.Minimize(this);
-        }
+        public void Minimize() => MinimizationOperations.Minimize(this);
 
-        public Automaton Optional()
-        {
-            return BasicOperations.Optional(this);
-        }
+        public Automaton Optional() => BasicOperations.Optional(this);
 
         /// <summary>
         /// Recomputes the hash code. The automaton must be minimal when this operation is performed.
@@ -758,25 +713,13 @@ namespace Fare
             Reduce();
         }
 
-        public Automaton Repeat(int min, int max)
-        {
-            return BasicOperations.Repeat(this, min, max);
-        }
+        public Automaton Repeat(int min, int max) => BasicOperations.Repeat(this, min, max);
 
-        public Automaton Repeat()
-        {
-            return BasicOperations.Repeat(this);
-        }
+        public Automaton Repeat() => BasicOperations.Repeat(this);
 
-        public Automaton Repeat(int min)
-        {
-            return BasicOperations.Repeat(this, min);
-        }
+        public Automaton Repeat(int min) => BasicOperations.Repeat(this, min);
 
-        public bool Run(string s)
-        {
-            return BasicOperations.Run(this, s);
-        }
+        public bool Run(string s) => BasicOperations.Run(this, s);
 
         /// <summary>
         /// Adds transitions to explicit crash state to ensure that transition function is total.

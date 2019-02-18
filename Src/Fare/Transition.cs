@@ -94,26 +94,17 @@ namespace Fare
         /// <summary>
         /// Gets the minimum of this transition interval.
         /// </summary>
-        public char Min
-        {
-            get { return _Min; }
-        }
+        public char Min => _Min;
 
         /// <summary>
         /// Gets the maximum of this transition interval.
         /// </summary>
-        public char Max
-        {
-            get { return _Max; }
-        }
+        public char Max => _Max;
 
         /// <summary>
         /// Gets the destination of this transition.
         /// </summary>
-        public State To
-        {
-            get { return _To; }
-        }
+        public State To => _To;
 
         /// <summary>
         /// Implements the operator ==.
@@ -127,10 +118,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator ==(Transition left, Transition right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(Transition left, Transition right) => Equals(left, right);
 
         /// <summary>
         /// Implements the operator !=.
@@ -144,10 +132,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(Transition left, Transition right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(Transition left, Transition right) => !Equals(left, right);
 
         /// <inheritdoc/>
         ///

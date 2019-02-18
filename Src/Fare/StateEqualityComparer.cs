@@ -48,10 +48,7 @@ namespace Fare
         /// <returns>
         /// true if the specified objects are equal; otherwise, false.
         /// </returns>
-        public bool Equals(State x, State y)
-        {
-            return x.Equals(y);
-        }
+        public bool Equals(State x, State y) => x.Equals(y);
 
         /// <summary>
         /// Returns a hash code for this instance.
@@ -66,9 +63,6 @@ namespace Fare
         /// <exception cref="T:System.ArgumentNullException">
         /// The type of <paramref name="obj"/> is a reference type and <paramref name="obj"/> is null.
         /// </exception>
-        public int GetHashCode(State obj)
-        {
-            return obj.GetHashCode();
-        }
+        public int GetHashCode(State obj) => obj.GetHashCode();
     }
 }

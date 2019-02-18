@@ -59,10 +59,7 @@ namespace Fare
         /// <summary>
         /// Gets the id.
         /// </summary>
-        public int Id
-        {
-            get { return id; }
-        }
+        public int Id => id;
 
         /// <summary>
         /// Gets or sets a value indicating whether this State is Accept.
@@ -87,10 +84,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator ==(State left, State right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(State left, State right) => Equals(left, right);
 
         /// <summary>
         /// Implements the operator !=.
@@ -100,10 +94,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(State left, State right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(State left, State right) => !Equals(left, right);
 
         /// <inheritdoc />
         public override bool Equals(object obj)
@@ -174,10 +165,7 @@ namespace Fare
         }
 
         /// <inheritdoc />
-        public int CompareTo(State other)
-        {
-            return other.Id - Id;
-        }
+        public int CompareTo(State other) => other.Id - Id;
 
         /// <inheritdoc />
         public override string ToString()
@@ -200,10 +188,7 @@ namespace Fare
         /// <param name="t">
         /// The transition.
         /// </param>
-        public void AddTransition(Transition t)
-        {
-            Transitions.Add(t);
-        }
+        public void AddTransition(Transition t) => Transitions.Add(t);
 
         /// <summary>
         /// Performs lookup in transitions, assuming determinism.
@@ -214,10 +199,7 @@ namespace Fare
         /// <returns>
         /// The destination state, null if no matching outgoing transition.
         /// </returns>
-        public State Step(char c)
-        {
-            return (from t in Transitions where t.Min <= c && c <= t.Max select t.To).FirstOrDefault();
-        }
+        public State Step(char c) => (from t in Transitions where t.Min <= c && c <= t.Max select t.To).FirstOrDefault();
 
         /// <summary>
         /// Performs lookup in transitions, allowing nondeterminism.
@@ -228,10 +210,7 @@ namespace Fare
         /// <param name="dest">
         /// The collection where destination states are stored.
         /// </param>
-        public void Step(char c, List<State> dest)
-        {
-            dest.AddRange(from t in Transitions where t.Min <= c && c <= t.Max select t.To);
-        }
+        public void Step(char c, List<State> dest) => dest.AddRange(from t in Transitions where t.Min <= c && c <= t.Max select t.To);
 
         /// <summary>
         /// Gets the transitions sorted by (min, reverse max, to) or (to, min, reverse max).
@@ -262,9 +241,6 @@ namespace Fare
             }
         }
 
-        internal void ResetTransitions()
-        {
-            Transitions = new List<Transition>();
-        }
+        internal void ResetTransitions() => Transitions = new List<Transition>();
     }
 }

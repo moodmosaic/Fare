@@ -27,10 +27,7 @@ namespace Fare
         private StringBuilder _Previous;
         private IDictionary<State, State> _Register = new Dictionary<State, State>();
 
-        public static IComparer<char[]> LexicographicOrderComparer
-        {
-            get { return _LexicographicOrder; }
-        }
+        public static IComparer<char[]> LexicographicOrderComparer => _LexicographicOrder;
 
         public static Fare.State Build(IEnumerable<char[]> input)
         {
@@ -187,25 +184,16 @@ namespace Fare
             private char[] _Labels = _NoLabels;
             private State[] _States = _NoStates;
 
-            public char[] TransitionLabels
-            {
-                get { return _Labels; }
-            }
+            public char[] TransitionLabels => _Labels;
 
-            public IEnumerable<State> States
-            {
-                get { return _States; }
-            }
+            public IEnumerable<State> States => _States;
 
-            public bool HasChildren
-            {
-                get { return _Labels.Length > 0; }
-            }
+            public bool HasChildren => _Labels.Length > 0;
 
             public bool IsFinal
             {
-                get { return _IsFinal; }
-                set { _IsFinal = value; }
+                get => _IsFinal;
+                set => _IsFinal = value;
             }
 
             public State LastChild
@@ -219,8 +207,7 @@ namespace Fare
 
             public override bool Equals(object obj)
             {
-                var other = obj as State;
-                if (other == null)
+                if (!(obj is State other))
                 {
                     return false;
                 }

@@ -36,9 +36,6 @@ namespace Fare
     {
         private static readonly Automaton ws = Automaton.Minimize(Automaton.MakeCharSet(" \t\n\r").Repeat());
 
-        public static Automaton WhitespaceAutomaton
-        {
-            get { return ws; }
-        }
+        public static Automaton WhitespaceAutomaton => ws;
     }
 }

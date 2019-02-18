@@ -18,10 +18,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator ==(ListEqualityComparer<T> left, ListEqualityComparer<T> right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(ListEqualityComparer<T> left, ListEqualityComparer<T> right) => Equals(left, right);
 
         /// <summary>
         /// Implements the operator !=.
@@ -35,10 +32,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(ListEqualityComparer<T> left, ListEqualityComparer<T> right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(ListEqualityComparer<T> left, ListEqualityComparer<T> right) => !Equals(left, right);
 
         /// <inheritdoc/>
         ///
@@ -54,18 +48,13 @@ namespace Fare
 
         /// <inheritdoc/>
         ///
-        public int GetHashCode(List<T> obj)
-        {
+        public int GetHashCode(List<T> obj) =>
             // http://stackoverflow.com/questions/1079192/is-it-possible-to-combine-hash-codes-for-private-members-to-generate-a-new-hash
-            return obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
-        }
+            obj.Aggregate(17, (current, item) => (current * 31) + item.GetHashCode());
 
         /// <inheritdoc/>
         ///
-        public bool Equals(ListEqualityComparer<T> other)
-        {
-            return !(other is null);
-        }
+        public bool Equals(ListEqualityComparer<T> other) => !(other is null);
 
         /// <inheritdoc/>
         ///
@@ -91,9 +80,6 @@ namespace Fare
 
         /// <inheritdoc/>
         ///
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
     }
 }

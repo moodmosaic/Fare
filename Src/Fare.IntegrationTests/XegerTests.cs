@@ -9,10 +9,7 @@ namespace Fare.IntegrationTests
     {
         private readonly ITestOutputHelper _testOutput;
 
-        public XegerTests(ITestOutputHelper testOutput)
-        {
-            _testOutput = testOutput;
-        }
+        public XegerTests(ITestOutputHelper testOutput) => _testOutput = testOutput;
 
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)

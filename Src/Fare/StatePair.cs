@@ -88,10 +88,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator ==(StatePair left, StatePair right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(StatePair left, StatePair right) => Equals(left, right);
 
         /// <summary>
         /// Implements the operator !=.
@@ -101,10 +98,7 @@ namespace Fare
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(StatePair left, StatePair right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(StatePair left, StatePair right) => !Equals(left, right);
 
         /// <inheritdoc />
         public bool Equals(StatePair other)
