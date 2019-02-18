@@ -2,7 +2,8 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     <AssemblyTitle>Fare.IntegrationTests</AssemblyTitle>
     <AssemblyName>Fare.IntegrationTests</AssemblyName>
 

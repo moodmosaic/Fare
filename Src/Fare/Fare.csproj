@@ -2,7 +2,8 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net35;netstandard1.1</TargetFrameworks>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     <AssemblyTitle>Fare</AssemblyTitle>
     <AssemblyName>Fare</AssemblyName>
     <Copyright>Copyright © Nikos Baxevanis 2016</Copyright>
