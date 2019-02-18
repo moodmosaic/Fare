@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -47,8 +47,8 @@ namespace Fare
         private static int nextId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="State"/> class. Initially, the new state is a 
-        ///   reject state.
+        /// Initializes a new instance of the <see cref="State"/> class. Initially, the new state is
+        /// a reject state.
         /// </summary>
         public State()
         {
@@ -79,8 +79,12 @@ namespace Fare
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -89,14 +93,19 @@ namespace Fare
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
         public static bool operator !=(State left, State right) => !Equals(left, right);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -117,7 +126,8 @@ namespace Fare
             return Equals((State)obj);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override int GetHashCode()
         {
             unchecked
@@ -129,8 +139,8 @@ namespace Fare
             }
         }
 
-
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public int CompareTo(object other)
         {
             if (other == null)
@@ -146,7 +156,8 @@ namespace Fare
             return CompareTo((State)other);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public bool Equals(State other)
         {
             if (other is null)
@@ -159,15 +170,17 @@ namespace Fare
                 return true;
             }
 
-            return other.id == id 
+            return other.id == id
                 && other.Accept.Equals(Accept)
                 && other.Number == Number;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public int CompareTo(State other) => other.Id - Id;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override string ToString()
         {
             var sb = new StringBuilder();

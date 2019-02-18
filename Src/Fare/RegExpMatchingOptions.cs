@@ -10,14 +10,25 @@ namespace Fare
         public const char IgnoreCase = 'i';
 
         /// <summary>
-        /// Use single-line mode, where the period matches every character,
-        /// instead of every character except <code>\n</code>.
+        /// Use single-line mode, where the period matches every character, instead of every
+        /// character except
+        /// <code>
+        /// \n
+        /// </code>
+        /// .
         /// </summary>
         public const char Singleline = 's';
 
         /// <summary>
-        /// Use multiline mode, where <code>^</code> and <code>$</code> match
-        /// the beginning and end of each line, instead of the beginning and end of the input string.
+        /// Use multiline mode, where
+        /// <code>
+        /// ^
+        /// </code>
+        /// and
+        /// <code>
+        /// $
+        /// </code>
+        /// match the beginning and end of each line, instead of the beginning and end of the input string.
         /// </summary>
         public const char Multiline = 'm';
 
@@ -27,8 +38,11 @@ namespace Fare
         public const char ExplicitCapture = 'n';
 
         /// <summary>
-        /// Exclude unescaped white space from the pattern
-        /// and enable comments after a hash sign <code>#</code>.
+        /// Exclude unescaped white space from the pattern and enable comments after a hash sign
+        /// <code>
+        /// #
+        /// </code>
+        /// .
         /// </summary>
         public const char IgnorePatternWhitespace = 'x';
 

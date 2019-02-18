@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -42,9 +42,15 @@ namespace Fare
         /// <summary>
         /// Initializes a new instance of the <see cref="StatePair"/> class.
         /// </summary>
-        /// <param name="s">The s.</param>
-        /// <param name="s1">The s1.</param>
-        /// <param name="s2">The s2.</param>
+        /// <param name="s">
+        /// The s.
+        /// </param>
+        /// <param name="s1">
+        /// The s1.
+        /// </param>
+        /// <param name="s2">
+        /// The s2.
+        /// </param>
         public StatePair(State s, State s1, State s2)
         {
             S = s;
@@ -55,8 +61,12 @@ namespace Fare
         /// <summary>
         /// Initializes a new instance of the <see cref="StatePair"/> class.
         /// </summary>
-        /// <param name="s1">The first state.</param>
-        /// <param name="s2">The second state.</param>
+        /// <param name="s1">
+        /// The first state.
+        /// </param>
+        /// <param name="s2">
+        /// The second state.
+        /// </param>
         public StatePair(State s1, State s2)
             : this(null, s1, s2)
         {
@@ -83,8 +93,12 @@ namespace Fare
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
@@ -93,14 +107,19 @@ namespace Fare
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
         /// <returns>
         /// The result of the operator.
         /// </returns>
         public static bool operator !=(StatePair left, StatePair right) => !Equals(left, right);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public bool Equals(StatePair other)
         {
             if (other is null)
@@ -117,7 +136,8 @@ namespace Fare
                 && Equals(other.SecondState, SecondState);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -138,7 +158,8 @@ namespace Fare
             return Equals((StatePair)obj);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        ///
         public override int GetHashCode()
         {
             unchecked
