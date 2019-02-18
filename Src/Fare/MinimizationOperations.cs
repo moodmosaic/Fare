@@ -542,16 +542,15 @@ namespace Fare
 
         private sealed class IntPair
         {
-            private readonly int _N1;
             private readonly int _N2;
 
             public IntPair(int n1, int n2)
             {
-                _N1 = n1;
+                N1 = n1;
                 _N2 = n2;
             }
 
-            public int N1 => _N1;
+            public int N1 { get; }
 
             public int N2 => _N2;
         }

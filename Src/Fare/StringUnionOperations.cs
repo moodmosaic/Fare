@@ -20,14 +20,12 @@ namespace Fare
 {
     public sealed class StringUnionOperations
     {
-        private static readonly IComparer<char[]> _LexicographicOrder = new LexicographicOrder();
-
         private readonly State _Root = new State();
 
         private StringBuilder _Previous;
         private IDictionary<State, State> _Register = new Dictionary<State, State>();
 
-        public static IComparer<char[]> LexicographicOrderComparer => _LexicographicOrder;
+        public static IComparer<char[]> LexicographicOrderComparer { get; } = new LexicographicOrder();
 
         public static Fare.State Build(IEnumerable<char[]> input)
         {
@@ -179,8 +177,6 @@ namespace Fare
         {
             private static readonly char[] _NoLabels = Array.Empty<char>();
             private static readonly State[] _NoStates = Array.Empty<State>();
-            private bool _IsFinal;
-
             private char[] _Labels = _NoLabels;
             private State[] _States = _NoStates;
 
@@ -190,11 +186,7 @@ namespace Fare
 
             public bool HasChildren => _Labels.Length > 0;
 
-            public bool IsFinal
-            {
-                get => _IsFinal;
-                set => _IsFinal = value;
-            }
+            public bool IsFinal { get; set; }
 
             public State LastChild
             {
@@ -212,14 +204,14 @@ namespace Fare
                     return false;
                 }
 
-                return _IsFinal == other._IsFinal
+                return IsFinal == other.IsFinal
                     && ReferenceEquals(_States, other._States)
                     && Equals(_Labels, other._Labels);
             }
 
             public override int GetHashCode()
             {
-                var hash = _IsFinal ? 1 : 0;
+                var hash = IsFinal ? 1 : 0;
                 hash ^= (hash * 31) + _Labels.Length;
                 hash = _Labels.Aggregate(hash, (current, c) => current ^ (current * 31) + c);
 

@@ -43,7 +43,6 @@ namespace Fare
     /// </summary>
     public class State : IEquatable<State>, IComparable<State>, IComparable
     {
-        private readonly int id;
         private static int nextId;
 
         /// <summary>
@@ -53,13 +52,13 @@ namespace Fare
         public State()
         {
             ResetTransitions();
-            id = Interlocked.Increment(ref nextId);
+            Id = Interlocked.Increment(ref nextId);
         }
 
         /// <summary>
         /// Gets the id.
         /// </summary>
-        public int Id => id;
+        public int Id { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this State is Accept.
@@ -132,7 +131,7 @@ namespace Fare
         {
             unchecked
             {
-                var result = id;
+                var result = Id;
                 result = (result * 397) ^ Accept.GetHashCode();
                 result = (result * 397) ^ Number;
                 return result;
@@ -170,7 +169,7 @@ namespace Fare
                 return true;
             }
 
-            return other.id == id
+            return other.Id == Id
                 && other.Accept.Equals(Accept)
                 && other.Number == Number;
         }

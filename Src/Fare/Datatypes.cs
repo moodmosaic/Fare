@@ -34,8 +34,6 @@ namespace Fare
 {
     public static class Datatypes
     {
-        private static readonly Automaton ws = Automaton.Minimize(Automaton.MakeCharSet(" \t\n\r").Repeat());
-
-        public static Automaton WhitespaceAutomaton => ws;
+        public static Automaton WhitespaceAutomaton { get; } = Automaton.Minimize(Automaton.MakeCharSet(" \t\n\r").Repeat());
     }
 }

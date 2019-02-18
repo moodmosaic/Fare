@@ -44,9 +44,7 @@ namespace Fare
     ///</summary>
     public class Transition : IEquatable<Transition>
     {
-        private readonly char _Max;
         private readonly char _Min;
-        private readonly State _To;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Transition"/> class. (Constructs a new
@@ -60,8 +58,8 @@ namespace Fare
         /// </param>
         public Transition(char c, State to)
         {
-            _Min = _Max = c;
-            _To = to;
+            _Min = Max = c;
+            To = to;
         }
 
         /// <summary>
@@ -87,8 +85,8 @@ namespace Fare
             }
 
             _Min = min;
-            _Max = max;
-            _To = to;
+            Max = max;
+            To = to;
         }
 
         /// <summary>
@@ -99,12 +97,12 @@ namespace Fare
         /// <summary>
         /// Gets the maximum of this transition interval.
         /// </summary>
-        public char Max => _Max;
+        public char Max { get; }
 
         /// <summary>
         /// Gets the destination of this transition.
         /// </summary>
-        public State To => _To;
+        public State To { get; }
 
         /// <summary>
         /// Implements the operator ==.
@@ -140,13 +138,13 @@ namespace Fare
         {
             var sb = new StringBuilder();
             AppendCharString(_Min, sb);
-            if (_Min != _Max)
+            if (_Min != Max)
             {
                 sb.Append("-");
-                AppendCharString(_Max, sb);
+                AppendCharString(Max, sb);
             }
 
-            sb.Append(" -> ").Append(_To.Number);
+            sb.Append(" -> ").Append(To.Number);
             return sb.ToString();
         }
 
@@ -179,8 +177,8 @@ namespace Fare
             unchecked
             {
                 var result = _Min.GetHashCode();
-                result = (result * 397) ^ _Max.GetHashCode();
-                result = (result * 397) ^ (_To != null ? _To.GetHashCode() : 0);
+                result = (result * 397) ^ Max.GetHashCode();
+                result = (result * 397) ^ (To != null ? To.GetHashCode() : 0);
                 return result;
             }
         }
@@ -200,8 +198,8 @@ namespace Fare
             }
 
             return other._Min == _Min
-                   && other._Max == _Max
-                   && Equals(other._To, _To);
+                   && other.Max == Max
+                   && Equals(other.To, To);
         }
 
         private static void AppendCharString(char c, StringBuilder sb)
