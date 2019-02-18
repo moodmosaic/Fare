@@ -51,8 +51,8 @@ namespace Fare
             }
 
             regex = RemoveStartEndMarkers(regex);
-            this._Automaton = new RegExp(regex, _AllExceptAnyString).ToAutomaton();
-            this._Random = random ?? throw new ArgumentNullException(nameof(random));
+            _Automaton = new RegExp(regex, _AllExceptAnyString).ToAutomaton();
+            _Random = random ?? throw new ArgumentNullException(nameof(random));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Fare
         public string Generate()
         {
             var builder = new StringBuilder();
-            this.Generate(builder, _Automaton.Initial);
+            Generate(builder, _Automaton.Initial);
             return builder.ToString();
         }
 
@@ -114,7 +114,7 @@ namespace Fare
 
             // Moving on to next transition.
             var transition = transitions[option - (state.Accept ? 1 : 0)];
-            this.AppendChoice(builder, transition);
+            AppendChoice(builder, transition);
             Generate(builder, transition.To);
         }
 

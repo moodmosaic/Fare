@@ -11,7 +11,7 @@ namespace Fare.IntegrationTests
 
         public XegerTests(ITestOutputHelper testOutput)
         {
-            this._testOutput = testOutput;
+            _testOutput = testOutput;
         }
 
         [Theory, MemberData(nameof(RegexPatternTestCases))]
@@ -21,7 +21,7 @@ namespace Fare.IntegrationTests
             const int repeatCount = 3;
 
             var randomSeed = Environment.TickCount;
-            this._testOutput.WriteLine($"Random seed: {randomSeed}");
+            _testOutput.WriteLine($"Random seed: {randomSeed}");
 
             var random = new HardRandom();
 
@@ -32,7 +32,7 @@ namespace Fare.IntegrationTests
                 .Select(_ =>
                 {
                     var generatedValue = sut.Generate();
-                    this._testOutput.WriteLine($"Generated value: {generatedValue}");
+                    _testOutput.WriteLine($"Generated value: {generatedValue}");
                     return generatedValue;
                 })
                 .ToArray();

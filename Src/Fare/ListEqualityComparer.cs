@@ -74,7 +74,7 @@ namespace Fare
                 return false;
             }
 
-            return this.Equals((ListEqualityComparer<T>)obj);
+            return Equals((ListEqualityComparer<T>)obj);
         }
 
         /// <inheritdoc />

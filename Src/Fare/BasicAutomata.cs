@@ -58,13 +58,17 @@ namespace Fare
         /// </returns>
         public static Automaton MakeAnyString()
         {
-            var state = new State();
-            state.Accept = true;
+            var state = new State
+            {
+                Accept = true
+            };
             state.Transitions.Add(new Transition(char.MinValue, char.MaxValue, state));
 
-            var a = new Automaton();
-            a.Initial = state;
-            a.IsDeterministic = true;
+            var a = new Automaton
+            {
+                Initial = state,
+                IsDeterministic = true
+            };
             return a;
         }
 
@@ -79,9 +83,11 @@ namespace Fare
         /// </returns>
         public static Automaton MakeChar(char c)
         {
-            var a = new Automaton();
-            a.Singleton = c.ToString();
-            a.IsDeterministic = true;
+            var a = new Automaton
+            {
+                Singleton = c.ToString(),
+                IsDeterministic = true
+            };
             return a;
         }
 
@@ -143,9 +149,11 @@ namespace Fare
         /// </returns>
         public static Automaton MakeEmptyString()
         {
-            var a = new Automaton();
-            a.Singleton = string.Empty;
-            a.IsDeterministic = true;
+            var a = new Automaton
+            {
+                Singleton = string.Empty,
+                IsDeterministic = true
+            };
             return a;
         }
 
@@ -225,9 +233,11 @@ namespace Fare
         /// </returns>
         public static Automaton MakeString(string s)
         {
-            var a = new Automaton();
-            a.Singleton = s;
-            a.IsDeterministic = true;
+            var a = new Automaton
+            {
+                Singleton = s,
+                IsDeterministic = true
+            };
             return a;
         }
 
@@ -442,9 +452,11 @@ namespace Fare
             }
 
             Array.Sort(strings, StringUnionOperations.LexicographicOrderComparer);
-            var a = new Automaton();
-            a.Initial = StringUnionOperations.Build(strings);
-            a.IsDeterministic = true;
+            var a = new Automaton
+            {
+                Initial = StringUnionOperations.Build(strings),
+                IsDeterministic = true
+            };
             a.Reduce();
             a.RecomputeHashCode();
             return a;

@@ -60,8 +60,8 @@ namespace Fare
         /// </param>
         public Transition(char c, State to)
         {
-            this._Min = this._Max = c;
-            this._To = to;
+            _Min = _Max = c;
+            _To = to;
         }
 
         /// <summary>
@@ -86,9 +86,9 @@ namespace Fare
                 min = t;
             }
 
-            this._Min = min;
-            this._Max = max;
-            this._To = to;
+            _Min = min;
+            _Max = max;
+            _To = to;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Fare
         /// </summary>
         public char Min
         {
-            get { return this._Min; }
+            get { return _Min; }
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Fare
         /// </summary>
         public char Max
         {
-            get { return this._Max; }
+            get { return _Max; }
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Fare
         /// </summary>
         public State To
         {
-            get { return this._To; }
+            get { return _To; }
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Fare
                 return false;
             }
 
-            return this.Equals((Transition)obj);
+            return Equals((Transition)obj);
         }
 
         /// <inheritdoc/>
@@ -250,12 +250,12 @@ namespace Fare
 
         private void AppendDot(StringBuilder sb)
         {
-            sb.Append(" -> ").Append(this._To.Number).Append(" [label=\"");
-            AppendCharString(this._Min, sb);
-            if (this._Min != this._Max)
+            sb.Append(" -> ").Append(_To.Number).Append(" [label=\"");
+            AppendCharString(_Min, sb);
+            if (_Min != _Max)
             {
                 sb.Append("-");
-                AppendCharString(this._Max, sb);
+                AppendCharString(_Max, sb);
             }
 
             sb.Append("\"]\n");

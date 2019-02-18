@@ -55,7 +55,7 @@ namespace Fare
         /// <returns></returns>
         public int Compare(Transition t1, Transition t2)
         {
-            if (this.toFirst)
+            if (toFirst)
             {
                 if (t1.To != t2.To)
                 {
@@ -101,7 +101,7 @@ namespace Fare
                 return 1;
             }
 
-            if (!this.toFirst)
+            if (!toFirst)
             {
                 if (t1.To != t2.To)
                 {

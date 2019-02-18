@@ -153,9 +153,11 @@ namespace Fare
                 s.AddEpsilon(bb.Initial);
             }
 
-            var automaton = new Automaton();
-            automaton.Initial = s;
-            automaton.IsDeterministic = false;
+            var automaton = new Automaton
+            {
+                Initial = s,
+                IsDeterministic = false
+            };
             automaton.ClearHashCode();
             automaton.CheckMinimizeAlways();
             return automaton;
@@ -543,8 +545,10 @@ namespace Fare
         public static Automaton Repeat(Automaton a)
         {
             a = a.CloneExpanded();
-            var s = new State();
-            s.Accept = true;
+            var s = new State
+            {
+                Accept = true
+            };
             s.AddEpsilon(a.Initial);
             foreach (var p in a.GetAcceptStates())
             {

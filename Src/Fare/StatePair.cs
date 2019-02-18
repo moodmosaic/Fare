@@ -47,9 +47,9 @@ namespace Fare
         /// <param name="s2">The s2.</param>
         public StatePair(State s, State s1, State s2)
         {
-            this.S = s;
-            this.FirstState = s1;
-            this.SecondState = s2;
+            S = s;
+            FirstState = s1;
+            SecondState = s2;
         }
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace Fare
                 return true;
             }
 
-            return Equals(other.FirstState, this.FirstState)
-                && Equals(other.SecondState, this.SecondState);
+            return Equals(other.FirstState, FirstState)
+                && Equals(other.SecondState, SecondState);
         }
 
         /// <inheritdoc />
@@ -141,7 +141,7 @@ namespace Fare
                 return false;
             }
 
-            return this.Equals((StatePair)obj);
+            return Equals((StatePair)obj);
         }
 
         /// <inheritdoc />
@@ -150,8 +150,8 @@ namespace Fare
             unchecked
             {
                 var result = 0;
-                result = (result * 397) ^ (this.FirstState != null ? this.FirstState.GetHashCode() : 0);
-                result = (result * 397) ^ (this.SecondState != null ? this.SecondState.GetHashCode() : 0);
+                result = (result * 397) ^ (FirstState != null ? FirstState.GetHashCode() : 0);
+                result = (result * 397) ^ (SecondState != null ? SecondState.GetHashCode() : 0);
                 return result;
             }
         }

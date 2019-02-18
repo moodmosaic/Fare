@@ -49,11 +49,11 @@ namespace Fare
             {
                 switch (Automaton.Minimization)
                 {
-                    case Automaton.MinimizeHuffman:
+                    case Automaton._MinimizeHuffman:
                         MinimizeHuffman(a);
                         break;
 
-                    case Automaton.MinimizeBrzozowski:
+                    case Automaton._MinimizeBrzozowski:
                         MinimizeBrzozowski(a);
                         break;
 
@@ -547,8 +547,8 @@ namespace Fare
 
             public IntPair(int n1, int n2)
             {
-                this._N1 = n1;
-                this._N2 = n2;
+                _N1 = n1;
+                _N2 = n2;
             }
 
             public int N1
