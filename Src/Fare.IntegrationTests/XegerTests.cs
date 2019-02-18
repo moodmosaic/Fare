@@ -13,18 +13,18 @@ namespace Fare.IntegrationTests
         {
             this._testOutput = testOutput;
         }
-        
+
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
             // Arrange
             const int repeatCount = 3;
-            
+
             var randomSeed = Environment.TickCount;
             this._testOutput.WriteLine($"Random seed: {randomSeed}");
-            
-            var random = new Random(randomSeed);
-            
+
+            var random = new HardRandom();
+
             var sut = new Fare.Xeger(pattern, random);
 
             // Act

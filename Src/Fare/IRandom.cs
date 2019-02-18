@@ -51,7 +51,7 @@
 
         public static long NextInt64(this IRandom random, long min, long max) => (long)(min + (max - min) * random.NextPercentage());
 
-        public static double NextPercentage(this IRandom random) => random.NextUInt64() / (double)ulong.MaxValue;
+        public static double NextPercentage(this IRandom random) => (double)Math.Round(random.NextUInt64() / (decimal)ulong.MaxValue, 5);
 
         public static sbyte NextSByte(this IRandom random) => (sbyte)random.NextByte();
 

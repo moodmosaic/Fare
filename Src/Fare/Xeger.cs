@@ -3,7 +3,7 @@
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://code.google.com/p/xeger/
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,23 +23,27 @@ using System.Text;
 namespace Fare
 {
     /// <summary>
-    /// An object that will generate text from a regular expression. In a way, 
-    /// it's the opposite of a regular expression matcher: an instance of this class
-    /// will produce text that is guaranteed to match the regular expression passed in.
+    /// An object that will generate text from a regular expression. In a way, it's the opposite of a
+    /// regular expression matcher: an instance of this class will produce text that is guaranteed to
+    /// match the regular expression passed in.
     /// </summary>
     public class Xeger
     {
         private const RegExpSyntaxOptions AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
 
         private readonly Automaton automaton;
-        private readonly Random random;
+        private readonly IRandom random;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
-        /// <param name="regex">The regex.</param>
-        /// <param name="random">The random.</param>
-        public Xeger(string regex, Random random)
+        /// <param name="regex">
+        /// The regex.
+        /// </param>
+        /// <param name="random">
+        /// The random.
+        /// </param>
+        public Xeger(string regex, IRandom random)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -51,7 +55,6 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
-
             regex = RemoveStartEndMarkers(regex);
             this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
             this.random = random;
@@ -60,34 +63,25 @@ namespace Fare
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
-        /// <param name="regex">The regex.</param>
+        /// <param name="regex">
+        /// The regex.
+        /// </param>
         public Xeger(string regex)
-            : this(regex, new Random())
+            : this(regex, new HardRandom())
         {
         }
 
         /// <summary>
-        /// Generates a random String that is guaranteed to match the regular expression passed to the constructor.
+        /// Generates a random String that is guaranteed to match the regular expression passed to
+        /// the constructor.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// </returns>
         public string Generate()
         {
             var builder = new StringBuilder();
             this.Generate(builder, automaton.Initial);
             return builder.ToString();
-        }
-
-        /// <summary>
-        /// Generates a random number within the given bounds.
-        /// </summary>
-        /// <param name="min">The minimum number (inclusive).</param>
-        /// <param name="max">The maximum number (inclusive).</param>
-        /// <param name="random">The object used as the randomizer.</param>
-        /// <returns>A random number in the given range.</returns>
-        private static int GetRandomInt(int min, int max, Random random)
-        {
-            int maxForRandom = max - min + 1;
-            return random.Next(maxForRandom) + min;
         }
 
         private void Generate(StringBuilder builder, State state)
@@ -104,7 +98,7 @@ namespace Fare
             }
 
             int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            int option = Xeger.GetRandomInt(0, nroptions, random);
+            int option = random.NextInt32(0, nroptions);
             if (state.Accept && option == 0)
             {
                 // 0 is considered stop.
@@ -119,7 +113,7 @@ namespace Fare
 
         private void AppendChoice(StringBuilder builder, Transition transition)
         {
-            var c = (char)Xeger.GetRandomInt(transition.Min, transition.Max, random);
+            var c = (char)random.NextInt32(transition.Min, transition.Max);
             builder.Append(c);
         }
 
