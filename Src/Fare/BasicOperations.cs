@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -41,12 +41,16 @@ namespace Fare
     public static class BasicOperations
     {
         /// <summary>
-        /// Adds epsilon transitions to the given automaton. This method adds extra character interval
-        /// transitions that are equivalent to the given set of epsilon transitions.
+        /// Adds epsilon transitions to the given automaton. This method adds extra character
+        /// interval transitions that are equivalent to the given set of epsilon transitions.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <param name="pairs">A collection of <see cref="StatePair"/> objects representing pairs of
-        /// source/destination states where epsilon transitions should be added.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <param name="pairs">
+        /// A collection of <see cref="StatePair"/> objects representing pairs of source/destination
+        /// states where epsilon transitions should be added.
+        /// </param>
         public static void AddEpsilons(Automaton a, ICollection<StatePair> pairs)
         {
             a.ExpandSingleton();
@@ -123,7 +127,9 @@ namespace Fare
         /// <summary>
         /// Returns an automaton that accepts the union of the languages of the given automata.
         /// </summary>
-        /// <param name="automatons">The l.</param>
+        /// <param name="automatons">
+        /// The l.
+        /// </param>
         /// <returns>
         /// An automaton that accepts the union of the languages of the given automata.
         /// </returns>
@@ -164,12 +170,15 @@ namespace Fare
         }
 
         /// <summary>
-        /// Returns a (deterministic) automaton that accepts the complement of the language of the 
+        /// Returns a (deterministic) automaton that accepts the complement of the language of the
         /// given automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <returns>A (deterministic) automaton that accepts the complement of the language of the 
-        /// given automaton.</returns>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <returns>
+        /// A (deterministic) automaton that accepts the complement of the language of the given automaton.
+        /// </returns>
         /// <remarks>
         /// Complexity: linear in number of states (if already deterministic).
         /// </remarks>
@@ -305,7 +314,9 @@ namespace Fare
         /// <remarks>
         /// Complexity: exponential in number of states.
         /// </remarks>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         public static void Determinize(Automaton a)
         {
             if (a.IsDeterministic || a.IsSingleton)
@@ -313,16 +324,22 @@ namespace Fare
                 return;
             }
 
-            var initialset = new HashSet<State>();
-            initialset.Add(a.Initial);
+            var initialset = new HashSet<State>
+            {
+                a.Initial
+            };
             Determinize(a, initialset.ToList());
         }
 
         /// <summary>
         /// Determinizes the given automaton using the given set of initial states.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <param name="initialset">The initial states.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <param name="initialset">
+        /// The initial states.
+        /// </param>
         public static void Determinize(Automaton a, List<State> initialset)
         {
             var points = a.GetStartPoints();
@@ -392,9 +409,11 @@ namespace Fare
         /// <summary>
         /// Determines whether the given automaton accepts no strings.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         /// <returns>
-        ///   <c>true</c> if the given automaton accepts no strings; otherwise, <c>false</c>.
+        /// <c>true</c> if the given automaton accepts no strings; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsEmpty(Automaton a)
         {
@@ -409,10 +428,11 @@ namespace Fare
         /// <summary>
         /// Determines whether the given automaton accepts the empty string and nothing else.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         /// <returns>
-        ///   <c>true</c> if the given automaton accepts the empty string and nothing else; otherwise,
-        /// <c>false</c>.
+        /// <c>true</c> if the given automaton accepts the empty string and nothing else; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsEmptyString(Automaton a)
         {
@@ -425,12 +445,17 @@ namespace Fare
         }
 
         /// <summary>
-        /// Returns an automaton that accepts the intersection of the languages of the given automata.
-        /// Never modifies the input automata languages.
+        /// Returns an automaton that accepts the intersection of the languages of the given
+        /// automata. Never modifies the input automata languages.
         /// </summary>
-        /// <param name="a1">The a1.</param>
-        /// <param name="a2">The a2.</param>
-        /// <returns></returns>
+        /// <param name="a1">
+        /// The a1.
+        /// </param>
+        /// <param name="a2">
+        /// The a2.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Automaton Intersection(Automaton a1, Automaton a2)
         {
             if (a1.IsSingleton)
@@ -508,15 +533,18 @@ namespace Fare
         }
 
         /// <summary>
-        /// Returns an automaton that accepts the union of the empty string and the language of the 
+        /// Returns an automaton that accepts the union of the empty string and the language of the
         /// given automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         /// <remarks>
         /// Complexity: linear in number of states.
         /// </remarks>
-        /// <returns>An automaton that accepts the union of the empty string and the language of the 
-        /// given automaton.</returns>
+        /// <returns>
+        /// An automaton that accepts the union of the empty string and the language of the given automaton.
+        /// </returns>
         public static Automaton Optional(Automaton a)
         {
             a = a.CloneExpandedIfRequired();
@@ -534,10 +562,12 @@ namespace Fare
         /// Accepts the Kleene star (zero or more concatenated repetitions) of the language of the
         /// given automaton. Never modifies the input automaton language.
         /// </summary>
-        /// <param name="a">The automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
         /// <returns>
-        /// An automaton that accepts the Kleene star (zero or more concatenated repetitions)
-        /// of the language of the given automaton. Never modifies the input automaton language.
+        /// An automaton that accepts the Kleene star (zero or more concatenated repetitions) of the
+        /// language of the given automaton. Never modifies the input automaton language.
         /// </returns>
         /// <remarks>
         /// Complexity: linear in number of states.
@@ -563,17 +593,31 @@ namespace Fare
         }
 
         /// <summary>
-        /// Accepts <code>min</code> or more concatenated repetitions of the language of the given 
-        /// automaton.
+        /// Accepts
+        /// <code>
+        /// min
+        /// </code>
+        /// or more concatenated repetitions of the language of the given automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <param name="min">The minimum concatenated repetitions of the language of the given 
-        /// automaton.</param>
-        /// <returns>Returns an automaton that accepts <code>min</code> or more concatenated 
-        /// repetitions of the language of the given automaton.
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <param name="min">
+        /// The minimum concatenated repetitions of the language of the given automaton.
+        /// </param>
+        /// <returns>
+        /// Returns an automaton that accepts
+        /// <code>
+        /// min
+        /// </code>
+        /// or more concatenated repetitions of the language of the given automaton.
         /// </returns>
         /// <remarks>
-        /// Complexity: linear in number of states and in <code>min</code>.
+        /// Complexity: linear in number of states and in
+        /// <code>
+        /// min
+        /// </code>
+        /// .
         /// </remarks>
         public static Automaton Repeat(Automaton a, int min)
         {
@@ -593,20 +637,46 @@ namespace Fare
         }
 
         /// <summary>
-        /// Accepts between <code>min</code> and <code>max</code> (including both) concatenated
-        /// repetitions of the language of the given automaton.
+        /// Accepts between
+        /// <code>
+        /// min
+        /// </code>
+        /// and
+        /// <code>
+        /// max
+        /// </code>
+        /// (including both) concatenated repetitions of the language of the given automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <param name="min">The minimum concatenated repetitions of the language of the given
-        /// automaton.</param>
-        /// <param name="max">The maximum concatenated repetitions of the language of the given
-        /// automaton.</param>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <param name="min">
+        /// The minimum concatenated repetitions of the language of the given automaton.
+        /// </param>
+        /// <param name="max">
+        /// The maximum concatenated repetitions of the language of the given automaton.
+        /// </param>
         /// <returns>
-        /// Returns an automaton that accepts between <code>min</code> and <code>max</code>
+        /// Returns an automaton that accepts between
+        /// <code>
+        /// min
+        /// </code>
+        /// and
+        /// <code>
+        /// max
+        /// </code>
         /// (including both) concatenated repetitions of the language of the given automaton.
         /// </returns>
         /// <remarks>
-        /// Complexity: linear in number of states and in <code>min</code> and <code>max</code>.
+        /// Complexity: linear in number of states and in
+        /// <code>
+        /// min
+        /// </code>
+        /// and
+        /// <code>
+        /// max
+        /// </code>
+        /// .
         /// </remarks>
         public static Automaton Repeat(Automaton a, int min, int max)
         {
@@ -667,12 +737,17 @@ namespace Fare
         /// <summary>
         /// Returns true if the given string is accepted by the automaton.
         /// </summary>
-        /// <param name="a">The automaton.</param>
-        /// <param name="s">The string.</param>
-        /// <returns></returns>
+        /// <param name="a">
+        /// The automaton.
+        /// </param>
+        /// <param name="s">
+        /// The string.
+        /// </param>
+        /// <returns>
+        /// </returns>
         /// <remarks>
-        /// Complexity: linear in the length of the string.
-        /// For full performance, use the RunAutomaton class.
+        /// Complexity: linear in the length of the string. For full performance, use the
+        /// RunAutomaton class.
         /// </remarks>
         public static bool Run(Automaton a, string s)
         {

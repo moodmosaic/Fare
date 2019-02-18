@@ -421,7 +421,7 @@ namespace Fare
         {
             for (var i = 0; i < size; i++)
             {
-                list.Add(default(T));
+                list.Add(default);
             }
         }
 

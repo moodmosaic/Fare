@@ -421,15 +421,6 @@ namespace Fare
             return r;
         }
 
-        private static RegExp MakeAnyChar()
-        {
-            var r = new RegExp
-            {
-                _Kind = Kind.RegexpAnyChar
-            };
-            return r;
-        }
-
         private static RegExp MakeAnyPrintableASCIIChar() => MakeCharRange(' ', '~');
 
         private static RegExp MakeCharRange(char from, char to)

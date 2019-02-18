@@ -232,18 +232,5 @@ namespace Fare
                 }
             }
         }
-
-        private void AppendDot(StringBuilder sb)
-        {
-            sb.Append(" -> ").Append(_To.Number).Append(" [label=\"");
-            AppendCharString(_Min, sb);
-            if (_Min != _Max)
-            {
-                sb.Append("-");
-                AppendCharString(_Max, sb);
-            }
-
-            sb.Append("\"]\n");
-        }
     }
 }

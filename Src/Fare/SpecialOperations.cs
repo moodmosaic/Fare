@@ -110,8 +110,6 @@ namespace Fare
         /// </returns>
         public static Automaton Overlap(Automaton a1, Automaton a2) => throw new NotImplementedException();
 
-        private static void AcceptToAccept(Automaton a) => throw new NotImplementedException();
-
         /// <summary>
         /// Returns an automaton that accepts the single chars that occur in strings that are
         /// accepted by the given automaton. Never modifies the input automaton.
@@ -156,8 +154,6 @@ namespace Fare
         /// <returns>
         /// </returns>
         public static Automaton Trim(Automaton a, string set, char c) => throw new NotImplementedException();
-
-        private static void AddSetTransitions(State s, string set, State p) => throw new NotImplementedException();
 
         /// <summary>
         /// Returns an automaton that accepts the compressed language of the given automaton.
@@ -219,19 +215,6 @@ namespace Fare
         /// <returns>
         /// </returns>
         public static Automaton Subst(Automaton a, IDictionary<char, HashSet<char>> dictionary) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Rinds the largest entry whose value is less than or equal to c, or 0 if there is no such entry.
-        /// </summary>
-        /// <param name="c">
-        /// The c.
-        /// </param>
-        /// <param name="points">
-        /// The points.
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private static int FindIndex(char c, char[] points) => throw new NotImplementedException();
 
         /// <summary>
         /// Returns an automaton where all transitions of the given char are replaced by a string.
@@ -330,24 +313,6 @@ namespace Fare
         public static bool IsFinite(Automaton a) => throw new NotImplementedException();
 
         /// <summary>
-        /// Checks whether there is a loop containing s. (This is sufficient since there are never
-        /// transitions to dead states).
-        /// </summary>
-        /// <param name="s">
-        /// The s.
-        /// </param>
-        /// <param name="path">
-        /// The path.
-        /// </param>
-        /// <param name="visited">
-        /// The visited.
-        /// </param>
-        /// <returns>
-        /// <c>true</c> if the specified s is finite; otherwise, <c>false</c>.
-        /// </returns>
-        private static bool IsFinite(State s, HashSet<State> path, HashSet<State> visited) => throw new NotImplementedException();
-
-        /// <summary>
         /// Returns the set of accepted strings of the given length.
         /// </summary>
         /// <param name="a">
@@ -359,8 +324,6 @@ namespace Fare
         /// <returns>
         /// </returns>
         public static HashSet<string> GetStrings(Automaton a, int length) => throw new NotImplementedException();
-
-        private static void GetStrings(State s, HashSet<string> strings, StringBuilder path, int length) => throw new NotImplementedException();
 
         /// <summary>
         /// Returns the set of accepted strings, assuming this automaton has a finite language. If
@@ -397,41 +360,6 @@ namespace Fare
         /// <returns>
         /// </returns>
         public static HashSet<string> GetFiniteStrings(Automaton a, int limit) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Returns the strings that can be produced from the given state, or false if more than
-        /// <code>
-        /// limit
-        /// </code>
-        /// strings are found.
-        /// <code>
-        /// limit
-        /// </code>
-        /// &lt;0 means "infinite".
-        /// </summary>
-        /// <param name="s">
-        /// The s.
-        /// </param>
-        /// <param name="pathStates">
-        /// The path states.
-        /// </param>
-        /// <param name="strings">
-        /// The strings.
-        /// </param>
-        /// <param name="path">
-        /// The path.
-        /// </param>
-        /// <param name="limit">
-        /// The limit.
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private static bool GetFiniteStrings(
-            State s,
-            HashSet<State> pathStates,
-            HashSet<string> strings,
-            StringBuilder path,
-            int limit) => throw new NotImplementedException();
 
         /// <summary>
         /// Returns the longest string that is a prefix of all accepted strings and visits each state
