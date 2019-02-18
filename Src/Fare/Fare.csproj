@@ -23,4 +23,8 @@
     <PackageLicenseUrl>https://github.com/moodmosaic/Fare/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>Regex Test NFA DFA Automaton</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3" />
+  </ItemGroup>
 </Project>
