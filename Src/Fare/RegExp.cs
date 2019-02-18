@@ -265,7 +265,7 @@ namespace Fare
         /// <returns>
         /// The previous value of the flag.
         /// </returns>
-        public bool SetAllowMutate(bool flag)
+        public static bool SetAllowMutate(bool flag)
         {
             var @bool = _AllowMutation;
             _AllowMutation = flag;
@@ -895,7 +895,7 @@ namespace Fare
                         throw new ArgumentException("integer expected at position " + _Pos);
                     }
 
-                    var n = int.Parse(_B.Substring(start, _Pos - start));
+                    var n = int.Parse(_B[start.._Pos]);
                     var m = -1;
                     if (Match(','))
                     {
@@ -907,7 +907,7 @@ namespace Fare
 
                         if (start != _Pos)
                         {
-                            m = int.Parse(_B.Substring(start, _Pos - start));
+                            m = int.Parse(_B[start.._Pos]);
                         }
                     }
                     else
@@ -1004,7 +1004,7 @@ namespace Fare
                     throw new ArgumentException("expected '\"' at position " + _Pos);
                 }
 
-                return MakeString(_B.Substring(start, ((_Pos - 1) - start)));
+                return MakeString(_B[start.._Pos - 1]);
             }
 
             if (Match('('))
@@ -1041,7 +1041,7 @@ namespace Fare
                     throw new ArgumentException("expected '>' at position " + _Pos);
                 }
 
-                var str = _B.Substring(start, ((_Pos - 1) - start));
+                var str = _B[start.._Pos - 1];
                 var i = str.IndexOf('-');
                 if (i == -1)
                 {
@@ -1065,8 +1065,8 @@ namespace Fare
                         throw new FormatException();
                     }
 
-                    var smin = str.Substring(0, i - 0);
-                    var smax = str.Substring(i + 1, (str.Length - (i + 1)));
+                    var smin = str[..i];
+                    var smax = str[i + 1..];
                     var imin = int.Parse(smin);
                     var imax = int.Parse(smax);
                     var numdigits = smin.Length == smax.Length ? smin.Length : 0;

@@ -668,7 +668,7 @@ namespace Fare
             }
             else
             {
-                b1.Append(value.Substring(i, p - i));
+                b1.Append(value[i..p]);
                 i = value.Length - 1;
                 while (i > p)
                 {
@@ -681,7 +681,7 @@ namespace Fare
                     i--;
                 }
 
-                b2.Append(value.Substring(p + 1, i + 1 - (p + 1)));
+                b2.Append(value[p + 1..i + 1]);
             }
 
             if (b1.Length == 0)
@@ -742,7 +742,7 @@ namespace Fare
                 for (var j = i; j >= 1; j--)
                 {
                     var d = s[j - 1];
-                    if (!done.Contains(d) && s.Substring(0, j - 1).Equals(s.Substring(i - j + 1, i - (i - j + 1))))
+                    if (!done.Contains(d) && s.Substring(0, j - 1).Equals(s[i - j + 1..i]))
                     {
                         states[i].Transitions.Add(new Transition(d, states[j]));
                         done.Add(d);

@@ -213,7 +213,7 @@ namespace Fare
                 get
                 {
                     Debug.Assert(HasChildren, "No outgoing transitions.");
-                    return _States[_States.Length - 1];
+                    return _States[^1];
                 }
             }
 
@@ -251,8 +251,8 @@ namespace Fare
                 _Labels = CopyOf(_Labels, _Labels.Length + 1);
                 _States = CopyOf(_States, _States.Length + 1);
 
-                _Labels[_Labels.Length - 1] = label;
-                return _States[_States.Length - 1] = new State();
+                _Labels[^1] = label;
+                return _States[^1] = new State();
             }
 
             public State GetLastChild(char label)
@@ -271,7 +271,7 @@ namespace Fare
             public void ReplaceLastChild(State state)
             {
                 Debug.Assert(HasChildren, "No outgoing transitions.");
-                _States[_States.Length - 1] = state;
+                _States[^1] = state;
             }
 
             private static char[] CopyOf(char[] original, int newLength)

@@ -1,12 +1,12 @@
 ﻿/*
  * dk.brics.automaton
- * 
+ *
  * Copyright (c) 2001-2011 Anders Moeller
  * All rights reserved.
  * http://github.com/moodmosaic/Fare/
  * Original Java code:
  * http://www.brics.dk/automaton/
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -39,8 +39,12 @@ namespace Fare
         /// <summary>
         /// Determines whether the specified objects are equal.
         /// </summary>
-        /// <param name="x">The first object of type <paramref name="x"/> to compare.</param>
-        /// <param name="y">The second object of type <paramref name="y"/> to compare.</param>
+        /// <param name="x">
+        /// The first object of type <paramref name="x"/> to compare.
+        /// </param>
+        /// <param name="y">
+        /// The second object of type <paramref name="y"/> to compare.
+        /// </param>
         /// <returns>
         /// true if the specified objects are equal; otherwise, false.
         /// </returns>
@@ -52,14 +56,16 @@ namespace Fare
         /// <summary>
         /// Returns a hash code for this instance.
         /// </summary>
-        /// <param name="obj">The obj.</param>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
         /// <returns>
         /// A hash code for this instance, suitable for use in hashing algorithms and data structures
-        /// like a hash table. 
+        /// like a hash table.
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">
         /// The type of <paramref name="obj"/> is a reference type and <paramref name="obj"/> is null.
-        ///   </exception>
+        /// </exception>
         public int GetHashCode(State obj)
         {
             return obj.GetHashCode();

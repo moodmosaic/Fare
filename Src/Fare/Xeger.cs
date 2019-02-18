@@ -118,7 +118,7 @@ namespace Fare
             Generate(builder, transition.To);
         }
 
-        private string RemoveStartEndMarkers(string regExp)
+        private static string RemoveStartEndMarkers(string regExp)
         {
             if (regExp.StartsWith("^"))
             {
@@ -127,7 +127,7 @@ namespace Fare
 
             if (regExp.EndsWith("$"))
             {
-                regExp = regExp.Substring(0, regExp.Length - 1);
+                regExp = regExp[0..^1];
             }
 
             return regExp;

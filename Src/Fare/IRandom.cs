@@ -53,14 +53,18 @@
 
         public static double NextPercentage(this IRandom random) => (double)Math.Round(random.NextUInt64() / (decimal)ulong.MaxValue, 5);
 
+        [CLSCompliant(false)]
         public static sbyte NextSByte(this IRandom random) => (sbyte)random.NextByte();
 
         public static float NextSingle(this IRandom random) => BitConverter.ToSingle(random.NextBytes(4), 0);
 
+        [CLSCompliant(false)]
         public static ushort NextUInt16(this IRandom random) => BitConverter.ToUInt16(random.NextBytes(2), 0);
 
+        [CLSCompliant(false)]
         public static uint NextUInt32(this IRandom random) => BitConverter.ToUInt32(random.NextBytes(4), 0);
 
+        [CLSCompliant(false)]
         public static ulong NextUInt64(this IRandom random) => BitConverter.ToUInt64(random.NextBytes(8), 0);
     }
 }
