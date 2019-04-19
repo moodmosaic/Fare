@@ -2,7 +2,7 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net35;netstandard1.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyTitle>Fare</AssemblyTitle>
     <AssemblyName>Fare</AssemblyName>
     <Copyright>Copyright © Nikos Baxevanis 2016</Copyright>

@@ -65,6 +65,8 @@ namespace Fare.IntegrationTests
 
         public static TheoryData<string> RegexPatternTestCases => new TheoryData<string>
         {
+            @"\d{8}(#)\d{3}",   // pattern reported for issue 32
+            
             "[ab]{4,6}",
             "[ab]{4,6}c",
             "(a|b)*ab",
