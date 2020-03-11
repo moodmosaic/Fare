@@ -837,10 +837,16 @@ namespace Fare
                 return MakeAnyPrintableASCIIChar();
             }
 
-            if (this.Check(RegExpSyntaxOptions.Empty) && this.Match('#'))
-            {
-                return RegExp.MakeEmpty();
-            }
+            /* Issue 32, https://github.com/moodmosaic/Fare/issues/32
+            *   The intent of the original code is a little unclear.  The comment for the Empty value in the 
+            *   enum is 'Enables empty language.'  Using '#' as token seems non-standard, and caused
+            *   unhandled exception in some cases.  The best option at this point is to remove handling of the
+            *   Empty option until a proper implementation is proposed.
+             */
+            // if (this.Check(RegExpSyntaxOptions.Empty) && this.Match('#'))
+            // {
+            //     return RegExp.MakeEmpty();
+            // }
 
             if (this.Check(RegExpSyntaxOptions.Anystring) && this.Match('@'))
             {
