@@ -41,6 +41,27 @@ namespace Fare.IntegrationTests
             Assert.All(result, regex => Assert.Matches(pattern, regex));
         }
 
+        [Fact]
+        public void GeneratedTextsAreDifferentWhenUsingDefaultCtorAndNewXegerRapidly()
+        {
+            // Arrange
+            const int repeatCount = 10;
+
+            // Act
+            var result = Enumerable.Repeat(0, repeatCount)
+                .Select(_ =>
+                {
+                    Xeger sut = new Xeger(".{10}");
+                    string generatedValue = sut.Generate();
+                    this._testOutput.WriteLine($"Generated value: {generatedValue}");
+                    return generatedValue;
+                })
+                .ToArray();
+
+            // Assert
+            Assert.Equal(result.Distinct(), result);
+        }
+
 #if REX_AVAILABLE
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrectWithRexEngine(string pattern)
