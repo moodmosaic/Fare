@@ -14,36 +14,6 @@ namespace Fare.IntegrationTests
             this._testOutput = testOutput;
         }
 
-        [Fact]
-        public void NewXeger2()
-        {
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-            new PR56Option2.Xeger(".");
-        }
-
-        [Fact]
-        public void NewXeger()
-        {
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-            new Xeger(".");
-        }
-
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
@@ -69,27 +39,6 @@ namespace Fare.IntegrationTests
 
             // Assert
             Assert.All(result, regex => Assert.Matches(pattern, regex));
-        }
-
-        [Fact]
-        public void GeneratedTextsAreDifferentWhenUsingDefaultCtorAndNewXegerRapidly()
-        {
-            // Arrange
-            const int repeatCount = 10;
-
-            // Act
-            var result = Enumerable.Repeat(0, repeatCount)
-                .Select(_ =>
-                {
-                    Xeger sut = new Xeger(".{10}");
-                    string generatedValue = sut.Generate();
-                    this._testOutput.WriteLine($"Generated value: {generatedValue}");
-                    return generatedValue;
-                })
-                .ToArray();
-
-            // Assert
-            Assert.Equal(result.Distinct(), result);
         }
 
 #if REX_AVAILABLE
