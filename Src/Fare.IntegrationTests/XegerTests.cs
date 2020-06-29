@@ -13,7 +13,37 @@ namespace Fare.IntegrationTests
         {
             this._testOutput = testOutput;
         }
-        
+
+        [Fact]
+        public void NewXeger2()
+        {
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+            new PR56Option2.Xeger(".");
+        }
+
+        [Fact]
+        public void NewXeger()
+        {
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+            new Xeger(".");
+        }
+
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
