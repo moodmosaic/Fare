@@ -9,7 +9,7 @@ namespace Fare.Benchmarking
         private readonly Random random = new Random();
 
         [Benchmark]
-        public Xeger XegerCtorSimple() => new Xeger(Pattern);
+        public Xeger XegerCtorSimple() => new Xeger(".");
 
         [Benchmark]
         public Xeger XegerCtorInjectRandom() => new Xeger(Pattern, this.random);
