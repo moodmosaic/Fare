@@ -13,7 +13,7 @@ namespace Fare.IntegrationTests
         {
             this._testOutput = testOutput;
         }
-        
+
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrect(string pattern)
         {
