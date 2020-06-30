@@ -59,9 +59,9 @@ namespace Fare
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.<br/>
-        /// Note that if multiple instances are created within short time, using this overload,<br/>
+        /// Note that if multiple instances are created within short time using this overload,<br/>
         /// the instances might generate identical random strings.<br/>
-        /// To avoid this - use the constructor overload that accepts an argument of type Random
+        /// To avoid this, use the constructor overload that accepts an argument of type Random.
         /// </summary>
         /// <param name="regex">The regex.</param>
         public Xeger(string regex)

@@ -6,7 +6,7 @@ namespace Fare.Benchmarking
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Benchmark>();
+            BenchmarkRunner.Run<Benchmark>();
         }
     }
 }
