@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Text;
 
 namespace Fare
@@ -106,16 +107,15 @@ namespace Fare
                 return;
             }
 
-            int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            int option = Xeger.GetRandomInt(0, nroptions, random);
-            if (state.Accept && option == 0)
+            if (state.Accept)
             {
-                // 0 is considered stop.
-                return;
+
+                var optionsCount = transitions.Sum(x => x.Max - x.Min + 1);
+                if (this.random.Next(optionsCount + 1) == 0) return;
             }
 
-            // Moving on to next transition.
-            Transition transition = transitions[option - (state.Accept ? 1 : 0)];
+            var transition = transitions.RandomItemWithProbability(x => x.Max - x.Min + 1);
+            
             this.AppendChoice(builder, transition);
             Generate(builder, transition.To);
         }
