@@ -34,13 +34,14 @@ namespace Fare
 
         private readonly Automaton automaton;
         private readonly Random random;
+        private readonly string anyCharCharset;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
         /// <param name="regex">The regex.</param>
         /// <param name="random">The random.</param>
-        public Xeger(string regex, Random random)
+        public Xeger(string regex, Random random, string anyCharCharset = null)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -52,9 +53,13 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
+            if (anyCharCharset != null)
+            {
+                this.anyCharCharset = anyCharCharset;
+            }
 
             regex = RemoveStartEndMarkers(regex);
-            this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
+            this.automaton = new RegExp(regex, anyCharCharset, AllExceptAnyString).ToAutomaton();
             this.random = random;
         }
 
