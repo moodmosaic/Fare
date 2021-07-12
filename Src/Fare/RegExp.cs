@@ -652,8 +652,10 @@ namespace Fare
         public string UsedChars()
         {
             var sb1 = new StringBuilder();
-            return this.ToAlphabetStringBuilder(sb1).ToString();
+            var str = (this.ToAlphabetStringBuilder(sb1).ToString()).Cast<char>().Distinct().OrderBy(x=>x).ToArray();
+            return new string(str);
         }
+        
         private StringBuilder ToAlphabetStringBuilder(StringBuilder sb)
         {
             switch (kind)
@@ -674,7 +676,7 @@ namespace Fare
                 case Kind.RegexpRepeat:
                 case Kind.RegexpRepeatMin:
                 case Kind.RegexpRepeatMinMax:
-                    exp1.ToStringBuilder(sb);
+                    exp1.ToAlphabetStringBuilder(sb);
                     break;
                 case Kind.RegexpComplement:
                     var sbc = new StringBuilder();

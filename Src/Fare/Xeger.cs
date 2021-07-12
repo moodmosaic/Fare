@@ -59,8 +59,15 @@ namespace Fare
             }
 
             regex = RemoveStartEndMarkers(regex);
-            this.automaton = new RegExp(regex, anyCharCharset, AllExceptAnyString).ToAutomaton();
+            var rx = new RegExp(regex, anyCharCharset, AllExceptAnyString);
+            this.RegexCharset = rx.UsedChars();
+            this.automaton = rx.ToAutomaton();
             this.random = random;
+        }
+
+        public string RegexCharset
+        {
+            get;
         }
 
         /// <summary>
