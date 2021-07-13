@@ -34,14 +34,15 @@ namespace Fare
 
         private readonly Automaton automaton;
         private readonly Random random;
-        private readonly string anyCharCharset;
+        private readonly string anyCharAlphabet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
         /// <param name="regex">The regex.</param>
         /// <param name="random">The random.</param>
-        public Xeger(string regex, Random random, string anyCharCharset = null)
+        /// <param name="anyCharAlphabet">The list of characters used for computing the possible values for classes "." "\s", "\d", "\w" (and "\S", "\D", "\W"). It does not check explicitly defined chars in regexp.</param>
+        public Xeger(string regex, Random random, string anyCharAlphabet = null)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -53,19 +54,19 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
-            if (anyCharCharset != null)
+            if (anyCharAlphabet != null)
             {
-                this.anyCharCharset = anyCharCharset;
+                this.anyCharAlphabet = anyCharAlphabet;
             }
 
             regex = RemoveStartEndMarkers(regex);
-            var rx = new RegExp(regex, anyCharCharset, AllExceptAnyString);
-            this.RegexCharset = rx.UsedChars();
+            var rx = new RegExp(regex, anyCharAlphabet, AllExceptAnyString);
+            this.UsedAlphabet = rx.UsedAlphabet();
             this.automaton = rx.ToAutomaton();
             this.random = random;
         }
 
-        public string RegexCharset
+        public string UsedAlphabet
         {
             get;
         }

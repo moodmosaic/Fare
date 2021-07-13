@@ -71,7 +71,7 @@ namespace Fare.IntegrationTests
                 .Select(_ =>
                 {
                     var generatedValue0 = sut.Generate();
-                    var generatedValue1 = sut.RegexCharset;
+                    var generatedValue1 = sut.UsedAlphabet;
                     this._testOutput.WriteLine($"charset value: {generatedValue1}");
                     return new Tuple<string,string>(generatedValue0, generatedValue1);
                 })

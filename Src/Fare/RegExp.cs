@@ -60,7 +60,7 @@ namespace Fare
         private int pos;
         private string s;
         private char to;
-        private string anyCharCharset;
+        private string anyCharAlphabet;
 
         /// <summary>
         ///   Prevents a default instance of the <see cref = "RegExp" /> class from being created.
@@ -73,8 +73,9 @@ namespace Fare
         ///   Initializes a new instance of the <see cref = "RegExp" /> class from a string.
         /// </summary>
         /// <param name = "s">A string with the regular expression.</param>
-        public RegExp(string s, string anyCharCharset = null)
-            : this(s, anyCharCharset, RegExpSyntaxOptions.All)
+        /// <param name = "anyCharAlphabet">A string with the regular expression.</param>
+        public RegExp(string s, string anyCharAlphabet = null)
+            : this(s, anyCharAlphabet, RegExpSyntaxOptions.All)
         {
         }
 
@@ -82,15 +83,16 @@ namespace Fare
         ///   Initializes a new instance of the <see cref = "RegExp" /> class from a string.
         /// </summary>
         /// <param name = "s">A string with the regular expression.</param>
+        /// <param name = "anyCharAlphabet">A string with the regular expression.</param>
         /// <param name = "syntaxFlags">Boolean 'or' of optional syntax constructs to be enabled.</param>
-        public RegExp(string s, string anyCharCharset, RegExpSyntaxOptions syntaxFlags)
+        public RegExp(string s, string anyCharAlphabet, RegExpSyntaxOptions syntaxFlags)
         {
             this.b = s;
             this.flags = syntaxFlags;
             RegExp e;
-            if (anyCharCharset != null)
+            if (anyCharAlphabet != null)
             {
-                this.anyCharCharset = anyCharCharset;
+                this.anyCharAlphabet = anyCharAlphabet;
             }
             if (s.Length == 0)
             {
@@ -488,7 +490,7 @@ namespace Fare
                     break;
                 case Kind.RegexpAnyChar:
                 {
-                    a = this.anyCharCharset != null ? BasicAutomata.MakeCharSet(this.anyCharCharset) : BasicAutomata.MakeAnyChar();
+                    a = this.anyCharAlphabet != null ? BasicAutomata.MakeCharSet(this.anyCharAlphabet) : BasicAutomata.MakeAnyChar();
                     break;
                 }
                 case Kind.RegexpEmpty:
@@ -649,46 +651,56 @@ namespace Fare
             return sb;
         }
 
-        public string UsedChars()
+        /// <summary>
+        /// This method parses given regexp searching for chars contained in matches matching that regexp pattern. It uses AnyCharAlphabet as set of chars possible for any-char symbol "." and related char classes (\D,\d,\W,\w,\S,\s).
+        /// If AnyCharAlphabet is not defined, it uses previously used MakeAnyPrintableASCIIChar for that.
+        /// </summary>
+        /// <returns></returns>
+        public string UsedAlphabet()
         {
             var sb1 = new StringBuilder();
-            var str = (this.ToAlphabetStringBuilder(sb1).ToString()).Cast<char>().Distinct().OrderBy(x=>x).ToArray();
+            var str = (this.ToStringBuilderForUsedAlphabet(sb1).ToString()).Cast<char>().Distinct().OrderBy(x=>x).ToArray();
             return new string(str);
         }
         
-        private StringBuilder ToAlphabetStringBuilder(StringBuilder sb)
+        /// <summary>
+        /// Helper method for saving possible chars used in regexp according of its structure.
+        /// </summary>
+        /// <param name="sb">stringbuilder used too store data about that alphabet.</param>
+        /// <returns></returns>
+        private StringBuilder ToStringBuilderForUsedAlphabet(StringBuilder sb)
         {
             switch (kind)
             {
                 case Kind.RegexpUnion:
                 case Kind.RegexpConcatenation:
-                    exp1.ToAlphabetStringBuilder(sb);
-                    exp2.ToAlphabetStringBuilder(sb);
+                    exp1.ToStringBuilderForUsedAlphabet(sb);
+                    exp2.ToStringBuilderForUsedAlphabet(sb);
                     break;
                 case Kind.RegexpIntersection:
                     var sb1 = new StringBuilder();
                     var sb2 = new StringBuilder();
-                    var st1 = exp1.ToAlphabetStringBuilder(sb1).ToString().ToCharArray();
-                    var st2 = exp2.ToAlphabetStringBuilder(sb2).ToString().ToCharArray();
+                    var st1 = exp1.ToStringBuilderForUsedAlphabet(sb1).ToString().ToCharArray();
+                    var st2 = exp2.ToStringBuilderForUsedAlphabet(sb2).ToString().ToCharArray();
                     sb.Append(st1.Intersect(st2).Distinct());
                     break;
                 case Kind.RegexpOptional:
                 case Kind.RegexpRepeat:
                 case Kind.RegexpRepeatMin:
                 case Kind.RegexpRepeatMinMax:
-                    exp1.ToAlphabetStringBuilder(sb);
+                    exp1.ToStringBuilderForUsedAlphabet(sb);
                     break;
                 case Kind.RegexpComplement:
                     var sbc = new StringBuilder();
-                    var stc = exp1.ToAlphabetStringBuilder(sbc).ToString().ToCharArray();
-                    if (this.anyCharCharset != null)
+                    var stc = exp1.ToStringBuilderForUsedAlphabet(sbc).ToString().ToCharArray();
+                    if (this.anyCharAlphabet != null)
                     {
-                        sb.Append(this.anyCharCharset.ToCharArray().Where(x => !stc.Contains(x)));
+                        sb.Append(this.anyCharAlphabet.ToCharArray().Where(x => !stc.Contains(x)));
                     }
                     else
                     {
                         var sba = new StringBuilder();
-                        var sta = MakeAnyPrintableASCIIChar(this.anyCharCharset).ToAlphabetStringBuilder(sba).ToString().ToCharArray();
+                        var sta = MakeAnyPrintableASCIIChar(this.anyCharAlphabet).ToStringBuilderForUsedAlphabet(sba).ToString().ToCharArray();
                         sb.Append(sta.Where(x => !stc.Contains(x)));
                     }
                     break;
@@ -703,20 +715,20 @@ namespace Fare
                     break;
                 case Kind.RegexpAnyChar:
                 case Kind.RegexpAnyString:
-                    if (this.anyCharCharset != null)
+                    if (this.anyCharAlphabet != null)
                     {
-                        sb.Append(this.anyCharCharset);
+                        sb.Append(this.anyCharAlphabet);
                     }
                     else
                     {
-                        MakeAnyPrintableASCIIChar(this.anyCharCharset).ToAlphabetStringBuilder(sb);    
+                        MakeAnyPrintableASCIIChar(this.anyCharAlphabet).ToStringBuilderForUsedAlphabet(sb);    
                     }
 
                     break;
                 case Kind.RegexpEmpty:
-                    if (this.anyCharCharset != null)
+                    if (this.anyCharAlphabet != null)
                     {
-                        foreach (char ch in this.anyCharCharset)
+                        foreach (char ch in this.anyCharAlphabet)
                         {
                             if (Char.IsWhiteSpace(ch)) sb.Append(ch);
                         }
@@ -922,7 +934,7 @@ namespace Fare
                 RegExp e = this.ParseCharClasses();
                 if (negate)
                 {
-                    e = ExcludeChars(e, MakeAnyPrintableASCIIChar(this.anyCharCharset));
+                    e = ExcludeChars(e, MakeAnyPrintableASCIIChar(this.anyCharAlphabet));
                 }
 
                 if (!this.Match(']'))
@@ -940,7 +952,7 @@ namespace Fare
         {
             if (this.Match('.'))
             {
-                return MakeAnyPrintableASCIIChar(this.anyCharCharset);
+                return MakeAnyPrintableASCIIChar(this.anyCharAlphabet);
             }
 
             if (this.Check(RegExpSyntaxOptions.Empty) && this.Match('#'))
@@ -1062,10 +1074,10 @@ namespace Fare
                 {
                     RegExp digitChars = MakeCharRange('0', '9');
                     return inclusion
-                        ? this.anyCharCharset == null 
+                        ? this.anyCharAlphabet == null 
                             ? digitChars 
-                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharCharset.ToCharArray().Where(char.IsDigit).ToArray()))
-                        : ExcludeChars(digitChars, MakeAnyPrintableASCIIChar(this.anyCharCharset)); 
+                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharAlphabet.ToCharArray().Where(char.IsDigit).ToArray()))
+                        : ExcludeChars(digitChars, MakeAnyPrintableASCIIChar(this.anyCharAlphabet)); 
                 }
 
                 // Whitespace chars only.
@@ -1073,10 +1085,10 @@ namespace Fare
                 {
                     RegExp whitespaceChars = MakeUnion(MakeChar(' '), MakeChar('\t'));
                     return inclusion
-                        ? this.anyCharCharset == null 
+                        ? this.anyCharAlphabet == null 
                             ? whitespaceChars
-                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharCharset.ToCharArray().Where(char.IsWhiteSpace).ToArray()))
-                        : ExcludeChars(whitespaceChars, MakeAnyPrintableASCIIChar(this.anyCharCharset)); 
+                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharAlphabet.ToCharArray().Where(char.IsWhiteSpace).ToArray()))
+                        : ExcludeChars(whitespaceChars, MakeAnyPrintableASCIIChar(this.anyCharAlphabet)); 
                 }
 
                 // Word character. Range is [A-Za-z0-9_]
@@ -1085,11 +1097,11 @@ namespace Fare
                     var ranges = new[] {MakeCharRange('A', 'Z'), MakeCharRange('a', 'z'), MakeCharRange('0', '9')};
                     RegExp wordChars = ranges.Aggregate(MakeChar('_'), MakeUnion);
                     return inclusion
-                        ? this.anyCharCharset == null 
+                        ? this.anyCharAlphabet == null 
                             ? wordChars
-                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharCharset.ToCharArray()
+                            : MakeAnyPrintableASCIIChar(new string((char[])this.anyCharAlphabet.ToCharArray()
                                 .Where(x => char.IsLetter(x) || char.IsDigit(x) || x == '_').ToArray()))
-                        : ExcludeChars(wordChars, MakeAnyPrintableASCIIChar(this.anyCharCharset));
+                        : ExcludeChars(wordChars, MakeAnyPrintableASCIIChar(this.anyCharAlphabet));
                 }
             }
             
