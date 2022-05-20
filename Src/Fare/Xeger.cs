@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Text;
 
 namespace Fare
@@ -33,13 +34,15 @@ namespace Fare
 
         private readonly Automaton automaton;
         private readonly Random random;
+        private readonly string anyCharAlphabet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
         /// </summary>
         /// <param name="regex">The regex.</param>
         /// <param name="random">The random.</param>
-        public Xeger(string regex, Random random)
+        /// <param name="anyCharAlphabet">The list of characters used for computing the possible values for classes "." "\s", "\d", "\w" (and "\S", "\D", "\W"). It does not check explicitly defined chars in regexp.</param>
+        public Xeger(string regex, Random random, string anyCharAlphabet = null)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -51,10 +54,21 @@ namespace Fare
                 throw new ArgumentNullException("random");
             }
 
+            if (anyCharAlphabet != null)
+            {
+                this.anyCharAlphabet = anyCharAlphabet;
+            }
 
             regex = RemoveStartEndMarkers(regex);
-            this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
+            var rx = new RegExp(regex, anyCharAlphabet, AllExceptAnyString);
+            this.UsedAlphabet = rx.UsedAlphabet();
+            this.automaton = rx.ToAutomaton();
             this.random = random;
+        }
+
+        public string UsedAlphabet
+        {
+            get;
         }
 
         /// <summary>
@@ -106,16 +120,15 @@ namespace Fare
                 return;
             }
 
-            int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            int option = Xeger.GetRandomInt(0, nroptions, random);
-            if (state.Accept && option == 0)
+            if (state.Accept)
             {
-                // 0 is considered stop.
-                return;
+
+                var optionsCount = transitions.Sum(x => x.Max - x.Min + 1);
+                if (this.random.Next(optionsCount + 1) == 0) return;
             }
 
-            // Moving on to next transition.
-            Transition transition = transitions[option - (state.Accept ? 1 : 0)];
+            var transition = transitions.RandomItemWithProbability(x => x.Max - x.Min + 1);
+            
             this.AppendChoice(builder, transition);
             Generate(builder, transition.To);
         }

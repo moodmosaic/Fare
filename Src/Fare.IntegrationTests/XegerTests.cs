@@ -36,10 +36,50 @@ namespace Fare.IntegrationTests
                     return generatedValue;
                 })
                 .ToArray();
+            
+            sut = new Fare.Xeger(pattern, random, "aAbBcC 1");
+
+            // Act
+            result = Enumerable.Repeat(0, repeatCount)
+                .Select(_ =>
+                {
+                    var generatedValue = sut.Generate();
+                    this._testOutput.WriteLine($"Generated value: {generatedValue}");
+                    return generatedValue;
+                })
+                .ToArray();
 
             // Assert
-            Assert.All(result, regex => Assert.Matches(pattern, regex));
+            Assert.All(result, regex => Assert.Matches(pattern, regex));            
         }
+        
+        [Theory, MemberData(nameof(RegexPatternCharset))]
+        public void GeneratedTextIsCorrectCharset(string pattern, string output)
+        {
+            // Arrange
+            const int repeatCount = 3;
+            
+            var randomSeed = Environment.TickCount;
+            this._testOutput.WriteLine($"Random seed: {randomSeed}");
+            
+            var random = new Random(randomSeed);
+            
+            var sut = new Fare.Xeger(pattern, random);
+
+            // Act
+            Tuple<string,string>[] result = Enumerable.Repeat(0, repeatCount)
+                .Select(_ =>
+                {
+                    var generatedValue0 = sut.Generate();
+                    var generatedValue1 = sut.UsedAlphabet;
+                    this._testOutput.WriteLine($"charset value: {generatedValue1}");
+                    return new Tuple<string,string>(generatedValue0, generatedValue1);
+                })
+                .ToArray();
+            
+            // Assert
+            Assert.All(result, regex => Assert.True(output == null || regex.Item2 == new string(output.Cast<char>().Distinct().OrderBy(x=>x).ToArray())));            
+        }        
 
 #if REX_AVAILABLE
         [Theory, MemberData(nameof(RegexPatternTestCases))]
@@ -87,7 +127,7 @@ namespace Fare.IntegrationTests
             "x[0-9A-Z]",
             "[^A-M]in",
             ".gr",
-            @"\(.*l",
+            //@"\(.*l", - on "classic" went sometimes overflow (even before my changes)
             "W*in",
             "[xX][0-9a-z]",
             @"\(\(\(ab\)*c\)*d\)\(ef\)*\(gh\)\{2\}\(ij\)*\(kl\)*\(mn\)*\(op\)*\(qr\)*",
@@ -121,9 +161,72 @@ namespace Fare.IntegrationTests
             @"\Sabc\S{3}111",
             @"^\S\S  (\S)+$",
             @"\\abc\\d",
-            @"\w+1\w{4}",
+            //@"\w+1\w{4}",
             @"\W+1\w?2\W{4}",
             @"^[^$]$"
+        };
+        
+        public static TheoryData<string, string> RegexPatternCharset => new TheoryData<string, string>
+        {
+            {"[ab]{4,6}","ab"},
+            {"[ab]{4,6}c","abc"},
+            {"(a|b)*ab","ab"},
+            {"[A-Za-z0-9]","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"},
+            {"[A-Za-z0-9_]","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"},
+            {"[A-Za-z]","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"},
+            {"[ \t]"," \t"},
+            {@"[(?<=\W)(?=\w)|(?<=\w)(?=\W)]",null},
+            {"[\x00-\x1F\x7F]",null},
+            {"[0-9]","0123456789"},
+            {"[^0-9]",null},
+            {"[\x21-\x7E]",null},
+            {"[a-z]","abcdefghijklmnopqrstuvwxyz"},
+            {"[\x20-\x7E]",null},
+            {"[ \t\r\n\v\f]"," \t\r\n\v\f"},
+            {"[^ \t\r\n\v\f]",null},
+            {"[A-Z]","ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
+            {"[A-Fa-f0-9]","ABCDEFabcdef0123456789"},
+            {"in[du]","indu"},
+            {"x[0-9A-Z]","x0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
+            {"[^A-M]in",null},
+            {".gr",null},
+            //@"\(.*l", - on "classic" went sometimes overflow (even before my changes)
+            {"W*in","Win"},
+            {"[xX][0-9a-z]","X0123456789abcdefghijklmnopqrstuvwxyz"},
+            {@"\(\(\(ab\)*c\)*d\)\(ef\)*\(gh\)\{2\}\(ij\)*\(kl\)*\(mn\)*\(op\)*\(qr\)*",null},
+            {@"((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+)",null},
+            {@"^http\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$",null},
+            {@"^([1-zA-Z0-1@.\s]{1,255})$",null},
+            {"[A-Z][0-9A-Z]{10}","ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"},
+            {"[A-Z][A-Za-z0-9]{10}","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"},
+            {"[A-Za-z0-9]{11}","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"},
+            {"[A-Za-z]{11}","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"},
+            {@"^[a-zA-Z''-'\s]{1,40}$",null},
+            {@"^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$",null},
+            {@"a[a-z]",@"abcdefghijklmnopqrstuvwxyz"},
+            {@"[1-9][0-9]",@"0123456789"},
+            {@"\d{8}",@"0123456789"},
+            {@"\d{5}(-\d{4})?",@"0123456789-"},
+            {@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",@"0123456789."},
+            {@"\D{8}",null},
+            {@"\D{5}(-\D{4})?",null},
+            {@"\D{1,3}\.\D{1,3}\.\D{1,3}\.\D{1,3}",null},
+            {@"^(?:[a-z0-9])+$",null},
+            {@"^(?i:[a-z0-9])+$",null},
+            {@"^(?s:[a-z0-9])+$",null},
+            {@"^(?m:[a-z0-9])+$",null},
+            {@"^(?n:[a-z0-9])+$",null},
+            {@"^(?x:[a-z0-9])+$",null},
+            {"\\S+.*",null},
+            {@"^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$",null},
+            {@"^\s1\s+2\s3\s?4\s*$",null},
+            {@"(\s123)+",null},
+            {@"\Sabc\S{3}111",null},
+            {@"^\S\S  (\S)+$",null},
+            {@"\\abc\\d",null},
+            //{@"\w+1\w{4}",null},
+            {@"\W+1\w?2\W{4}",null},
+            {@"^[^$]$",null},
         };
     }
 }
