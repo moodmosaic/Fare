@@ -31,7 +31,7 @@ namespace Fare
     {
         private const RegExpSyntaxOptions AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
 
-        private readonly Automaton automaton;
+        private readonly Automaton automation;
         private readonly Random random;
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Fare
 
 
             regex = RemoveStartEndMarkers(regex);
-            this.automaton = new RegExp(regex, AllExceptAnyString).ToAutomaton();
+            this.automation = new RegExp(regex, AllExceptAnyString).ToAutomaton();
             this.random = random;
         }
 
@@ -76,7 +76,7 @@ namespace Fare
         public string Generate()
         {
             var builder = new StringBuilder();
-            this.Generate(builder, automaton.Initial);
+            this.Generate(builder, this.automation.Initial);
             return builder.ToString();
         }
 
@@ -95,29 +95,32 @@ namespace Fare
 
         private void Generate(StringBuilder builder, State state)
         {
-            var transitions = state.GetSortedTransitions(true);
-            if (transitions.Count == 0)
+            while (true)
             {
-                if (!state.Accept)
+                var transitions = state.GetSortedTransitions(true);
+                if (transitions.Count == 0)
                 {
-                    throw new InvalidOperationException("state");
+                    if (!state.Accept)
+                    {
+                        throw new InvalidOperationException("The regex is not solvable");
+                    }
+
+                    return;
                 }
 
-                return;
-            }
+                int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
+                int option = Xeger.GetRandomInt(0, nroptions, random);
+                if (state.Accept && option == 0)
+                {
+                    // 0 is considered stop.
+                    return;
+                }
 
-            int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-            int option = Xeger.GetRandomInt(0, nroptions, random);
-            if (state.Accept && option == 0)
-            {
-                // 0 is considered stop.
-                return;
+                // Moving on to next transition.
+                Transition transition = transitions[option - (state.Accept ? 1 : 0)];
+                this.AppendChoice(builder, transition);
+                state = transition.To;
             }
-
-            // Moving on to next transition.
-            Transition transition = transitions[option - (state.Accept ? 1 : 0)];
-            this.AppendChoice(builder, transition);
-            Generate(builder, transition.To);
         }
 
         private void AppendChoice(StringBuilder builder, Transition transition)

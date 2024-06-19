@@ -91,6 +91,11 @@ namespace Fare
         /// </returns>
         public static Automaton MakeCharRange(char min, char max)
         {
+            if (min > max)
+            {
+                throw new ArgumentException($"Invalid character range: from '{min}' to '{max}'");
+            }
+
             if (min == max)
             {
                 return BasicAutomata.MakeChar(min);
@@ -101,10 +106,7 @@ namespace Fare
             var s2 = new State();
             a.Initial = s1;
             s2.Accept = true;
-            if (min <= max)
-            {
-                s1.Transitions.Add(new Transition(min, max, s2));
-            }
+            s1.Transitions.Add(new Transition(min, max, s2));
 
             a.IsDeterministic = true;
             return a;
