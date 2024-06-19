@@ -6,10 +6,6 @@
 
     <Features>IOperation</Features>
     <Configurations>Debug;Release;Verify</Configurations>
-
-    <!-- A workaround for the issue .NET Core cannot build project if it contains .NET 3.5 target.
-         See more detail here: https://github.com/Microsoft/msbuild/issues/1333 -->
-    <FrameworkPathOverride Condition=" '$(TargetFramework)'=='net35' ">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
   </PropertyGroup>
 
   <Choose>
