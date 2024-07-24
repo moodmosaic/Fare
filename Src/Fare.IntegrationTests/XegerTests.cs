@@ -71,7 +71,7 @@ namespace Fare.IntegrationTests
         public static TheoryData<string> BadRegexPatternTestCases => new TheoryData<string>
         {
             @"\w{7,1}",
-            @"[\w-.]+",  // unescaped "-" is interpreted as as invalid character range, see https://learn.microsoft.com/dotnet/standard/base-types/character-classes-in-regular-expressions#positive-character-group--
+            @"[\w-.]+", // Unescaped "-" is interpreted as as invalid character range, see https://learn.microsoft.com/dotnet/standard/base-types/character-classes-in-regular-expressions#positive-character-group--/.
             @"[z-a]",
             @"[[",
         };
