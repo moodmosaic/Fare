@@ -41,6 +41,12 @@ namespace Fare.IntegrationTests
             Assert.All(result, regex => Assert.Matches(pattern, regex));
         }
 
+        [Theory, MemberData(nameof(BadRegexPatternTestCases))]
+        public void RegexCanNotBeParsed(string pattern)
+        {
+            Assert.ThrowsAny<Exception>(() => new Fare.Xeger(pattern, new Random()).Generate());
+        }
+
 #if REX_AVAILABLE
         [Theory, MemberData(nameof(RegexPatternTestCases))]
         public void GeneratedTextIsCorrectWithRexEngine(string pattern)
@@ -62,6 +68,13 @@ namespace Fare.IntegrationTests
             Assert.All(result, regex => Assert.Matches(pattern, regex));
         }
 #endif
+        public static TheoryData<string> BadRegexPatternTestCases => new TheoryData<string>
+        {
+            @"\w{7,1}",
+            @"[\w-.]+", // Unescaped "-" is interpreted as as invalid character range, see https://learn.microsoft.com/dotnet/standard/base-types/character-classes-in-regular-expressions#positive-character-group--/.
+            @"[z-a]",
+            @"[[",
+        };
 
         public static TheoryData<string> RegexPatternTestCases => new TheoryData<string>
         {
@@ -123,7 +136,10 @@ namespace Fare.IntegrationTests
             @"\\abc\\d",
             @"\w+1\w{4}",
             @"\W+1\w?2\W{4}",
-            @"^[^$]$"
+            @"^[^$]$",
+            @"[\w\-.]",
+            @"[\w.-]",
+            @"[-\w]",
         };
     }
 }
