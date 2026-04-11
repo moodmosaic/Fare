@@ -18,12 +18,13 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Fare
 {
     /// <summary>
-    /// An object that will generate text from a regular expression. In a way, 
+    /// An object that will generate text from a regular expression. In a way,
     /// it's the opposite of a regular expression matcher: an instance of this class
     /// will produce text that is guaranteed to match the regular expression passed in.
     /// </summary>
@@ -31,8 +32,17 @@ namespace Fare
     {
         private const RegExpSyntaxOptions AllExceptAnyString = RegExpSyntaxOptions.All & ~RegExpSyntaxOptions.Anystring;
 
+        // Base of the exponential bias applied when picking a transition.
+        // A transition leading to a state at distance d from an accept state is weighted
+        // by BiasBase^(-d), so transitions that make progress toward acceptance are
+        // favoured over back-edges. BiasBase == 1 reproduces the original uniform walk;
+        // BiasBase -> infinity collapses to shortest-path generation. 2.0 is a good
+        // middle ground: walks stay random but cannot wander for thousands of steps.
+        private const double BiasBase = 2.0;
+
         private readonly Automaton automation;
         private readonly Random random;
+        private readonly Dictionary<State, int> distanceToAccept;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Xeger"/> class.
@@ -55,6 +65,63 @@ namespace Fare
             regex = RemoveStartEndMarkers(regex);
             this.automation = new RegExp(regex, AllExceptAnyString).ToAutomaton();
             this.random = random;
+            this.distanceToAccept = ComputeDistanceToAccept(this.automation);
+        }
+
+        /// <summary>
+        /// Computes the shortest distance (in number of transitions) from every reachable
+        /// state to the nearest accept state, using a reverse BFS from all accept states.
+        /// States that cannot reach any accept state are absent from the returned map.
+        /// </summary>
+        private static Dictionary<State, int> ComputeDistanceToAccept(Automaton automaton)
+        {
+            var states = automaton.GetStates();
+
+            // Build reverse adjacency: for every transition s -> t, record s as a predecessor of t.
+            var predecessors = new Dictionary<State, List<State>>(states.Count);
+            foreach (var s in states)
+            {
+                predecessors[s] = new List<State>();
+            }
+            foreach (var s in states)
+            {
+                foreach (var t in s.Transitions)
+                {
+                    if (!predecessors.TryGetValue(t.To, out var preds))
+                    {
+                        preds = new List<State>();
+                        predecessors[t.To] = preds;
+                    }
+                    preds.Add(s);
+                }
+            }
+
+            var distance = new Dictionary<State, int>(states.Count);
+            var queue = new Queue<State>();
+            foreach (var s in states)
+            {
+                if (s.Accept)
+                {
+                    distance[s] = 0;
+                    queue.Enqueue(s);
+                }
+            }
+
+            while (queue.Count > 0)
+            {
+                var s = queue.Dequeue();
+                var d = distance[s];
+                foreach (var pred in predecessors[s])
+                {
+                    if (!distance.ContainsKey(pred))
+                    {
+                        distance[pred] = d + 1;
+                        queue.Enqueue(pred);
+                    }
+                }
+            }
+
+            return distance;
         }
 
         /// <summary>
@@ -93,8 +160,10 @@ namespace Fare
             return random.Next(maxForRandom) + min;
         }
 
-        private void Generate(StringBuilder builder, State state)
+        private void Generate(StringBuilder builder, State initialState)
         {
+            var state = initialState;
+
             while (true)
             {
                 var transitions = state.GetSortedTransitions(true);
@@ -108,16 +177,59 @@ namespace Fare
                     return;
                 }
 
-                int nroptions = state.Accept ? transitions.Count : transitions.Count - 1;
-                int option = Xeger.GetRandomInt(0, nroptions, random);
-                if (state.Accept && option == 0)
+                // Weight each outgoing transition by BiasBase^(-distanceToAccept(target)).
+                // Targets closer to an accept state get exponentially more probability mass,
+                // so the random walk is naturally pulled toward acceptance instead of
+                // wandering through back-edges. If the current state is itself an accept
+                // state, "stop" is included as an additional option with weight 1 (i.e.
+                // the same weight a self-loop on a distance-0 state would receive).
+                var weights = new double[transitions.Count];
+                double totalWeight = 0.0;
+                for (int i = 0; i < transitions.Count; i++)
                 {
-                    // 0 is considered stop.
-                    return;
+                    var w = this.distanceToAccept.TryGetValue(transitions[i].To, out int d)
+                        ? Math.Pow(BiasBase, -d) :
+                        0.0; // Target cannot reach any accept state (a "dead" state). Avoid it.
+
+                    weights[i] = w;
+                    totalWeight += w;
+                }
+
+                double stopWeight = state.Accept ? 1.0 : 0.0;
+                totalWeight += stopWeight;
+
+                if (totalWeight == 0.0)
+                {
+                    // We're at a non-accept state with no usable outgoing transitions:
+                    // the automaton is malformed for our purposes.
+                    throw new InvalidOperationException("The regex is not solvable");
+                }
+
+                double r = this.random.NextDouble() * totalWeight;
+                if (state.Accept)
+                {
+                    if (r < stopWeight)
+                    {
+                        // 0 is considered stop.
+                        return;
+                    }
+
+                    r -= stopWeight;
+                }
+
+                int chosen = transitions.Count - 1;
+                for (int i = 0; i < transitions.Count; i++)
+                {
+                    r -= weights[i];
+                    if (r <= 0.0)
+                    {
+                        chosen = i;
+                        break;
+                    }
                 }
 
                 // Moving on to next transition.
-                Transition transition = transitions[option - (state.Accept ? 1 : 0)];
+                Transition transition = transitions[chosen];
                 this.AppendChoice(builder, transition);
                 state = transition.To;
             }
