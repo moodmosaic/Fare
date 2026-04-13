@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  ARTIFACTS: ${{ github.workspace }}/artifacts
+
 jobs:
   build:
     runs-on: windows-latest
@@ -44,19 +47,20 @@ jobs:
           dotnet pack Src/Fare/Fare.csproj
           --configuration Release
           --no-build
-          --output ./artifacts
+          --output ${{ env.ARTIFACTS }}
           /p:Version=${{ steps.version.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
-          path: ./artifacts/*
+          path: ${{ env.ARTIFACTS }}/*
 
       - name: Push to NuGet
         if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
         run: >
-          dotnet nuget push "./artifacts/*.nupkg"
+          dotnet nuget push ${{ env.ARTIFACTS }}/*.nupkg
           --api-key ${{ secrets.NUGET_API_KEY }}
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
@@ -66,4 +70,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: ./artifacts/*
+          files: ${{ env.ARTIFACTS }}/*
