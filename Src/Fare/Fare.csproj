@@ -20,7 +20,18 @@
 
     <Authors>Nikos Baxevanis</Authors>
     <PackageProjectUrl>https://github.com/moodmosaic/Fare</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/moodmosaic/Fare/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Regex Test NFA DFA Automaton</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/moodmosaic/Fare</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
